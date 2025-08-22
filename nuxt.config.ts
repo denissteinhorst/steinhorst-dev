@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  ssr: true,
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   modules: [
@@ -10,5 +11,14 @@ export default defineNuxtConfig({
     'nuxt-aos',
     '@nuxtjs/seo',
     '@nuxtjs/color-mode'
-  ]
+  ],
+  vite: {
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: '@use "~/assets/scss/app.scss" as *;'
+        }
+      }
+    }
+  }
 })
