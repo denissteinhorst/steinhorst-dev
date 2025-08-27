@@ -1,0 +1,106 @@
+@use "sass:map";
+
+/*
+ * Design tokens (SCSS)
+ * - Colors: base palette organized in a map
+ * - Typography: font-size scale in a map
+ * - Themes: light/dark maps for text/background/surfaces
+ * - Helpers: small functions + mixin to expose CSS variables
+ */
+
+// Colors (base palette)
+$colors: (
+  // branding / interactive
+  primary: #9861ff,
+  link: #9861ff,
+  link-hover: #c7aaff,
+
+  secondary: #00c2ff,
+  success: #22c55e,
+  warning: #f59e0b,
+  danger: #ef4444,
+  info: #3b82f6
+) !default;
+
+// Typography scale (rem)
+$font-sizes: (
+  xs: 0.75rem,
+  sm: 0.875rem,
+  base: 1rem,
+  lg: 1.125rem,
+  xl: 1.25rem,
+  "2xl": 1.5rem,
+  "3xl": 1.875rem,
+  "4xl": 2.25rem,
+  "5xl": 3rem,
+  "6xl": 3.75rem,
+) !default;
+
+// Theme tokens
+$theme-light: (
+  heading: #404040,
+  text: #495665,
+  bg: #fdfdfd,
+  surface: #ffffff,
+  border: #36415399,
+) !default;
+
+$theme-dark: (
+  heading: #e5e5e5,
+  text: #d1d5db,
+  bg: #1d2129,
+  surface: #232833,
+  border: #e5e7ebb3,
+) !default;
+
+// Helpers
+@function color($name) {
+  @return map.get($colors, $name);
+}
+
+@function fs($scale) {
+  @return map.get($font-sizes, $scale);
+}
+
+@mixin theme-vars($theme) {
+  // semantic theme variables
+  --color-heading: #{map.get($theme, heading)};
+  --color-text: #{map.get($theme, text)};
+  --color-bg: #{map.get($theme, bg)};
+  --color-surface: #{map.get($theme, surface)};
+  --color-border: #{map.get($theme, border)};
+
+  // expose palette entries as CSS vars as well
+  --color-primary: #{color(primary)};
+  --color-link: #{color(link)};
+  --color-link-hover: #{color(link-hover)};
+  --color-secondary: #{color(secondary)};
+  --color-success: #{color(success)};
+  --color-warning: #{color(warning)};
+  --color-danger: #{color(danger)};
+  --color-info: #{color(info)};
+}
+
+// Export variables (light as default); Nuxt Color Mode usually toggles a `.dark` class
+:root {
+  @include theme-vars($theme-light);
+
+  // font-size variables
+  --font-size-xs: #{fs(xs)};
+  --font-size-sm: #{fs(sm)};
+  --font-size-base: #{fs(base)};
+  --font-size-lg: #{fs(lg)};
+  --font-size-xl: #{fs(xl)};
+  --font-size-2xl: #{fs("2xl")};
+  --font-size-3xl: #{fs("3xl")};
+  --font-size-4xl: #{fs("4xl")};
+  --font-size-5xl: #{fs("5xl")};
+  --font-size-6xl: #{fs("6xl")};
+
+  // radii & shadows
+  --radius-default: 8px;
+  --shadow-default: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+    rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+    rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+}
