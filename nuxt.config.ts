@@ -10,8 +10,15 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     'nuxt-aos',
     '@nuxtjs/seo',
-    '@nuxtjs/color-mode'
+    '@nuxtjs/color-mode',
+    'nuxt-strapi-blocks-renderer'
   ],
+  runtimeConfig: {
+    public: {
+      api_url: process.env.STRAPI_URL || 'http://localhost:1337',
+      api_token: process.env.STRAPI_TOKEN || 'public',
+    }
+  },
   vite: {
     css: {
       preprocessorOptions: {

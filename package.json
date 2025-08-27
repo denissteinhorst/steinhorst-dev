@@ -23,6 +23,7 @@
     "eslint": "^9.33.0",
     "nuxt": "^4.0.3",
     "nuxt-aos": "^1.2.5",
+    "nuxt-strapi-blocks-renderer": "^1.1.0",
     "typescript": "^5.9.2",
     "vue": "^3.5.18",
     "vue-chartjs": "^5.3.2",

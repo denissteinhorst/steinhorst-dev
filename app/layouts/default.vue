@@ -6,6 +6,7 @@ import "~/assets/scss/app.scss";
   <UApp>
     <NuxtRouteAnnouncer />
     <div class="layout-root">
+      <main-navigation />
       <main id="main-content" tabindex="-1">
         <NuxtPage />
       </main>
