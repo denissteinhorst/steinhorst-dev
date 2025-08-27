@@ -2,6 +2,8 @@
  * Strapi API helper functions
  * @returns {object} - Strapi API helper functions
  */
+import type { StrapiImage } from '~/types/types';
+
 export const useStrapi = () => {
 
   const locale = ref('de'); // TODO: Replace with useI18n() when i18n is set up
@@ -99,7 +101,39 @@ export const useStrapi = () => {
     }
   };
 
+  /**
+   * Build a full image URL from a Strapi image object and desired format key.
+   * Uses runtimeConfig public.api_base (or public.api_url) as the base.
+   * Falls back to the image.url value if formats are missing.
+   */
+  const buildImageUrl = (
+    image?: StrapiImage | null,
+    format: string = 'small'
+  ): string | null => {
+    if (!image) return null;
+
+    const runtime = useRuntimeConfig();
+    const base = (runtime.public && (runtime.public.api_base || runtime.public.api_url)) || '';
+
+    // Try formats first (e.g. image.formats.small.url), then fallback to image.url
+    const formats = image.formats as Record<string, { url?: string } | undefined> | undefined;
+    const formatObj = formats ? formats[format] : undefined;
+    const relative = formatObj?.url ?? image.url ?? null;
+    if (!relative) return null;
+
+    // If the URL is already absolute, return it
+    if (/^https?:\/\//i.test(relative) || /^\/\//.test(relative)) {
+      return relative;
+    }
+
+    // Ensure proper slashes when concatenating
+    const baseTrim = base.replace(/\/+$/g, '');
+    const rel = relative.startsWith('/') ? relative : `/${relative}`;
+    return baseTrim ? `${baseTrim}${rel}` : rel;
+  };
+
   return {
-    cmsRequest
+    cmsRequest,
+    buildImageUrl,
   };
 };

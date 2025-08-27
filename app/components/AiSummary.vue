@@ -1,6 +1,4 @@
 <script setup lang="ts">
-// props
-
 const props = defineProps<{
   title: string;
   target: string;
@@ -43,7 +41,7 @@ const props = defineProps<{
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 $block: "ai-summary";
 
 .#{$block} {
@@ -99,7 +97,7 @@ $block: "ai-summary";
   &__icon {
     height: 1rem;
     width: 1rem;
-    color: rgb(196, 181, 253); // text-violet-300
+    color: rgb(196, 181, 253);
     transition: transform 150ms ease;
   }
 
@@ -181,7 +179,6 @@ $block: "ai-summary";
     z-index: 5;
   }
 
-  /* Provide per-sparkle CSS variables so particles can be randomized via CSS only */
   .sparkle-wrapper .sparkle:nth-child(1) {
     left: 18%;
     --delay: 0s;
@@ -244,7 +241,6 @@ $block: "ai-summary";
     opacity: 0;
     transform-origin: center;
     filter: saturate(120%);
-    /* Use the per-particle vars defined above; default fallback values included */
     --dur: var(--dur, 0.9s);
     --delay: var(--delay, 0s);
     --scale: var(--scale, 0.6);

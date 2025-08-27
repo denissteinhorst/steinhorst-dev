@@ -15,6 +15,7 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     public: {
+      api_base: process.env.STRAPI_BASE || 'http://localhost:1337',
       api_url: process.env.STRAPI_URL || 'http://localhost:1337',
       api_token: process.env.STRAPI_TOKEN || 'public',
     }

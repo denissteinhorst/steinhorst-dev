@@ -63,3 +63,73 @@ export interface NavigationResponse
   specialLink?: string;
   navigationElements?: NavigationElement[];
 }
+
+// Reusable Strapi image shapes (matches common Strapi media object)
+export interface StrapiImageFormat {
+  ext?: string | null;
+  url?: string;
+  hash?: string;
+  mime?: string;
+  name?: string;
+  path?: string | null;
+  size?: number; // human-friendly (KB/MB) numeric value if available
+  width?: number;
+  height?: number;
+  sizeInBytes?: number;
+}
+
+export type StrapiImageFormats = Record<string, StrapiImageFormat | undefined> | undefined;
+
+export interface StrapiImage {
+  id?: number;
+  documentId?: string;
+  name?: string;
+  alternativeText?: string | null;
+  caption?: string | null;
+  width?: number;
+  height?: number;
+  formats?: StrapiImageFormats;
+  hash?: string;
+  ext?: string | null;
+  mime?: string | null;
+  size?: number | null;
+  url?: string | null;
+  previewUrl?: string | null;
+  provider?: string | null;
+  provider_metadata?: unknown;
+  createdAt?: ISODateString;
+  updatedAt?: ISODateString;
+  publishedAt?: ISODateString | null;
+}
+
+// Hero section specific types (all fields optional by request)
+export interface HeroTag {
+  id?: number;
+  text?: string;
+}
+
+export type HeroLinkType = 'button' | 'anchor' | string;
+
+export interface HeroLink {
+  id?: number;
+  type?: HeroLinkType;
+  icon?: string | null;
+  text?: string | null;
+  link?: string | null;
+  target?: NavigationLinkTarget;
+  tooltip?: string | null;
+}
+
+/**
+ * Hero section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface HeroSectionResponse extends BaseResponse<HeroSectionResponse> {
+  titleBefore?: string;
+  emphasis?: string;
+  titleAfter?: string;
+  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  jumpmark?: string;
+  heroTags?: HeroTag[];
+  heroLinks?: HeroLink[];
+  image?: StrapiImage | null;
+}
