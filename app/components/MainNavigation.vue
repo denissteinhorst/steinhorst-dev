@@ -23,6 +23,10 @@ const showSkipLink = ref(true);
 
 const brandName = computed(() => data.value?.brandName ?? "");
 const brandLink = computed(() => data.value?.brandLink ?? "/");
+
+const specialName = computed(() => data.value?.specialButton ?? "");
+const specialLink = computed(() => data.value?.specialLink ?? "/");
+
 const mainLinks = computed<NavigationElement[]>(
   () => data.value?.navigationElements ?? []
 );
@@ -113,7 +117,7 @@ watch(isMobileMenuOpen, (open) => {
             </li>
 
             <li class="main-navigation__extra">
-              <slot name="extra">AI Summary</slot>
+              <ai-summary :title="specialName" :target="specialLink" />
             </li>
           </ul>
         </nav>
@@ -188,7 +192,7 @@ watch(isMobileMenuOpen, (open) => {
 
                     <!-- Mobile: Extra slot (e.g., AI Summary) -->
                     <li class="main-navigation__mobile-extra">
-                      <slot name="extra"></slot>
+                      <ai-summary :title="specialName" :target="specialLink" />
                     </li>
                   </ul>
                 </nav>
@@ -366,8 +370,7 @@ $block: "main-navigation";
   &__extra {
     display: flex;
     align-items: center;
-    margin-left: 8px;
-    padding-left: 12px;
+    padding-left: 6px;
     border-left: 1px solid rgba(148, 163, 184, 0.4);
   }
 
