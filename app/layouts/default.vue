@@ -10,6 +10,7 @@ import "~/assets/scss/app.scss";
       <main id="main-content" tabindex="-1">
         <NuxtPage />
       </main>
+      <color-selector />
     </div>
   </UApp>
 </template>
