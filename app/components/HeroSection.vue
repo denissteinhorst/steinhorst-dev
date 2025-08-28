@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { BlockNode } from "#strapi-blocks-renderer/types";
-import type { HeroSectionResponse } from "~/types/types";
 
 const { cmsRequest, buildImageUrl } = useStrapi();
 
