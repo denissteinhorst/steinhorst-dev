@@ -338,7 +338,7 @@ $block: "main-navigation";
     list-style: none;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     margin: 0;
     padding: 0;
   }
