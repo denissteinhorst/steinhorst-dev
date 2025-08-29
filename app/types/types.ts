@@ -172,3 +172,51 @@ export interface SkillSectionResponse extends BaseResponse<SkillSectionResponse>
   quickFilter?: QuickFilter;
   skillCards?: SkillCard[];
 }
+
+// Personality section specific types
+export type PersonalityCardVariant = 'polarChart' | 'barChart' | string;
+
+/** Rich text content block structure from CMS */
+export interface RichTextBlock {
+  type: string;
+  format?: string;
+  children?: RichTextBlock[];
+  text?: string;
+}
+
+export interface PolarChartTooltip {
+  id: number;
+  title: string;
+  text: RichTextBlock[];
+  percentage: number;
+}
+
+export interface BarChartTooltip {
+  id: number;
+  title: string;
+  innerSelf: string;
+  outerSelf: string;
+  text: RichTextBlock[];
+  innerValue: number;
+  outerValue: number;
+}
+
+export interface PersonalityCard {
+  id?: number;
+  title?: string;
+  variant?: PersonalityCardVariant;
+  subtitle?: string;
+  text?: string;
+  polarChartTooltips?: PolarChartTooltip[];
+  barChartTooltips?: BarChartTooltip[];
+}
+
+/**
+ * Personality section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface PersonalitySectionResponse extends BaseResponse<PersonalitySectionResponse> {
+  title?: string;
+  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  jumpmark?: string;
+  personalityCards?: PersonalityCard[];
+}

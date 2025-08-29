@@ -4,5 +4,6 @@
   <div class="app">
     <hero-section />
     <skill-section />
+    <personality-section />
   </div>
 </template>
