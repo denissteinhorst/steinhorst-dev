@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { BlockNode } from "#strapi-blocks-renderer/types";
-
 const { cmsRequest, buildImageUrl } = useStrapi();
 
 const { data, pending, error } = await useLazyAsyncData<HeroSectionResponse>(
@@ -16,6 +14,10 @@ const { data, pending, error } = await useLazyAsyncData<HeroSectionResponse>(
       "heroTags",
       "heroLinks",
     ])
+);
+
+const text = computed<BlockNode[]>(
+  () => (data.value?.text ?? []) as BlockNode[]
 );
 </script>
 
@@ -62,7 +64,7 @@ const { data, pending, error } = await useLazyAsyncData<HeroSectionResponse>(
               </h1>
 
               <div class="hero-section__text">
-                <StrapiBlocksText :nodes="(data.text ?? []) as BlockNode[]" />
+                <StrapiBlocksText :nodes="text" />
               </div>
             </header>
           </div>
