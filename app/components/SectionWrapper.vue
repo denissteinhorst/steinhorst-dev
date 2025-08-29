@@ -29,7 +29,6 @@ const handleButtonClick = (event: MouseEvent) => {
 <template>
   <section :id="jumpmark" class="section-wrapper">
     <UContainer class="section-wrapper--container">
-      <!-- SECTION HEADER -->
       <header
         class="section-header"
         :aria-labelledby="'section-heading-' + jumpmark"
@@ -72,10 +71,8 @@ const handleButtonClick = (event: MouseEvent) => {
         </div>
       </header>
 
-      <!-- SECTION BODY -->
       <slot name="content"></slot>
 
-      <!-- SECTION FOOTER -->
       <footer
         v-if="props.footerText && props.footerText.length > 0"
         class="section-footer"

@@ -13,11 +13,9 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
-// Constants
 const modalId = "skills-filter-modal";
 const MODAL_ATTRIBUTE = "data-skill-quickfilter-open";
 
-// Convert props to refs for composable
 const skillCardsRef = toRef(props, "skillCards");
 
 // Use skill search composable

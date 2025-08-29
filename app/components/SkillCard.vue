@@ -41,8 +41,6 @@ const cardId = computed(() => `skill-${props.title}`);
 $block: "skill-card";
 
 .#{$block} {
-  // container visuals moved to BaseCard
-
   &__content {
     display: flex;
     flex-direction: column;

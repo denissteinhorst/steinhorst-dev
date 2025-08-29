@@ -1,16 +1,7 @@
-<script setup lang="ts">
-type UCardVariant = "soft" | "outline" | "solid" | "subtle";
-
-const props = withDefaults(
-  defineProps<{
-    variant?: UCardVariant;
-  }>(),
-  { variant: "soft" }
-);
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <UCard class="base-card" :variant="props.variant" v-bind="$attrs">
+  <UCard class="base-card" variant="soft" v-bind="$attrs">
     <slot></slot>
   </UCard>
 </template>
@@ -18,7 +9,7 @@ const props = withDefaults(
 <style scoped lang="scss">
 $block: "base-card";
 
-.#{"#{$block}"} {
+.#{$block} {
   height: 100%;
   display: flex;
   flex-direction: column;
