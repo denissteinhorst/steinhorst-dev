@@ -18,13 +18,15 @@ export const useStrapi = () => {
    * @param {string[]} fields - Optional array of fields to include
    * @param {string} locale - Optional locale parameter (e.g. 'en', 'de'). If not provided, uses the current i18n locale
    * @param {boolean} isCollection - Whether the endpoint is a collection type (default: false)
+   * @param {string[]} populates - Optional array of relations to populate using dot notation (e.g. ['quickFilter', 'skillCards.skillItems'])
    * @returns Filtered JSON response from Strapi
    */
   const cmsRequest = async <T = unknown>(
     endpoint: string,
     fields: string[] = [],
     customLocale?: string,
-    isCollection: boolean = false
+    isCollection: boolean = false,
+    populates: string[] = []
   ): Promise<T> => {
     try {
       // Input validation for endpoint parameter
@@ -43,6 +45,11 @@ export const useStrapi = () => {
         query.fields = fields;
       }
 
+      // Add populates to query if provided
+      if (populates.length > 0) {
+        query.populates = populates;
+      }
+
       // Add locale to query, preferring:
       // 1. Custom locale if provided
       // 2. Current i18n locale if available
@@ -53,7 +60,7 @@ export const useStrapi = () => {
       }
 
       // Fetch data through our server proxy
-      const response: IStrapiResponseData = await $fetch('/api/request-proxy', {
+      const response: IStrapiResponseData = await $fetch('/api/request', {
         method: 'GET',
         query,
         timeout: 8000
