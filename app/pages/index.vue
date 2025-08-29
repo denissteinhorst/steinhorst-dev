@@ -3,5 +3,6 @@
 <template>
   <div class="app">
     <hero-section />
+    <skill-section />
   </div>
 </template>
