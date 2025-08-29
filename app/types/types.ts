@@ -166,7 +166,8 @@ export interface QuickFilter {
  */
 export interface SkillSectionResponse extends BaseResponse<SkillSectionResponse> {
   title?: string;
-  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  text?: unknown[];
+  footerText?: unknown[];
   jumpmark?: string;
   quickFilter?: QuickFilter;
   skillCards?: SkillCard[];
