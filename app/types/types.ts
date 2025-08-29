@@ -133,3 +133,41 @@ export interface HeroSectionResponse extends BaseResponse<HeroSectionResponse> {
   heroLinks?: HeroLink[];
   image?: StrapiImage | null;
 }
+
+// Skills section specific types
+export interface SkillItem {
+  id?: number;
+  title?: string;
+}
+
+export interface SkillCard {
+  id?: number;
+  title?: string;
+  skillItems?: SkillItem[];
+}
+
+export interface QuickFilter {
+  id?: number;
+  toggle?: string;
+  icon?: string;
+  text?: string;
+  placeholder?: string;
+  hintDefault?: string;
+  hintSuccess?: string;
+  hintError?: string;
+  buttonTextSuccess?: string;
+  buttonTextError?: string;
+  link?: string;
+  target?: NavigationLinkTarget;
+}
+
+/**
+ * Skills section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface SkillSectionResponse extends BaseResponse<SkillSectionResponse> {
+  title?: string;
+  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  jumpmark?: string;
+  quickFilter?: QuickFilter;
+  skillCards?: SkillCard[];
+}

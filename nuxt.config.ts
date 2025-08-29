@@ -20,6 +20,16 @@ export default defineNuxtConfig({
       api_token: process.env.STRAPI_TOKEN || 'public',
     }
   },
+  imports: {
+    dirs: ['types'],
+    imports: [
+      {
+        from: '#strapi-blocks-renderer/types',
+        name: 'BlockNode',
+        type: true
+      }
+    ]
+  },
   vite: {
     css: {
       preprocessorOptions: {
