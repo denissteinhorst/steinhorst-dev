@@ -5,5 +5,6 @@
     <hero-section />
     <skill-section />
     <personality-section />
+    <project-section />
   </div>
 </template>

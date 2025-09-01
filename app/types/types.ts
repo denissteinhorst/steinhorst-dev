@@ -231,3 +231,50 @@ export interface JobBadgeResponse extends BaseResponse<JobBadgeResponse> {
   icon?: string; // optional icon name or class
   link?: string; // internal route or hash (e.g., "#contact")
 }
+
+// Project section specific types
+
+/** Individual project card representing a company/project experience */
+export interface ProjectCard {
+  id?: number;
+  title?: string;
+  text?: string;
+  tagList?: RichTextBlock[];
+  referral?: string;
+  link?: string;
+  target?: NavigationLinkTarget;
+  company?: string;
+  logo?: StrapiImage | null;
+}
+
+/** Item within the last project card content */
+export interface LastProjectCardItem {
+  name?: string;
+  type?: string;
+}
+
+/** Content structure for the last project card */
+export interface LastProjectCardContent {
+  items?: LastProjectCardItem[];
+}
+
+/** Special last project card for honorable mentions */
+export interface LastProjectCard {
+  id?: number;
+  title?: string;
+  text?: string;
+  content?: LastProjectCardContent;
+}
+
+/**
+ * Project section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface ProjectSectionResponse extends BaseResponse<ProjectSectionResponse> {
+  title?: string;
+  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  placeholder?: string;
+  jumpmark?: string;
+  projectCards?: ProjectCard[];
+  lastProjectCard?: LastProjectCard;
+  footnote?: unknown[]; // rich text blocks - keep generic to avoid coupling
+}

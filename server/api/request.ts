@@ -39,6 +39,12 @@ export default defineEventHandler(async (event) => {
     }
 
     populates.forEach((path) => {
+      // Special case for projectCards.logo to generate populate[projectCards][populate]=logo
+      if (path === 'projectCards.logo') {
+        params['populate[projectCards][populate]'] = 'logo';
+        return;
+      }
+
       const parts = path.split('.');
 
       if (parts.length === 1) {
