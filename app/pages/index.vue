@@ -6,5 +6,6 @@
     <skill-section />
     <personality-section />
     <project-section />
+    <experience-section />
   </div>
 </template>

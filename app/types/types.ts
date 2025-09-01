@@ -278,3 +278,32 @@ export interface ProjectSectionResponse extends BaseResponse<ProjectSectionRespo
   lastProjectCard?: LastProjectCard;
   footnote?: unknown[]; // rich text blocks - keep generic to avoid coupling
 }
+
+// Experience section specific types
+
+/** Individual experience card representing a professional role */
+export interface ExperienceCard {
+  id?: number;
+  period?: string;
+  company?: string | null;
+  link?: string | null;
+  target?: NavigationLinkTarget;
+  position?: string | null;
+  text?: RichTextBlock[];
+  duty?: RichTextBlock[];
+  learning?: RichTextBlock[];
+  logo?: StrapiImage | null;
+}
+
+/**
+ * Experience section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface ExperienceSectionResponse extends BaseResponse<ExperienceSectionResponse> {
+  title?: string;
+  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  contactToggle?: string;
+  expandToggle?: string;
+  collapseToggle?: string;
+  jumpmark?: string;
+  experienceCards?: ExperienceCard[];
+}

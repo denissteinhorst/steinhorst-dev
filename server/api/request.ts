@@ -38,29 +38,58 @@ export default defineEventHandler(async (event) => {
       return params;
     }
 
-    populates.forEach((path) => {
-      // Special case for projectCards.logo to generate populate[projectCards][populate]=logo
-      if (path === 'projectCards.logo') {
-        params['populate[projectCards][populate]'] = 'logo';
-        return;
-      }
+    // Group populates by parent to handle multiple children under same parent
+    const groupedPopulates = new Map<string, string[]>();
+    const simplePopulates: string[] = [];
+    const complexPopulates: string[] = [];
 
+    populates.forEach((path) => {
       const parts = path.split('.');
 
       if (parts.length === 1) {
-        // Simple relation: populate[relation]=*
-        params[`populate[${parts[0]}]`] = '*';
-      } else {
-        // Nested relation: populate[parent][populate][child]=*
-        let paramKey = `populate[${parts[0]}]`;
+        simplePopulates.push(path);
+      } else if (parts.length === 2) {
+        const parent = parts[0];
+        const child = parts[1];
 
-        for (let i = 1; i < parts.length - 1; i++) {
-          paramKey += `[populate][${parts[i]}]`;
+        if (!groupedPopulates.has(parent)) {
+          groupedPopulates.set(parent, []);
         }
-
-        paramKey += `[populate][${parts[parts.length - 1]}]`;
-        params[paramKey] = '*';
+        groupedPopulates.get(parent)!.push(child);
+      } else {
+        complexPopulates.push(path);
       }
+    });
+
+    // Handle simple relations
+    simplePopulates.forEach((path) => {
+      params[`populate[${path}]`] = '*';
+    });
+
+    // Handle grouped two-level relations
+    groupedPopulates.forEach((children, parent) => {
+      if (children.length === 1) {
+        // Single child: populate[parent][populate]=child
+        params[`populate[${parent}][populate]`] = children[0];
+      } else {
+        // Multiple children: populate[parent][populate][child1]=* and populate[parent][populate][child2]=*
+        children.forEach((child) => {
+          params[`populate[${parent}][populate][${child}]`] = '*';
+        });
+      }
+    });
+
+    // Handle complex (3+ level) relations
+    complexPopulates.forEach((path) => {
+      const parts = path.split('.');
+      let paramKey = `populate[${parts[0]}]`;
+
+      for (let i = 1; i < parts.length - 1; i++) {
+        paramKey += `[populate][${parts[i]}]`;
+      }
+
+      paramKey += `[populate][${parts[parts.length - 1]}]`;
+      params[paramKey] = '*';
     });
 
     return params;
