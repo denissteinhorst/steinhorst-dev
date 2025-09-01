@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title>Lensly — Magnifying Glass Logo</title>
+  <desc>Stylized magnifying glass logo with a circular lens and angled handle.</desc>
+
+  <!-- Lens -->
+  <g fill="none" stroke="#a684ff" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="112" cy="112" r="70" stroke-width="14" />
+    <!-- Handle -->
+    <path d="M158 158 L220 220" stroke-width="20" />
+  </g>
+
+  <!-- Subtle lens highlight -->
+  <circle cx="92" cy="92" r="12" fill="#a684ff" opacity="0.5" />
+
+  <!-- Optional inner detail ring for depth -->
+  <circle cx="112" cy="112" r="52" fill="none" stroke="#a684ff" stroke-width="4" opacity="0.8" />
+</svg>

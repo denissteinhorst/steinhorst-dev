@@ -1,14 +1,243 @@
 <script setup lang="ts">
-defineProps<{ data: ProjectCard }>();
+const props = defineProps<{ data: ExperienceCard }>();
 
 const { buildImageUrl } = useStrapi();
+
+// Helper function to compute duration from period string
+const computeDuration = (period?: string): string => {
+  if (!period) return "";
+
+  // Map German month names to month numbers (1-12)
+  const monthMap: Record<string, number> = {
+    januar: 1,
+    februar: 2,
+    märz: 3,
+    maerz: 3,
+    april: 4,
+    mai: 5,
+    juni: 6,
+    juli: 7,
+    august: 8,
+    september: 9,
+    oktober: 10,
+    november: 11,
+    dezember: 12,
+  };
+
+  // Split by common separators: 'bis', en-dash, em-dash, hyphen
+  const parts = period.split(/\s+(?:bis|–|—|-)\s+/i).map((p) => p.trim());
+  if (parts.length < 1) return "";
+
+  const parsePart = (text?: string | null): Date | null => {
+    if (!text) return null;
+    if (/heute/i.test(text)) return new Date();
+    const m = text.match(/([A-Za-zäöüÄÖÜß]+)\s+(\d{4})/);
+    if (!m) return null;
+    const monthName = (m[1] ?? "").toLowerCase();
+    const yearStr = m[2] ?? "";
+    const year = parseInt(yearStr, 10);
+    if (Number.isNaN(year)) return null;
+    const month = monthMap[monthName] ?? NaN;
+    if (Number.isNaN(month)) return null;
+    // Create date representing first day of month
+    return new Date(year, month - 1, 1);
+  };
+
+  const startDate = parsePart(parts[0] ?? "");
+  const endDate = parts[1] ? parsePart(parts[1]) : null;
+  const effectiveEnd = endDate ?? new Date();
+
+  if (!startDate) return "";
+
+  // Inclusive month difference (counts both start and end months)
+  // Example: Februar -> Juli (same year) = 6 Monate
+  const monthsRaw =
+    effectiveEnd.getFullYear() * 12 +
+    effectiveEnd.getMonth() -
+    (startDate.getFullYear() * 12 + startDate.getMonth());
+  const monthsDiff = monthsRaw + 1; // inclusive
+  if (monthsDiff <= 0) return "";
+
+  // Always show exact years and months (inclusive), no rounding and no tilde
+  let years = Math.floor(monthsDiff / 12);
+  const rem = monthsDiff % 12;
+
+  // If there are no full years, only show months (inclusive total)
+  if (years === 0) {
+    const monthsLabelOnly = monthsDiff === 1 ? "Monat" : "Monate";
+    return ` (${monthsDiff} ${monthsLabelOnly})`;
+  }
+
+  // When years > 0, display months as remainder + 1 (if there's a remainder)
+  let shownMonths = rem > 0 ? rem + 1 : 0;
+  // Rollover: 12 months -> +1 year, 0 months
+  if (shownMonths === 12) {
+    years += 1;
+    shownMonths = 0;
+  }
+
+  const yearsLabel = years === 1 ? "Jahr" : "Jahre";
+  const monthsLabel = shownMonths === 1 ? "Monat" : "Monate";
+  return ` (${years} ${yearsLabel}, ${shownMonths} ${monthsLabel})`;
+};
+
+// Helper function to render rich text blocks as plain text
+const renderRichTextAsText = (blocks?: RichTextBlock[]): string => {
+  if (!blocks) return "";
+
+  return blocks
+    .map((block) => {
+      if (block.type === "text" && block.text) {
+        return block.text;
+      }
+      if (block.children) {
+        return renderRichTextAsText(block.children);
+      }
+      return "";
+    })
+    .join("");
+};
+
+// Helper function to extract list items from rich text
+const extractListItems = (blocks?: RichTextBlock[]): string[] => {
+  if (!blocks) return [];
+
+  const items: string[] = [];
+
+  const traverse = (blocks: RichTextBlock[]) => {
+    blocks.forEach((block) => {
+      if (block.type === "list-item" && block.children) {
+        const text = renderRichTextAsText(block.children);
+        if (text.trim()) {
+          items.push(text.trim());
+        }
+      } else if (block.children) {
+        traverse(block.children);
+      }
+    });
+  };
+
+  traverse(blocks);
+  return items;
+};
+
+// Computed properties
+const durationDisplay = computed(() => computeDuration(props.data.period));
+const mainText = computed(() => renderRichTextAsText(props.data.text));
+const dutyItems = computed(() => extractListItems(props.data.duty));
+const learningText = computed(() => renderRichTextAsText(props.data.learning));
+const logoUrl = computed(() => buildImageUrl(props.data.logo, "small"));
 </script>
 
 <template>
   <div v-if="data" class="experience-card">
-    <small>
-      <pre>{{ data }}</pre>
-    </small>
+    <!-- Mobile: Logo above company and role -->
+    <div class="experience-card__mobile-logo">
+      <a
+        v-if="logoUrl && data.link"
+        :href="data.link"
+        :target="data.target || '_blank'"
+        rel="noopener noreferrer"
+        class="experience-card__logo-link"
+      >
+        <NuxtImg
+          :src="logoUrl"
+          :alt="`Logo von ${data.company}`"
+          class="experience-card__logo-image"
+          format="webp"
+        />
+      </a>
+      <div v-else-if="logoUrl" class="experience-card__logo-link">
+        <NuxtImg
+          :src="logoUrl"
+          :alt="`Logo von ${data.company}`"
+          class="experience-card__logo-image"
+          format="webp"
+        />
+      </div>
+    </div>
+
+    <!-- Date and Title -->
+    <div class="experience-card__header">
+      <span class="experience-card__date">
+        {{ data.period }}
+        <span v-if="durationDisplay" class="experience-card__duration">
+          {{ durationDisplay }}
+        </span>
+      </span>
+
+      <h3 :id="`exp-${data.id}`" class="experience-card__title" tabindex="-1">
+        <a
+          v-if="data.link"
+          :href="data.link"
+          :target="data.target || '_blank'"
+          rel="noopener noreferrer"
+          class="experience-card__company-link"
+        >
+          {{ data.company }}
+        </a>
+        <span v-else class="experience-card__company-link">
+          {{ data.company }}
+        </span>
+        <span class="experience-card__position"> — {{ data.position }} </span>
+      </h3>
+    </div>
+
+    <!-- Content -->
+    <div class="experience-card__content">
+      <!-- Description Content -->
+      <div class="experience-card__description">
+        <p v-if="mainText" class="experience-card__summary">
+          {{ mainText }}
+        </p>
+        <ul v-if="dutyItems.length" class="experience-card__duties">
+          <li
+            v-for="item in dutyItems"
+            :key="item"
+            class="experience-card__duty-item"
+          >
+            {{ item }}
+          </li>
+        </ul>
+        <blockquote v-if="learningText" class="experience-card__learning">
+          <UIcon
+            name="i-material-symbols-format-quote"
+            aria-hidden="true"
+            class="experience-card__quote-icon"
+          />
+          {{ learningText }}
+        </blockquote>
+      </div>
+
+      <!-- Logo for Larger Screens -->
+      <div class="experience-card__desktop-logo">
+        <a
+          v-if="logoUrl && data.link"
+          :href="data.link"
+          :target="data.target || '_blank'"
+          rel="noopener noreferrer"
+          class="experience-card__logo-link experience-card__logo-link--desktop"
+        >
+          <NuxtImg
+            :src="logoUrl"
+            :alt="`Logo von ${data.company}`"
+            class="experience-card__logo-image"
+            format="webp"
+          />
+        </a>
+        <div
+          v-else-if="logoUrl"
+          class="experience-card__logo-link experience-card__logo-link--desktop"
+        >
+          <NuxtImg
+            :src="logoUrl"
+            :alt="`Logo von ${data.company}`"
+            class="experience-card__logo-image"
+            format="webp"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -16,5 +245,177 @@ const { buildImageUrl } = useStrapi();
 $block: "experience-card";
 
 .#{$block} {
+  width: 100%;
+
+  &__mobile-logo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+    width: 100%;
+
+    @media (min-width: 640px) {
+      display: none;
+    }
+  }
+
+  &__header {
+    margin-bottom: 0.75rem;
+  }
+
+  &__title {
+    margin-top: 0.75rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--color-gray-900);
+
+    .dark & {
+      color: var(--color-gray-100);
+    }
+  }
+
+  &__company-link {
+    color: var(--color-secondary-600);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    .dark & {
+      color: var(--color-secondary-400);
+    }
+  }
+
+  &__position {
+    font-weight: 400;
+    color: var(--color-gray-500);
+
+    .dark & {
+      color: var(--color-gray-400);
+    }
+  }
+
+  &__date {
+    display: inline-block;
+    margin-bottom: 0.375rem;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas,
+      "Liberation Mono", "Courier New", monospace;
+    font-size: 0.75rem;
+    letter-spacing: -0.025em;
+    color: var(--color-gray-500);
+
+    .dark & {
+      color: var(--color-gray-400);
+    }
+  }
+
+  &__duration {
+    margin-left: 0.25rem;
+    color: var(--color-gray-400);
+
+    .dark & {
+      color: var(--color-gray-500);
+    }
+  }
+
+  &__content {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    flex-direction: column;
+
+    @media (min-width: 640px) {
+      flex-direction: row;
+    }
+  }
+
+  &__description {
+    flex: 1;
+    color: var(--color-gray-700);
+    font-size: 1rem;
+    line-height: 1.75;
+    max-width: 36rem;
+
+    .dark & {
+      color: var(--color-gray-300);
+    }
+  }
+
+  &__summary {
+    margin: 0;
+  }
+
+  &__duties {
+    margin-top: 0.75rem;
+    padding-left: 1.25rem;
+    list-style-type: disc;
+
+    &:deep(li) {
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  &__duty-item {
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  &__learning {
+    margin-top: 1.25rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    color: var(--color-gray-500);
+    font-weight: 500;
+
+    .dark & {
+      color: var(--color-gray-400);
+    }
+  }
+
+  &__quote-icon {
+    font-size: 1.125rem;
+    margin-right: 0.25rem;
+  }
+
+  &__desktop-logo {
+    margin-left: auto;
+    flex-shrink: 0;
+    align-items: center;
+    display: none;
+
+    @media (min-width: 640px) {
+      display: flex;
+    }
+  }
+
+  &__logo-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 5rem;
+    width: 8rem;
+    border-radius: 0.375rem;
+    background-color: var(--color-white);
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    margin-bottom: 0.5rem;
+
+    .dark & {
+      background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    &--desktop {
+      margin-bottom: 0;
+    }
+  }
+
+  &__logo-image {
+    max-height: 4rem;
+    max-width: 7rem;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
 }
 </style>
