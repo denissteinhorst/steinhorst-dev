@@ -61,9 +61,9 @@ const themeColors = computed(() => {
     tooltipBorder: isDarkMode ? "rgba(99,102,241,0.4)" : "#ffffff",
     gridColor: isDarkMode ? "rgba(148,163,184,0.25)" : "rgba(100,116,139,0.25)",
     tickColor: isDarkMode ? "#cbd5e1" : "#334155",
-    titleColor: isDarkMode ? "#f1f5f9" : "#1e293b",
-    subtitleColor: isDarkMode ? "#94a3b8" : "#475569",
-    descriptionColor: isDarkMode ? "#a0a0a0" : "#475569",
+    titleColor: isDarkMode ? "#e5e5e5" : "#1e293b",
+    subtitleColor: isDarkMode ? "#c9d3de" : "#475569",
+    descriptionColor: isDarkMode ? "#bfc3c9" : "#475569",
   };
 });
 

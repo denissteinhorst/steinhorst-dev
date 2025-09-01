@@ -82,9 +82,9 @@ const themeColors = computed(() => {
     tooltipTitle: isDarkMode ? "#e2e8f0" : "#0f172a",
     tooltipBody: isDarkMode ? "#f8fafc" : "#1e293b",
     tooltipBorder: isDarkMode ? "rgba(148,163,184,0.4)" : "#334155",
-    titleColor: isDarkMode ? "#f1f5f9" : "#1e293b",
-    subtitleColor: isDarkMode ? "#94a3b8" : "#475569",
-    descriptionColor: isDarkMode ? "#a0a0a0" : "#475569",
+    titleColor: isDarkMode ? "#e5e5e5" : "#1e293b",
+    subtitleColor: isDarkMode ? "#c9d3de" : "#475569",
+    descriptionColor: isDarkMode ? "#bfc3c9" : "#475569",
   };
 });
 
