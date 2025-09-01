@@ -38,6 +38,12 @@ interface Props {
 const { title = "", subtitle = "", text = "", tooltips } = defineProps<Props>();
 
 const colorMode = useColorMode();
+const hydrated = ref(false);
+if (import.meta.client) {
+  onMounted(() => {
+    hydrated.value = true;
+  });
+}
 
 // Personality trait order for consistent display
 const PERSONALITY_TRAITS = [
@@ -52,8 +58,11 @@ const PERSONALITY_TRAITS = [
  * Provides consistent colors for chart elements across themes
  */
 const themeColors = computed(() => {
-  const isDarkMode = colorMode.value === "dark";
-
+  // On SSR, use colorMode.value (Nuxt injects correct value)
+  // On client, only use colorMode.value after hydration
+  const isDarkMode = hydrated.value
+    ? colorMode.value === "dark"
+    : colorMode.value === "dark";
   return {
     tooltipBackground: isDarkMode ? "#0f172a" : "#ffffff",
     tooltipTitle: isDarkMode ? "#e2e8f0" : "#0f172a",

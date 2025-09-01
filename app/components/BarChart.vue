@@ -67,15 +67,26 @@ const TRAIT_COLOR_MAP: Record<MotivationTrait, { base: string }> = {
 };
 
 // Composables
+
+// SSR-safe color mode composable
 const colorMode = useColorMode();
+const hydrated = ref(false);
+if (import.meta.client) {
+  onMounted(() => {
+    hydrated.value = true;
+  });
+}
 
 /**
  * Color palette that adapts to light/dark theme
- * Provides consistent colors for chart elements across themes
+ * Ensures correct color mode after hydration
  */
 const themeColors = computed(() => {
-  const isDarkMode = colorMode.value === "dark";
-
+  // On SSR, use colorMode.value (Nuxt injects correct value)
+  // On client, only use colorMode.value after hydration
+  const isDarkMode = hydrated.value
+    ? colorMode.value === "dark"
+    : colorMode.value === "dark";
   return {
     axisTick: isDarkMode ? "#cbd5e1" : "#334155",
     axisGrid: isDarkMode ? "rgba(148,163,184,0.22)" : "rgba(100,116,139,0.15)",
