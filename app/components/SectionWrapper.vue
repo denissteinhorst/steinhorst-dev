@@ -119,6 +119,7 @@ $block: "section-wrapper";
       font-size: 1.875rem;
       letter-spacing: -0.01em;
       margin: 0;
+      margin-bottom: 1.25rem;
 
       @media (min-width: 640px) {
         font-size: 2.25rem;
@@ -168,6 +169,33 @@ $block: "section-wrapper";
       width: 1rem;
       height: 1rem;
       display: inline-block;
+    }
+  }
+
+  .section-footer {
+    font-size: 0.875rem;
+    color: rgba(75, 85, 99, 1);
+    margin-top: 2rem;
+    text-align: left;
+    line-height: 1.5;
+    text-align: center;
+
+    :deep(p) {
+      padding-bottom: 0.5rem;
+      font-size: 16px;
+      color: var(--color-text-secondary);
+
+      @media (prefers-color-scheme: dark) {
+        color: #979fab;
+      }
+    }
+
+    :deep(a) {
+      color: var(--color-primary);
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 }
