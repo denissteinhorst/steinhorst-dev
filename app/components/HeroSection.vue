@@ -35,7 +35,7 @@ const text = computed<BlockNode[]>(
     aria-labelledby="hero-heading"
   >
     <!-- persistent dark gradient background -->
-    <div class="hero-section__bg-dark" aria-hidden="true"></div>
+    <div class="hero-section__bg-glow" aria-hidden="true"></div>
 
     <!-- layered decorative backgrounds -->
     <div class="hero-section__bg-layers" aria-hidden="true">
@@ -52,7 +52,7 @@ const text = computed<BlockNode[]>(
           <div class="hero-section__col hero-section__col--content">
             <header class="hero-section__header">
               <div class="hero-section__badge">
-                <!-- <job-search-badge /> -->
+                <job-search-badge />
               </div>
 
               <h1 id="hero-heading" tabindex="-1" class="hero-section__title">
@@ -283,6 +283,26 @@ $block: "hero-section";
     padding-bottom: 5rem;
   }
 
+  &__bg-glow {
+    position: absolute;
+    left: 50%;
+    top: -40vh;
+    transform: translateX(-50%);
+    width: 160vw;
+    height: 120vh;
+    pointer-events: none;
+    z-index: 5;
+    background: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.192) 0%,
+      rgba(56, 52, 139, 0.058) 40%,
+      transparent 80%
+    );
+    filter: blur(64px) brightness(1.2) saturate(1.1);
+    opacity: 0.7;
+    border-radius: 50%;
+  }
+
   &__bg-layers {
     position: absolute;
     inset: 0;
@@ -397,6 +417,7 @@ $block: "hero-section";
       grid-column: 1 / -1;
       margin: 0 auto;
       max-width: 28rem;
+      margin-top: 4.8rem;
 
       @media (min-width: 1024px) {
         grid-column: 8 / -1;
@@ -496,7 +517,7 @@ $block: "hero-section";
     display: block;
     border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(255, 255, 255, 1);
     z-index: 10;
     object-fit: cover;
     transform: perspective(1200px) rotateY(-6deg) rotateX(4deg);

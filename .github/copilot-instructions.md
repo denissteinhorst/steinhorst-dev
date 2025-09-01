@@ -26,6 +26,7 @@ These instructions are designed to guide GitHub Copilot in making appropriate co
 ## Core Rules:
 
 - Only modify files explicitly named in prompts; avoid global scans unless explicitly asked to “look around”.
+- You will not peek at any files unless explicitly asked to do so. (This includes README.md, other documentation files and the packages.)
 - Before making changes, confirm the file(s) you intend to edit; if not specified, ask which file to modify.
 - Base all changes on: Nuxt 4 (pages layouts), Vue 3 Composition API, TypeScript
 - Follow project ESLint/Prettier config automatically

@@ -220,3 +220,14 @@ export interface PersonalitySectionResponse extends BaseResponse<PersonalitySect
   jumpmark?: string;
   personalityCards?: PersonalityCard[];
 }
+
+// Job badge specific types
+/**
+ * Job badge payload. Mirrors the CMS shape and extends the common base.
+ */
+export interface JobBadgeResponse extends BaseResponse<JobBadgeResponse> {
+  isEnabled?: boolean;
+  text?: string; // display text (e.g., label or icon class depending on CMS usage)
+  icon?: string; // optional icon name or class
+  link?: string; // internal route or hash (e.g., "#contact")
+}
