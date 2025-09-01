@@ -13,6 +13,10 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     'nuxt-strapi-blocks-renderer'
   ],
+  colorMode: {
+    preference: 'light',
+    storageKey: 'nuxt-color-mode'
+  },
   runtimeConfig: {
     public: {
       api_base: process.env.STRAPI_BASE || 'http://localhost:1337',

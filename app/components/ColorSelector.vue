@@ -16,7 +16,8 @@ const setPreference = (preference: string) => {
     >
       <UIcon
         name="i-lucide-moon"
-        class="color-selector--icon"
+        class="color-selector__icon"
+        style="--color-secondary: var(--color-secondary, #8b5cf6)"
         aria-label="In den Dunkel-Modus wechseln"
         @click="setPreference('dark')"
       />
@@ -29,7 +30,8 @@ const setPreference = (preference: string) => {
     >
       <UIcon
         name="i-lucide-sun"
-        class="color-selector--icon"
+        class="color-selector__icon"
+        style="--color-secondary: var(--color-secondary, #8b5cf6)"
         aria-label="In den Hell-Modus wechseln"
         @click="setPreference('light')"
       />
@@ -41,12 +43,22 @@ const setPreference = (preference: string) => {
 $block: "color-selector";
 
 .#{$block} {
-  &--icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%; // Ensures it takes full height of parent container
+
+  &__icon {
+    color: #111827; // text-gray-900 - matches ScrollCompanion icons
     cursor: pointer;
+    font-size: 1.25rem; // text-xl - matches ScrollCompanion icons
+    transition: color 0.2s ease; // matches ScrollCompanion transition
 
     &:hover {
-      color: var(--color-primary);
-      transition: color 0.33s ease;
+      color: var(
+        --color-secondary,
+        #8b5cf6
+      ) !important; // matches ScrollCompanion hover
     }
   }
 }

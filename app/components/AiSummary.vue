@@ -2,6 +2,7 @@
 const props = defineProps<{
   title: string;
   target: string;
+  iconOnly?: boolean;
 }>();
 </script>
 
@@ -32,6 +33,7 @@ const props = defineProps<{
       </span>
 
       <span
+        v-if="!props.iconOnly"
         class="ai-summary__label ai-summary-label"
         :data-label="props.target"
       >
