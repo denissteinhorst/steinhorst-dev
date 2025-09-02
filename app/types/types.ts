@@ -412,3 +412,13 @@ export interface ContactSectionResponse extends BaseResponse<ContactSectionRespo
   jumpmark?: string;
   contactCards?: ContactCard[];
 }
+
+
+/**
+ * Imprint section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface ImprintSectionResponse extends BaseResponse<ImprintSectionResponse> {
+  title?: string;
+  jumpmark?: string;
+  text?: unknown[];
+}

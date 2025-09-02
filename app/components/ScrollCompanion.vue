@@ -111,7 +111,7 @@ onUnmounted(() => {
               :content="{ side: 'top', sideOffset: 8 }"
             >
               <NuxtLink
-                to="#contact"
+                to="/#contact"
                 aria-label="Direkt zum Kontaktbereich scrollen"
                 class="scroll-companion__contact-link"
               >

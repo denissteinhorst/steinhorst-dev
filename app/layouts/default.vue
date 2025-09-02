@@ -19,4 +19,16 @@ import "~/assets/scss/app.scss";
 <style>
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+/* Sticky footer layout */
+.layout-root {
+  min-height: 100vh;
+  min-height: 100dvh; /* modern viewport units for mobile */
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-root > main {
+  flex: 1 0 auto; /* take remaining space so footer sits at bottom */
+}
 </style>
