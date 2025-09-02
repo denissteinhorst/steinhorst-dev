@@ -11,6 +11,7 @@ import "~/assets/scss/app.scss";
         <NuxtPage />
       </main>
       <scroll-companion />
+      <footer-section />
     </div>
   </UApp>
 </template>
