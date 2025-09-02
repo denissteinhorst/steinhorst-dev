@@ -1,7 +1,8 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   data: RecommendationCard;
   isActive?: boolean;
+  index?: number;
 }>();
 
 const emit = defineEmits<{
@@ -11,37 +12,51 @@ const emit = defineEmits<{
 const handleClick = () => {
   emit("click");
 };
+
+const aosDelay = computed(() => Math.min(props.index ?? 0, 5) * 100);
 </script>
 
 <template>
-  <BaseCard
-    :is-active="isActive"
-    class="testimonial-card-compact"
-    :class="{ 'testimonial-card-compact--active': isActive }"
-    role="listitem"
-    :aria-labelledby="`testimonial-${data.id}`"
-    @click="handleClick"
+  <div
+    data-aos="fade-up"
+    :data-aos-delay="aosDelay"
+    class="testimonial-card-compact-wrapper"
   >
-    <article class="testimonial-card-compact__article">
-      <span class="testimonial-card-compact__summary">
-        {{ data.summary }}
-      </span>
-      <div class="testimonial-card-compact__footer">
-        <div class="testimonial-card-compact__author-info">
-          <p class="testimonial-card-compact__author-name">
-            {{ data.author }}
-          </p>
-          <p class="testimonial-card-compact__author-position">
-            {{ data.position }} | {{ data.company }}
-          </p>
+    <BaseCard
+      :is-active="isActive"
+      class="testimonial-card-compact"
+      :class="{ 'testimonial-card-compact--active': isActive }"
+      role="listitem"
+      :aria-labelledby="`testimonial-${data.id}`"
+      @click="handleClick"
+    >
+      <article class="testimonial-card-compact__article">
+        <span class="testimonial-card-compact__summary">
+          {{ data.summary }}
+        </span>
+        <div class="testimonial-card-compact__footer">
+          <div class="testimonial-card-compact__author-info">
+            <p class="testimonial-card-compact__author-name">
+              {{ data.author }}
+            </p>
+            <p class="testimonial-card-compact__author-position">
+              {{ data.position }} | {{ data.company }}
+            </p>
+          </div>
         </div>
-      </div>
-    </article>
-  </BaseCard>
+      </article>
+    </BaseCard>
+  </div>
 </template>
 
 <style scoped lang="scss">
 $block: "testimonial-card-compact";
+
+.testimonial-card-compact-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
 .#{$block} {
   transition: all 0.15s ease-in-out;

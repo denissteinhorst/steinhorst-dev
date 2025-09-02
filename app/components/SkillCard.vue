@@ -6,39 +6,54 @@ const props = defineProps<{
 }>();
 
 const cardId = computed(() => `skill-${props.title}`);
+const aosDelay = computed(() => (props.index ?? 0) * 100);
 </script>
 
 <template>
-  <BaseCard class="skill-card" :aria-labelledby="cardId" role="group">
-    <div class="skill-card__content">
-      <h3 :id="cardId" class="skill-card__title">
-        {{ props.title }}
-      </h3>
-      <ul class="skill-card__list" :aria-label="`Kategorie ${props.title}`">
-        <li
-          v-for="(item, itemIndex) in props.listItems"
-          :key="itemIndex"
-          class="skill-card__list-item"
-        >
-          <span class="skill-card__list-item-marker" aria-hidden="true"></span>
-          <span class="skill-card__list-item-text">
-            <span v-for="(part, partIndex) in item.split('|')" :key="partIndex">
-              {{ part }}
+  <div data-aos="fade-up" :data-aos-delay="aosDelay" class="skill-card-wrapper">
+    <BaseCard class="skill-card" :aria-labelledby="cardId" role="group">
+      <div class="skill-card__content">
+        <h3 :id="cardId" class="skill-card__title">
+          {{ props.title }}
+        </h3>
+        <ul class="skill-card__list" :aria-label="`Kategorie ${props.title}`">
+          <li
+            v-for="(item, itemIndex) in props.listItems"
+            :key="itemIndex"
+            class="skill-card__list-item"
+          >
+            <span
+              class="skill-card__list-item-marker"
+              aria-hidden="true"
+            ></span>
+            <span class="skill-card__list-item-text">
               <span
-                v-if="partIndex < item.split('|').length - 1"
-                class="skill-card__list-item-separator"
-                >|</span
+                v-for="(part, partIndex) in item.split('|')"
+                :key="partIndex"
               >
+                {{ part }}
+                <span
+                  v-if="partIndex < item.split('|').length - 1"
+                  class="skill-card__list-item-separator"
+                  >|</span
+                >
+              </span>
             </span>
-          </span>
-        </li>
-      </ul>
-    </div>
-  </BaseCard>
+          </li>
+        </ul>
+      </div>
+    </BaseCard>
+  </div>
 </template>
 
 <style scoped lang="scss">
 $block: "skill-card";
+
+.skill-card-wrapper {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 
 .#{$block} {
   &__content {

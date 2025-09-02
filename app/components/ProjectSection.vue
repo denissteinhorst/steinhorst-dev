@@ -114,20 +114,28 @@ const filteredProjects = computed(() => {
 
       <!-- PROJECT CARD GRID -->
       <div class="project-section__grid">
-        <project-card
+        <div
           v-for="(card, index) in filteredProjects"
           :key="index"
-          :data="card"
-        />
+          data-aos="fade-up"
+          :data-aos-delay="Math.min(index, 5) * 100"
+          class="project-section__card-wrapper"
+        >
+          <project-card :data="card" />
+        </div>
 
-        <project-card-last
+        <div
           v-if="
             data.lastProjectCard &&
             !isFiltering &&
             showCount >= (data.projectCards?.length || 0)
           "
-          :data="data.lastProjectCard"
-        />
+          data-aos="fade-up"
+          :data-aos-delay="Math.min(filteredProjects.length, 5) * 100"
+          class="project-section__card-wrapper"
+        >
+          <project-card-last :data="data.lastProjectCard" />
+        </div>
       </div>
     </template>
   </section-wrapper>
@@ -147,6 +155,12 @@ $block: "project-section";
     @media (min-width: 768px) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+  }
+
+  &__card-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 }
 </style>

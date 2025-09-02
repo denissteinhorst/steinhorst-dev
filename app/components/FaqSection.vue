@@ -37,45 +37,53 @@ const headerText = computed<BlockNode[]>(
             <div class="faq-section__accent-line-gradient"></div>
           </div>
           <UContainer class="faq-section__content">
-            <UAccordion
-              id="faq-accordion"
-              type="multiple"
-              :items="data.faqItems || []"
-              trailing-icon="i-lucide-chevron-down"
-              class="faq-section__accordion"
-              aria-describedby="faq-instructions"
-              label-key="question"
-              :ui="{
-                item: 'faq-section__accordion-item',
-                trigger: 'faq-section__accordion-trigger',
-                content: 'faq-section__accordion-content',
-                body: 'faq-section__accordion-body',
-                leadingIcon: 'faq-section__accordion-leading-icon',
-                trailingIcon: 'faq-section__accordion-trailing-icon',
-                label: 'faq-section__accordion-label',
-              }"
-            >
-              <template #default="{ item }">
-                <div class="faq-section__question-wrapper">
-                  <UIcon
-                    name="i-lucide:help-circle"
-                    class="faq-section__question-icon"
-                    aria-hidden="true"
-                  />
-                  <h6
-                    :id="`faq-q-` + item.question"
-                    class="faq-section__question"
-                  >
-                    {{ item.question }}
-                  </h6>
-                </div>
-              </template>
-              <template #body="{ item }">
-                <div class="faq-section__answer">
-                  {{ item.answer }}
-                </div>
-              </template>
-            </UAccordion>
+            <div class="faq-section__accordion-wrapper">
+              <div
+                v-for="(item, index) in data.faqItems || []"
+                :key="index"
+                data-aos="fade-up"
+                :data-aos-delay="Math.min(index, 5) * 100"
+                class="faq-section__accordion-item-wrapper"
+              >
+                <UAccordion
+                  type="multiple"
+                  :items="[item]"
+                  trailing-icon="i-lucide-chevron-down"
+                  class="faq-section__accordion"
+                  label-key="question"
+                  :ui="{
+                    item: 'faq-section__accordion-item',
+                    trigger: 'faq-section__accordion-trigger',
+                    content: 'faq-section__accordion-content',
+                    body: 'faq-section__accordion-body',
+                    leadingIcon: 'faq-section__accordion-leading-icon',
+                    trailingIcon: 'faq-section__accordion-trailing-icon',
+                    label: 'faq-section__accordion-label',
+                  }"
+                >
+                  <template #default="{ item: accordionItem }">
+                    <div class="faq-section__question-wrapper">
+                      <UIcon
+                        name="i-lucide:help-circle"
+                        class="faq-section__question-icon"
+                        aria-hidden="true"
+                      />
+                      <h6
+                        :id="`faq-q-` + accordionItem.question"
+                        class="faq-section__question"
+                      >
+                        {{ accordionItem.question }}
+                      </h6>
+                    </div>
+                  </template>
+                  <template #body="{ item: accordionItem }">
+                    <div class="faq-section__answer">
+                      {{ accordionItem.answer }}
+                    </div>
+                  </template>
+                </UAccordion>
+              </div>
+            </div>
           </UContainer>
         </div>
       </div>
@@ -159,6 +167,14 @@ $block: "faq-section";
     z-index: 1;
   }
 
+  &__accordion-wrapper {
+    width: 100%;
+  }
+
+  &__accordion-item-wrapper {
+    width: 100%;
+  }
+
   &__accordion {
     width: 100%;
   }
@@ -205,12 +221,15 @@ $block: "faq-section";
 :deep(.#{$block}__accordion-item) {
   border-bottom: 1px solid rgb(var(--color-gray-200));
 
-  &:last-child {
-    border-bottom: none;
-  }
-
   @media (prefers-color-scheme: dark) {
     border-bottom-color: rgb(var(--color-gray-800));
+  }
+}
+
+// Remove border from the last accordion item wrapper
+.#{$block}__accordion-item-wrapper:last-child {
+  :deep(.#{$block}__accordion-item) {
+    border-bottom: none;
   }
 }
 

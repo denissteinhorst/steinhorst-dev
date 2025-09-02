@@ -36,11 +36,15 @@ const headerText = computed<BlockNode[]>(
     <template #content>
       <div class="certificate-section" aria-label="Main">
         <div class="certificate-section__grid">
-          <certificate-card
+          <div
             v-for="(card, index) in data.certificationCards"
             :key="index"
-            :data="card"
-          />
+            data-aos="fade-up"
+            :data-aos-delay="Math.min(index, 5) * 100"
+            class="certificate-section__card-wrapper"
+          >
+            <certificate-card :data="card" />
+          </div>
         </div>
       </div>
     </template>
@@ -67,6 +71,12 @@ $block: "certificate-section";
       gap: 2rem; // gap-8
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
+  }
+
+  &__card-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 }
 </style>

@@ -2,23 +2,23 @@
 const props = defineProps<{
   isActive?: boolean;
   isDark?: boolean;
+  aosDelay?: number;
 }>();
 </script>
 
 <template>
-  <UCard
-    :class="[
-      'base-card',
-      {
-        'base-card--active': props.isActive,
-        'base-card--dark': props.isDark,
-      },
-    ]"
-    variant="soft"
+  <div
+    class="base-card"
+    :class="{
+      'base-card--active': props.isActive,
+      'base-card--dark': props.isDark,
+    }"
     v-bind="$attrs"
   >
-    <slot></slot>
-  </UCard>
+    <UCard variant="soft">
+      <slot></slot>
+    </UCard>
+  </div>
 </template>
 
 <style scoped lang="scss">

@@ -1,5 +1,8 @@
 <script setup lang="ts">
-const props = defineProps<{ data: ExperienceCard }>();
+const props = defineProps<{
+  data: ExperienceCard;
+  index?: number;
+}>();
 
 const { buildImageUrl } = useStrapi();
 
@@ -127,10 +130,16 @@ const mainText = computed(() => renderRichTextAsText(props.data.text));
 const dutyItems = computed(() => extractListItems(props.data.duty));
 const learningText = computed(() => renderRichTextAsText(props.data.learning));
 const logoUrl = computed(() => buildImageUrl(props.data.logo, "small"));
+const aosDelay = computed(() => Math.min(props.index ?? 0, 5) * 100);
 </script>
 
 <template>
-  <div v-if="data" class="experience-card">
+  <div
+    v-if="data"
+    data-aos="fade-up"
+    :data-aos-delay="aosDelay"
+    class="experience-card"
+  >
     <!-- Mobile: Logo above company and role -->
     <div class="experience-card__mobile-logo">
       <a

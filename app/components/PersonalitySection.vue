@@ -39,28 +39,32 @@ const headerText = computed<BlockNode[]>(
   >
     <template #content>
       <div class="personality-section__grid">
-        <base-card
+        <div
           v-for="(card, index) in data.personalityCards"
           :key="index"
-          class="personality-section__card"
+          data-aos="fade-up"
+          :data-aos-delay="index * 100"
+          class="personality-section__card-wrapper"
         >
-          <template v-if="card.variant === 'polarChart'">
-            <polar-chart
-              :title="card.title"
-              :subtitle="card.subtitle"
-              :text="card.text"
-              :tooltips="card.polarChartTooltips || []"
-            />
-          </template>
-          <template v-else-if="card.variant === 'barChart'">
-            <bar-chart
-              :title="card.title"
-              :subtitle="card.subtitle"
-              :text="card.text"
-              :tooltips="card.barChartTooltips || []"
-            />
-          </template>
-        </base-card>
+          <base-card class="personality-section__card">
+            <template v-if="card.variant === 'polarChart'">
+              <polar-chart
+                :title="card.title"
+                :subtitle="card.subtitle"
+                :text="card.text"
+                :tooltips="card.polarChartTooltips || []"
+              />
+            </template>
+            <template v-else-if="card.variant === 'barChart'">
+              <bar-chart
+                :title="card.title"
+                :subtitle="card.subtitle"
+                :text="card.text"
+                :tooltips="card.barChartTooltips || []"
+              />
+            </template>
+          </base-card>
+        </div>
       </div>
     </template>
   </section-wrapper>
@@ -114,9 +118,16 @@ $block: "personality-section";
     }
   }
 
+  &__card-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
   &__card {
     display: flex;
     flex-direction: column;
+    height: 100%;
   }
 }
 </style>

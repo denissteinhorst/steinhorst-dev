@@ -88,6 +88,7 @@ const timelineItems = computed(() => {
     icon: idx === 0 ? "i-lucide-rocket" : "i-lucide-code",
     card,
     isFirst: idx === 0,
+    index: idx,
   }));
 });
 
@@ -136,7 +137,7 @@ const visibleTimelineItems = computed(() => {
           class="experience-section__timeline"
         >
           <template #description="{ item }">
-            <ExperienceCard :data="item.card" />
+            <ExperienceCard :data="item.card" :index="item.index" />
             <div v-if="item.isFirst" class="experience-section__contact-cta">
               <UButton
                 to="/#contact"
