@@ -230,6 +230,32 @@ $block: "experience-section";
 
   &__timeline {
     width: 100%;
+
+    /* Remove any hover effects that might enlarge cards - target all possible elements */
+    :deep(*) {
+      &:hover {
+        transform: none !important;
+        scale: none !important;
+        transition: none !important;
+      }
+    }
+
+    /* Specifically target timeline elements */
+    :deep(.utimeline-item),
+    :deep(.utimeline-item-content),
+    :deep(.utimeline-description),
+    :deep([class*="timeline"]),
+    :deep([class*="utimeline"]) {
+      transform: none !important;
+      scale: none !important;
+      transition: none !important;
+
+      &:hover {
+        transform: none !important;
+        scale: none !important;
+        transition: none !important;
+      }
+    }
   }
 
   &__contact-cta {
