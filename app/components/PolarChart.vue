@@ -56,13 +56,13 @@ const PERSONALITY_TRAITS = [
 /**
  * Color palette that adapts to light/dark theme
  * Provides consistent colors for chart elements across themes
+ * Uses light mode colors during SSR to prevent hydration mismatches
  */
 const themeColors = computed(() => {
-  // On SSR, use colorMode.value (Nuxt injects correct value)
-  // On client, only use colorMode.value after hydration
-  const isDarkMode = hydrated.value
-    ? colorMode.value === "dark"
-    : colorMode.value === "dark";
+  // Always use light mode colors on SSR to prevent hydration mismatches
+  // Only use actual color mode after client hydration
+  const isDarkMode =
+    import.meta.client && hydrated.value ? colorMode.value === "dark" : false;
   return {
     tooltipBackground: isDarkMode ? "#0f172a" : "#ffffff",
     tooltipTitle: isDarkMode ? "#e2e8f0" : "#0f172a",

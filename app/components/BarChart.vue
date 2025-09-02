@@ -79,14 +79,13 @@ if (import.meta.client) {
 
 /**
  * Color palette that adapts to light/dark theme
- * Ensures correct color mode after hydration
+ * Uses light mode colors during SSR to prevent hydration mismatches
  */
 const themeColors = computed(() => {
-  // On SSR, use colorMode.value (Nuxt injects correct value)
-  // On client, only use colorMode.value after hydration
-  const isDarkMode = hydrated.value
-    ? colorMode.value === "dark"
-    : colorMode.value === "dark";
+  // Always use light mode colors on SSR to prevent hydration mismatches
+  // Only use actual color mode after client hydration
+  const isDarkMode =
+    import.meta.client && hydrated.value ? colorMode.value === "dark" : false;
   return {
     axisTick: isDarkMode ? "#cbd5e1" : "#334155",
     axisGrid: isDarkMode ? "rgba(148,163,184,0.22)" : "rgba(100,116,139,0.15)",
