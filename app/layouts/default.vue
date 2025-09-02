@@ -31,6 +31,7 @@ function updateAmbientBackground(preference: string) {
     <NuxtRouteAnnouncer />
     <div class="layout-root">
       <main-navigation />
+      <!-- Ambient background (starts after hero/first viewport) -->
       <div class="ambient-background" aria-hidden="true"></div>
       <main id="main-content" tabindex="-1">
         <NuxtPage />
@@ -45,21 +46,20 @@ function updateAmbientBackground(preference: string) {
 @import "tailwindcss";
 @import "@nuxt/ui";
 
+/* Sticky footer layout */
 .layout-root {
   min-height: 100vh;
-  min-height: 100dvh;
+  min-height: 100dvh; /* modern viewport units for mobile */
   display: flex;
   flex-direction: column;
   position: relative;
-  background: #181818;
+  background: #181818; /* fallback base */
+  /* Ensure stacking context so negative z-index child stays behind */
   isolation: isolate;
-  /* Performance optimizations */
-  will-change: auto;
-  contain: layout style paint;
 }
 
 .layout-root > main {
-  flex: 1 0 auto;
+  flex: 1 0 auto; /* take remaining space so footer sits at bottom */
 }
 
 /* Ambient background effect */
@@ -85,7 +85,7 @@ function updateAmbientBackground(preference: string) {
     #181818 120vh
   );
   overflow: hidden;
-  transition: background 2s ease-in-out;
+  transition: background 0.5s ease-in-out;
 }
 
 /* Use pseudo elements so we can layer glows + subtle noise separately for compositing control */
@@ -95,7 +95,6 @@ function updateAmbientBackground(preference: string) {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  will-change: transform;
 }
 
 /* Soft multi‑glow layer (very low opacity). Large blurred radial gradients animated slowly. */
@@ -123,9 +122,8 @@ function updateAmbientBackground(preference: string) {
     );
   filter: blur(60px) saturate(140%);
   mix-blend-mode: screen; /* Keeps it subtle over dark base */
-  animation: ambient-shift-1 120s ease-in-out infinite alternate;
+  animation: ambient-shift-1 110s linear infinite alternate;
   opacity: 0.65;
-  transform: translateZ(0); /* Force hardware acceleration */
 }
 
 /* Subtle secondary motion / parallax using another gentle gradient veil + dither noise */
@@ -149,8 +147,7 @@ function updateAmbientBackground(preference: string) {
   filter: blur(40px) contrast(110%) brightness(105%);
   mix-blend-mode: plus-lighter;
   opacity: 0.35;
-  animation: ambient-shift-2 240s ease-in-out infinite alternate;
-  transform: translateZ(0); /* Force hardware acceleration */
+  animation: ambient-shift-2 300s ease-in-out infinite alternate;
 }
 
 /* Light mode variant of the ambient background */
@@ -164,7 +161,7 @@ function updateAmbientBackground(preference: string) {
     rgba(255, 255, 255, 0.8) 90vh,
     #ffffff 120vh
   );
-  transition: background 2s ease-in-out;
+  transition: background 0.5s ease-in-out;
 }
 
 .ambient-background-light::before {
@@ -190,9 +187,8 @@ function updateAmbientBackground(preference: string) {
     );
   filter: blur(60px) saturate(140%);
   mix-blend-mode: screen;
-  animation: ambient-shift-1 120s ease-in-out infinite alternate;
+  animation: ambient-shift-1 110s linear infinite alternate;
   opacity: 0.65;
-  transform: translateZ(0); /* Force hardware acceleration */
 }
 
 .ambient-background-light::after {
@@ -215,8 +211,7 @@ function updateAmbientBackground(preference: string) {
   filter: blur(40px) contrast(110%) brightness(105%);
   mix-blend-mode: plus-lighter;
   opacity: 0.35;
-  animation: ambient-shift-2 240s ease-in-out infinite alternate;
-  transform: translateZ(0); /* Force hardware acceleration */
+  animation: ambient-shift-2 300s ease-in-out infinite alternate;
 }
 
 /* Keyframes: translate backgrounds subtly, no large movements to avoid distraction */
@@ -224,14 +219,11 @@ function updateAmbientBackground(preference: string) {
   0% {
     transform: translate3d(0, 0, 0) scale(1);
   }
-  33% {
-    transform: translate3d(1%, -1%, 0) scale(1.01);
-  }
-  66% {
-    transform: translate3d(-1.5%, 1.5%, 0) scale(1.02);
+  50% {
+    transform: translate3d(2%, -2%, 0) scale(1.03);
   }
   100% {
-    transform: translate3d(0.5%, -0.5%, 0) scale(1.015);
+    transform: translate3d(-3%, 3%, 0) scale(1.05);
   }
 }
 
@@ -239,11 +231,8 @@ function updateAmbientBackground(preference: string) {
   0% {
     transform: translate3d(0, 0, 0) scale(1);
   }
-  50% {
-    transform: translate3d(-2%, 1%, 0) scale(1.02);
-  }
   100% {
-    transform: translate3d(1%, -1%, 0) scale(1.01);
+    transform: translate3d(-4%, 2%, 0) scale(1.04);
   }
 }
 

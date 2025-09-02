@@ -71,6 +71,8 @@ onUnmounted(() => {
       },
     ]"
   >
+    <!-- Glow effect as separate element -->
+    <div class="scroll-companion__glow"></div>
     <div
       :class="[
         'scroll-companion__inner',
@@ -175,6 +177,29 @@ $block: "scroll-companion";
     bottom: 3rem;
   }
 
+  &__glow {
+    position: absolute;
+    left: 50%;
+    bottom: -32px;
+    transform: translateX(-50%);
+    width: 320px;
+    height: 120px;
+    background: radial-gradient(
+      ellipse 70% 60% at 50% 60%,
+      var(--color-primary, #8b5cf6) 0%,
+      transparent 80%
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease-out;
+    z-index: 1;
+    filter: blur(16px) saturate(1.2);
+  }
+
+  &:hover &__glow {
+    opacity: 0.7;
+  }
+
   &__inner {
     display: flex;
     justify-content: space-around;
@@ -189,6 +214,7 @@ $block: "scroll-companion";
     pointer-events: auto;
     position: relative;
     transform: translateZ(0); /* Force hardware acceleration */
+    z-index: 2; /* Ensure companion stays above the glow */
 
     &--active {
       width: 150px;
@@ -197,31 +223,6 @@ $block: "scroll-companion";
       box-shadow: none;
       border-radius: 500px;
       animation: mutate 0.4s ease-out;
-    }
-
-    // Glow effect
-    &::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      bottom: -32px;
-      transform: translateX(-50%);
-      width: 320px;
-      height: 120px;
-      background: radial-gradient(
-        ellipse 70% 60% at 50% 60%,
-        var(--color-primary, #8b5cf6) 0%,
-        transparent 80%
-      );
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s ease-out;
-      z-index: -1;
-      filter: blur(16px) saturate(1.2);
-    }
-
-    &:hover::after {
-      opacity: 0.7;
     }
 
     // Badge transformation on hover (when not active)
