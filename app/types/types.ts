@@ -348,3 +348,30 @@ export interface FaqSectionResponse extends BaseResponse<FaqSectionResponse> {
   jumpmark?: string;
   faqItems?: FaqItem[];
 }
+
+// Testimonial section specific types
+
+/** Individual recommendation card from colleagues/clients */
+export interface RecommendationCard {
+  id?: number;
+  author?: string;
+  position?: string;
+  company?: string;
+  relation?: string | null;
+  recommendation?: unknown[];
+  isTranslated?: boolean | null;
+  platform?: string;
+  postDate?: string;
+  summary?: string;
+  avatar?: StrapiImage | null;
+}
+
+/**
+ * Testimonial section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface TestimonialSectionResponse extends BaseResponse<TestimonialSectionResponse> {
+  title?: string;
+  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  jumpmark?: string;
+  recommendationCards?: RecommendationCard[];
+}

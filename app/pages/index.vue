@@ -9,5 +9,6 @@
     <experience-section />
     <certificate-section />
     <faq-section />
+    <testimonial-section />
   </div>
 </template>
