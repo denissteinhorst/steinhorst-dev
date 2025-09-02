@@ -307,3 +307,26 @@ export interface ExperienceSectionResponse extends BaseResponse<ExperienceSectio
   jumpmark?: string;
   experienceCards?: ExperienceCard[];
 }
+
+/** Individual certificate/award card */
+export interface CertificateCard {
+  id?: number;
+  title?: string;
+  text?: unknown[];
+  linkText?: string;
+  link?: string;
+  target?: NavigationLinkTarget;
+  toolTip?: string; // CMS field uses "toolTip" casing
+  logo?: StrapiImage | null; // similar to ExperienceCard
+  bgColor: string;
+}
+
+/**
+ * Certificate section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface CertificateSectionResponse extends BaseResponse<CertificateSectionResponse> {
+  title?: string;
+  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  jumpmark?: string;
+  certificationCards?: CertificateCard[];
+}

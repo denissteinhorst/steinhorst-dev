@@ -7,5 +7,6 @@
     <personality-section />
     <project-section />
     <experience-section />
+    <certificate-section />
   </div>
 </template>
