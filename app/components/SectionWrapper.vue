@@ -128,6 +128,12 @@ $block: "section-wrapper";
       display: flex;
       flex-direction: column;
       gap: 1rem;
+
+      @media (min-width: 768px) {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
     }
 
     &__leading {
@@ -179,6 +185,8 @@ $block: "section-wrapper";
 
       @media (min-width: 768px) {
         margin-top: 0;
+        justify-content: flex-end;
+        align-self: flex-end;
       }
     }
 
@@ -186,7 +194,8 @@ $block: "section-wrapper";
       justify-content: center;
 
       @media (min-width: 768px) {
-        justify-content: center;
+        justify-content: flex-end;
+        align-self: flex-end;
       }
     }
 
@@ -195,12 +204,14 @@ $block: "section-wrapper";
 
       @media (min-width: 768px) {
         justify-content: flex-end;
+        align-self: flex-end;
       }
     }
 
     &--left &__actions {
       @media (min-width: 768px) {
         justify-content: flex-end;
+        align-self: flex-end;
       }
     }
 
