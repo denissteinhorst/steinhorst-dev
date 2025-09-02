@@ -256,6 +256,14 @@ const chartDisplayOptions = computed(() => ({
         themeColors.value.axisTick === "#cbd5e1" ? "#0f172a" : "#ffffff",
       titleColor: themeColors.value.tooltipTitle,
       bodyColor: themeColors.value.tooltipBody,
+      filter: () => {
+        // Include both datasets in tooltip
+        return true;
+      },
+      itemSort: (a: TooltipItem<"bar">, b: TooltipItem<"bar">) => {
+        // Sort so that "Inneres Selbstbild" (dataset 0) appears before "Äußeres Selbstbild" (dataset 1)
+        return a.datasetIndex - b.datasetIndex;
+      },
       borderColor: (context: unknown) => {
         // Extract border color based on data point
         const contextData = context as
@@ -282,18 +290,27 @@ const chartDisplayOptions = computed(() => ({
           return dimension?.name || "";
         },
         label: (context: TooltipItem<"bar">) => {
-          // Only show detailed info for the base dataset (inner values)
-          if (context.datasetIndex !== 0) return "";
-
           const dimension = motivationDimensions.value[context.dataIndex];
           if (!dimension) return "";
 
-          return [
-            `Inneres Selbstbild: ${dimension.innerValue}`,
-            `Äußeres Selbstbild: ${dimension.outerValue}`,
-            "",
-            ...wrapTextContent(dimension.description, 50),
-          ];
+          // Show dataset-specific info with proper labeling
+          if (context.datasetIndex === 0) {
+            // Inner dataset
+            return `Inneres Selbstbild: ${dimension.innerValue}`;
+          } else if (context.datasetIndex === 1) {
+            // Outer dataset - show total outer value
+            return `Äußeres Selbstbild: ${dimension.outerValue}`;
+          }
+
+          return "";
+        },
+        // Show the description after all dataset labels
+        afterBody: (items: TooltipItem<"bar">[]) => {
+          const firstItem = items?.[0];
+          if (!firstItem) return "";
+          const dimension = motivationDimensions.value[firstItem.dataIndex];
+          if (!dimension) return "";
+          return ["", ...wrapTextContent(dimension.description, 50)];
         },
       },
       titleFont: {
