@@ -83,9 +83,13 @@ $block: "personality-section";
       margin-left: -50vw;
       margin-right: -50vw;
       width: 100vw;
-      background-color: rgba(0, 0, 0, 0.25);
+      background-color: rgba(0, 0, 0, 0.05);
       pointer-events: none;
       z-index: -1;
+
+      @at-root .dark #{&} {
+        background-color: rgba(0, 0, 0, 0.2) !important;
+      }
 
       @media (min-width: 640px) {
         top: -2.5rem;
