@@ -1,17 +1,31 @@
 <script setup lang="ts">
-defineProps<{ data: RecommendationCard }>();
+defineProps<{
+  data: RecommendationCard;
+  isActive?: boolean;
+}>();
+
+const emit = defineEmits<{
+  click: [];
+}>();
+
+const handleClick = () => {
+  emit("click");
+};
 </script>
 
 <template>
   <BaseCard
+    :is-active="isActive"
     class="testimonial-card-compact"
+    :class="{ 'testimonial-card-compact--active': isActive }"
     role="listitem"
-    :aria-labelledby="`project-${data.id}`"
+    :aria-labelledby="`testimonial-${data.id}`"
+    @click="handleClick"
   >
     <article class="testimonial-card-compact__article">
-      <p class="testimonial-card-compact__summary">
+      <span class="testimonial-card-compact__summary">
         {{ data.summary }}
-      </p>
+      </span>
       <div class="testimonial-card-compact__footer">
         <div class="testimonial-card-compact__author-info">
           <p class="testimonial-card-compact__author-name">
@@ -30,31 +44,35 @@ defineProps<{ data: RecommendationCard }>();
 $block: "testimonial-card-compact";
 
 .#{$block} {
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+  padding-bottom: 0 !important;
+
+  :deep(p) {
+    padding-bottom: 0;
+  }
+
   &__article {
     border-radius: 0.5rem;
     cursor: pointer;
     transition: all 0.15s ease-in-out;
-    height: 100%;
     min-height: 0;
-
-    &:hover {
-      border-color: #d1d5db;
-    }
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-bottom: 0;
 
     @at-root .dark #{&} {
-      border-color: #374151;
-
-      &:hover {
-        border-color: #4b5563;
-      }
+      border-color: transparent;
     }
   }
 
   &__summary {
     font-size: 0.75rem;
-    line-height: 1rem;
-    margin-bottom: 0.75rem;
+    margin: 0;
+    padding: 0;
     color: #374151;
+    flex: 1;
 
     @at-root .dark #{&} {
       color: #e5e7eb;
@@ -66,11 +84,13 @@ $block: "testimonial-card-compact";
     align-items: center;
     justify-content: flex-end;
     gap: 0.75rem;
+    margin-top: auto;
   }
 
   &__author-info {
     min-width: 0;
     text-align: right;
+    line-height: 1;
   }
 
   &__author-name {
@@ -79,7 +99,7 @@ $block: "testimonial-card-compact";
     text-overflow: ellipsis;
     white-space: nowrap;
     color: #111827;
-    margin-bottom: -0.75rem;
+    margin: 0;
 
     @at-root .dark #{&} {
       color: #ffffff;
@@ -92,6 +112,8 @@ $block: "testimonial-card-compact";
     text-overflow: ellipsis;
     white-space: nowrap;
     color: #6b7280;
+    margin: 0;
+    line-height: 1.2;
 
     @at-root .dark #{&} {
       color: #9ca3af;

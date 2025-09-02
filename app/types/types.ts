@@ -364,6 +364,8 @@ export interface RecommendationCard {
   postDate?: string;
   summary?: string;
   avatar?: StrapiImage | null;
+  /** Optional external link to the original feedback (e.g., LinkedIn) */
+  sourceUrl?: string;
 }
 
 /**
