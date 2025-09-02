@@ -8,18 +8,25 @@ const isContactInView = ref(false);
 const showContactIcon = ref(true);
 
 let contactObserver: IntersectionObserver | null = null;
+let ticking = false;
 
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const updateScrollState = () => {
-  const scrollY = window.scrollY || window.pageYOffset;
-  const windowHeight = window.innerHeight;
-  isStarting.value = scrollY > windowHeight / 4;
-  isActive.value = scrollY > windowHeight / 4.2;
-  isBottom.value = false;
-  showContactIcon.value = !isContactInView.value;
+  if (!ticking) {
+    requestAnimationFrame(() => {
+      const scrollY = window.scrollY || window.pageYOffset;
+      const windowHeight = window.innerHeight;
+      isStarting.value = scrollY > windowHeight / 4;
+      isActive.value = scrollY > windowHeight / 4.2;
+      isBottom.value = false;
+      showContactIcon.value = !isContactInView.value;
+      ticking = false;
+    });
+    ticking = true;
+  }
 };
 
 onMounted(() => {
@@ -159,12 +166,12 @@ $block: "scroll-companion";
   bottom: -10rem; // Start hidden below viewport
 
   &--starting {
-    animation: slide 0.33s ease-in-out, fade 0.5s ease-in-out;
+    animation: slide 0.4s ease-out, fade 0.6s ease-out;
     bottom: 1rem;
   }
 
   &--bottom {
-    animation: slide-higher 0.5s ease-in-out, fade 0.5s ease-in-out;
+    animation: slide-higher 0.6s ease-out;
     bottom: 3rem;
   }
 
@@ -178,9 +185,10 @@ $block: "scroll-companion";
     height: 3.75rem; // h-15
     box-shadow: 0 0 0 25px rgba(0, 0, 0, 0.25);
     border-radius: 50%;
-    transition: all 0.33s ease;
+    transition: all 0.4s ease-out;
     pointer-events: auto;
     position: relative;
+    transform: translateZ(0); /* Force hardware acceleration */
 
     &--active {
       width: 150px;
@@ -188,7 +196,7 @@ $block: "scroll-companion";
       border: 1px solid rgba(0, 0, 0, 0.05);
       box-shadow: none;
       border-radius: 500px;
-      animation: mutate 0.33s ease-in-out;
+      animation: mutate 0.4s ease-out;
     }
 
     // Glow effect
@@ -207,7 +215,7 @@ $block: "scroll-companion";
       );
       opacity: 0;
       pointer-events: none;
-      transition: opacity 0.3s;
+      transition: opacity 0.4s ease-out;
       z-index: -1;
       filter: blur(16px) saturate(1.2);
     }
@@ -225,7 +233,7 @@ $block: "scroll-companion";
       backdrop-filter: blur(4px) !important;
       box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
       border-radius: 500px !important;
-      transition: all 0.3s ease !important;
+      transition: all 0.4s ease-out !important;
       display: inline-flex !important;
       gap: 0.5rem !important;
       padding: 0 0.75rem !important;
@@ -237,7 +245,7 @@ $block: "scroll-companion";
       .#{$block}__rocket-icon {
         opacity: 1;
         transform: translateX(30px);
-        transition: all 0.3s ease;
+        transition: all 0.4s ease-out;
       }
 
       &::before {
@@ -249,7 +257,7 @@ $block: "scroll-companion";
         font-weight: 500;
         white-space: nowrap;
         opacity: 1;
-        animation: fadeIn 0.3s ease-in-out;
+        animation: fadeIn 0.4s ease-out;
       }
     }
   }
@@ -274,7 +282,7 @@ $block: "scroll-companion";
     color: #111827; // text-gray-900
     cursor: pointer;
     font-size: 1.25rem; // text-xl
-    transition: color 0.2s ease;
+    transition: color 0.3s ease-out;
 
     &--clickable:hover {
       color: var(--color-secondary, #8b5cf6) !important;
@@ -391,15 +399,19 @@ $block: "scroll-companion";
 @keyframes slide {
   0% {
     bottom: -10rem;
+    opacity: 0;
   }
-  50% {
-    bottom: 2rem;
+  60% {
+    bottom: 1.5rem;
+    opacity: 0.8;
   }
-  75% {
-    bottom: 0.5rem;
+  80% {
+    bottom: 0.8rem;
+    opacity: 0.95;
   }
   100% {
     bottom: 1rem;
+    opacity: 1;
   }
 }
 
