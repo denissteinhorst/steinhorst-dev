@@ -330,3 +330,21 @@ export interface CertificateSectionResponse extends BaseResponse<CertificateSect
   jumpmark?: string;
   certificationCards?: CertificateCard[];
 }
+
+/** Individual FAQ item */
+export interface FaqItem {
+  order: number;
+  id: number;
+  question: string;
+  answer: string;
+}
+
+/**
+ * FAQ section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface FaqSectionResponse extends BaseResponse<FaqSectionResponse> {
+  title?: string;
+  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  jumpmark?: string;
+  faqItems?: FaqItem[];
+}

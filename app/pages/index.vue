@@ -8,5 +8,6 @@
     <project-section />
     <experience-section />
     <certificate-section />
+    <faq-section />
   </div>
 </template>

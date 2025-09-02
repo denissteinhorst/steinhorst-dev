@@ -9,6 +9,7 @@ const props = defineProps<{
   buttonIcon?: string;
   target?: string;
   footerText?: Array<BlockNode> | [];
+  textAlign?: "left" | "center" | "right";
 }>();
 
 const footerContentText = computed<BlockNode[]>(
@@ -31,6 +32,7 @@ const handleButtonClick = (event: MouseEvent) => {
     <UContainer class="section-wrapper--container">
       <header
         class="section-header"
+        :class="`section-header--${props.textAlign || 'left'}`"
         :aria-labelledby="'section-heading-' + jumpmark"
       >
         <div class="section-header__inner">
@@ -43,7 +45,14 @@ const handleButtonClick = (event: MouseEvent) => {
               {{ props.headerTitle }}
             </component>
 
-            <div class="section-header__intro">
+            <div
+              :class="[
+                'section-header__intro',
+                {
+                  'section-header__intro--center': props.textAlign === 'center',
+                },
+              ]"
+            >
               <StrapiBlocksText :nodes="props.headerText" />
             </div>
           </div>
@@ -103,6 +112,18 @@ $block: "section-wrapper";
     margin-bottom: 3rem;
     text-align: left;
 
+    &--left {
+      text-align: left;
+    }
+
+    &--center {
+      text-align: center;
+    }
+
+    &--right {
+      text-align: right;
+    }
+
     &__inner {
       display: flex;
       flex-direction: column;
@@ -139,6 +160,12 @@ $block: "section-wrapper";
         padding-bottom: 0 !important;
       }
 
+      &--center {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 80%;
+      }
+
       @media (min-width: 640px) {
         font-size: 1.125rem;
       }
@@ -151,8 +178,29 @@ $block: "section-wrapper";
       justify-content: flex-start;
 
       @media (min-width: 768px) {
-        justify-content: flex-end;
         margin-top: 0;
+      }
+    }
+
+    &--center &__actions {
+      justify-content: center;
+
+      @media (min-width: 768px) {
+        justify-content: center;
+      }
+    }
+
+    &--right &__actions {
+      justify-content: flex-end;
+
+      @media (min-width: 768px) {
+        justify-content: flex-end;
+      }
+    }
+
+    &--left &__actions {
+      @media (min-width: 768px) {
+        justify-content: flex-end;
       }
     }
 
