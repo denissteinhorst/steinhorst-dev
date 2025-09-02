@@ -35,6 +35,7 @@ const headerText = computed<BlockNode[]>(
     :jumpmark="data.jumpmark || ''"
     :header-title="data.title || ''"
     :header-text="headerText"
+    class="personality-section__wrapper"
   >
     <template #content>
       <div class="personality-section__grid">
@@ -69,6 +70,35 @@ const headerText = computed<BlockNode[]>(
 $block: "personality-section";
 
 .#{$block} {
+  &__wrapper {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -2rem;
+      bottom: -2rem;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+      width: 100vw;
+      background-color: rgba(0, 0, 0, 0.25);
+      pointer-events: none;
+      z-index: -1;
+
+      @media (min-width: 640px) {
+        top: -2.5rem;
+        bottom: -2.5rem;
+      }
+
+      @media (min-width: 1024px) {
+        top: 0;
+        bottom: 0;
+      }
+    }
+  }
+
   &__grid {
     display: grid;
     gap: 1.5rem;

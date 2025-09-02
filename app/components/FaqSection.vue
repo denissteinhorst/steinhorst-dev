@@ -27,6 +27,7 @@ const headerText = computed<BlockNode[]>(
     :header-title="data.title || ''"
     :header-text="headerText"
     text-align="center"
+    class="faq-section__wrapper"
   >
     <template #content>
       <div class="faq-section" aria-label="Main">
@@ -86,6 +87,35 @@ const headerText = computed<BlockNode[]>(
 $block: "faq-section";
 
 .#{$block} {
+  &__wrapper {
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -2rem;
+      bottom: -2rem;
+      left: 50%;
+      right: 50%;
+      margin-left: -50vw;
+      margin-right: -50vw;
+      width: 100vw;
+      background-color: rgba(0, 0, 0, 0.25);
+      pointer-events: none;
+      z-index: -1;
+
+      @media (min-width: 640px) {
+        top: -2.5rem;
+        bottom: -2.5rem;
+      }
+
+      @media (min-width: 1024px) {
+        top: 0;
+        bottom: 0;
+      }
+    }
+  }
+
   &--loading,
   &--error {
     padding: 2rem;
