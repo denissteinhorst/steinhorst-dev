@@ -10,5 +10,6 @@
     <certificate-section />
     <faq-section />
     <testimonial-section />
+    <contact-section />
   </div>
 </template>

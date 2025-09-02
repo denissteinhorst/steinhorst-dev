@@ -1,12 +1,19 @@
 <script setup lang="ts">
 const props = defineProps<{
   isActive?: boolean;
+  isDark?: boolean;
 }>();
 </script>
 
 <template>
   <UCard
-    :class="['base-card', { 'base-card--active': props.isActive }]"
+    :class="[
+      'base-card',
+      {
+        'base-card--active': props.isActive,
+        'base-card--dark': props.isDark,
+      },
+    ]"
     variant="soft"
     v-bind="$attrs"
   >
@@ -48,6 +55,19 @@ $block: "base-card";
 
   &--active {
     border: 1px solid var(--color-primary) !important;
+  }
+
+  &--dark {
+    border-color: rgba(55, 65, 81, 0.7) !important;
+    background-color: rgba(17, 24, 39, 0.6) !important;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+
+    :deep(*) {
+      &[class*="body"],
+      &[class*="card-body"] {
+        background-color: transparent !important;
+      }
+    }
   }
 
   &:hover {

@@ -377,3 +377,38 @@ export interface TestimonialSectionResponse extends BaseResponse<TestimonialSect
   jumpmark?: string;
   recommendationCards?: RecommendationCard[];
 }
+
+// Contact section specific types
+
+/** Individual contact channel with all required information */
+export interface ContactChannel {
+  id: string;
+  label: string;
+  description: string;
+  href: string;
+  icon: string;
+  external?: boolean;
+  aria?: string;
+}
+
+/** Individual contact card with platform-specific information */
+export interface ContactCard {
+  id?: number;
+  icon?: string;
+  title?: string;
+  text?: unknown[];
+  link?: string;
+  target?: NavigationLinkTarget;
+  buttonText?: string;
+}
+
+/**
+ * Contact section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface ContactSectionResponse extends BaseResponse<ContactSectionResponse> {
+  title?: string;
+  text?: unknown[];
+  closingNote?: string;
+  jumpmark?: string;
+  contactCards?: ContactCard[];
+}
