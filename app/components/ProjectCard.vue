@@ -10,7 +10,7 @@ const extractTextFromRichText = (block: RichTextBlock): string => {
   }
   if (block.children?.length) {
     return block.children
-      .map((child) => extractTextFromRichText(child))
+      .map((child: RichTextBlock): string => extractTextFromRichText(child))
       .join("");
   }
   return "";
