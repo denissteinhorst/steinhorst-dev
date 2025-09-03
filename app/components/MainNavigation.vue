@@ -74,18 +74,20 @@ const onBrandClick = (e: MouseEvent) => {
     if (import.meta.client) {
       const base = `${window.location.pathname}${window.location.search}`;
       try {
-        window.history.replaceState(window.history.state, '', base);
+        window.history.replaceState(window.history.state, "", base);
       } catch {
         /* noop: best-effort to clear hash without navigation */
       }
     }
     // Smooth scroll to hero heading if present, else top
-    const el = document.getElementById('hero-heading') || document.getElementById('hero');
+    const el =
+      document.getElementById("hero-heading") ||
+      document.getElementById("hero");
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
       (el as HTMLElement).focus?.();
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
     return;
   }
@@ -116,7 +118,11 @@ const onBrandClick = (e: MouseEvent) => {
         <div class="main-navigation__brand">
           <!-- Brand / Logo -->
           <slot name="brand">
-            <NuxtLink :to="brandLink" class="main-navigation__brand-link" @click="onBrandClick">
+            <NuxtLink
+              :to="brandLink"
+              class="main-navigation__brand-link"
+              @click="onBrandClick"
+            >
               {{ brandNameParts.main
               }}<span class="text-primary"
                 >.{{ brandNameParts.secondary }}</span
