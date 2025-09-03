@@ -5,9 +5,7 @@ const props = defineProps<{
 }>();
 
 // Compute text nodes for StrapiBlocksText
-const textNodes = computed<BlockNode[]>(
-  () => (props.data.text ?? []) as BlockNode[]
-);
+const textNodes = computed<RichTextNodes>(() => props.data.text ?? []);
 
 // Compute aria label based on target
 const getAriaLabel = (card: ContactCard): string => {

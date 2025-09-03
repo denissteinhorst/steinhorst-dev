@@ -1,19 +1,26 @@
 <script setup lang="ts">
-const props = defineProps<{
-  jumpmark: string;
-  variant: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-  headerTitle: string;
-  headerText: Array<BlockNode> | [];
-  buttonText?: string;
-  buttonLink?: string;
-  buttonIcon?: string;
-  target?: string;
-  footerText?: Array<BlockNode> | [];
-  textAlign?: "left" | "center" | "right";
-}>();
-
-const footerContentText = computed<BlockNode[]>(
-  () => (props.footerText ?? []) as BlockNode[]
+const props = withDefaults(
+  defineProps<{
+    jumpmark: string;
+    variant: HeadingLevel;
+    headerTitle: string;
+    headerText?: RichTextNodes | [];
+    buttonText?: string;
+    buttonLink?: string;
+    buttonIcon?: string;
+    target?: NavigationLinkTarget;
+    footerText?: RichTextNodes | [];
+    textAlign?: TextAlignment;
+  }>(),
+  {
+    headerText: () => [] as unknown as RichTextNodes,
+    footerText: () => [] as unknown as RichTextNodes,
+    buttonText: undefined,
+    buttonLink: undefined,
+    buttonIcon: undefined,
+    target: "_self" as NavigationLinkTarget,
+    textAlign: "left" as TextAlignment,
+  }
 );
 
 const emit = defineEmits<{
@@ -86,7 +93,7 @@ const handleButtonClick = (event: MouseEvent) => {
         v-if="props.footerText && props.footerText.length > 0"
         class="section-footer"
       >
-        <StrapiBlocksText :nodes="footerContentText" />
+        <StrapiBlocksText :nodes="props.footerText" />
       </footer>
     </UContainer>
   </section>

@@ -12,9 +12,7 @@ const { data, pending, error } =
     )
   );
 
-const headerText = computed<BlockNode[]>(
-  () => (data.value?.text ?? []) as BlockNode[]
-);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 
 // Active testimonial state management
 // Use `page` (1-based) as single source of truth for UPagination

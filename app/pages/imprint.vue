@@ -6,9 +6,7 @@ const { data, pending, error } = await useLazyAsyncData<ImprintSectionResponse>(
   () => cmsRequest<ImprintSectionResponse>("imprint-section", [])
 );
 
-const imprintText = computed<BlockNode[]>(
-  () => (data.value?.text ?? []) as BlockNode[]
-);
+const imprintText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </script>
 
 <template>

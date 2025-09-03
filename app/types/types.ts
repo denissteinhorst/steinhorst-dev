@@ -1,3 +1,14 @@
+// UI helper types (centralized for reuse across components)
+import type { BlockNode } from '#strapi-blocks-renderer/types';
+
+/** HTML heading levels used by UI components. */
+export type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+
+/** Common text alignment options for UI. */
+export type TextAlignment = 'left' | 'center' | 'right';
+
+/** Renderer-ready rich text node list (from nuxt-strapi-blocks-renderer). */
+export type RichTextNodes = BlockNode[];
 /** Query shape accepted by the request proxy endpoint. */
 export interface RequestProxyQuery {
   endpoint: string;
@@ -127,7 +138,7 @@ export interface HeroSectionResponse extends BaseResponse<HeroSectionResponse> {
   titleBefore?: string;
   emphasis?: string;
   titleAfter?: string;
-  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  text?: RichTextNodes; // CMS rich text blocks ready for renderer
   jumpmark?: string;
   heroTags?: HeroTag[];
   heroLinks?: HeroLink[];
@@ -166,8 +177,8 @@ export interface QuickFilter {
  */
 export interface SkillSectionResponse extends BaseResponse<SkillSectionResponse> {
   title?: string;
-  text?: unknown[];
-  footerText?: unknown[];
+  text?: RichTextNodes;
+  footerText?: RichTextNodes;
   jumpmark?: string;
   quickFilter?: QuickFilter;
   skillCards?: SkillCard[];
@@ -216,7 +227,7 @@ export interface PersonalityCard {
  */
 export interface PersonalitySectionResponse extends BaseResponse<PersonalitySectionResponse> {
   title?: string;
-  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  text?: RichTextNodes;
   jumpmark?: string;
   personalityCards?: PersonalityCard[];
 }
@@ -271,12 +282,12 @@ export interface LastProjectCard {
  */
 export interface ProjectSectionResponse extends BaseResponse<ProjectSectionResponse> {
   title?: string;
-  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  text?: RichTextNodes;
   placeholder?: string;
   jumpmark?: string;
   projectCards?: ProjectCard[];
   lastProjectCard?: LastProjectCard;
-  footnote?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  footnote?: RichTextNodes;
 }
 
 // Experience section specific types
@@ -300,7 +311,7 @@ export interface ExperienceCard {
  */
 export interface ExperienceSectionResponse extends BaseResponse<ExperienceSectionResponse> {
   title?: string;
-  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  text?: RichTextNodes;
   contactToggle?: string;
   expandToggle?: string;
   collapseToggle?: string;
@@ -312,7 +323,7 @@ export interface ExperienceSectionResponse extends BaseResponse<ExperienceSectio
 export interface CertificateCard {
   id?: number;
   title?: string;
-  text?: unknown[];
+  text?: RichTextNodes;
   linkText?: string;
   link?: string;
   target?: NavigationLinkTarget;
@@ -326,7 +337,7 @@ export interface CertificateCard {
  */
 export interface CertificateSectionResponse extends BaseResponse<CertificateSectionResponse> {
   title?: string;
-  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  text?: RichTextNodes;
   jumpmark?: string;
   certificationCards?: CertificateCard[];
 }
@@ -344,7 +355,7 @@ export interface FaqItem {
  */
 export interface FaqSectionResponse extends BaseResponse<FaqSectionResponse> {
   title?: string;
-  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  text?: RichTextNodes;
   jumpmark?: string;
   faqItems?: FaqItem[];
 }
@@ -358,7 +369,7 @@ export interface RecommendationCard {
   position?: string;
   company?: string;
   relation?: string | null;
-  recommendation?: unknown[];
+  recommendation?: RichTextNodes;
   isTranslated?: boolean | null;
   platform?: string;
   postDate?: string;
@@ -373,7 +384,7 @@ export interface RecommendationCard {
  */
 export interface TestimonialSectionResponse extends BaseResponse<TestimonialSectionResponse> {
   title?: string;
-  text?: unknown[]; // rich text blocks - keep generic to avoid coupling
+  text?: RichTextNodes;
   jumpmark?: string;
   recommendationCards?: RecommendationCard[];
 }
@@ -396,7 +407,7 @@ export interface ContactCard {
   id?: number;
   icon?: string;
   title?: string;
-  text?: unknown[];
+  text?: RichTextNodes;
   link?: string;
   target?: NavigationLinkTarget;
   buttonText?: string;
@@ -407,7 +418,7 @@ export interface ContactCard {
  */
 export interface ContactSectionResponse extends BaseResponse<ContactSectionResponse> {
   title?: string;
-  text?: unknown[];
+  text?: RichTextNodes;
   closingNote?: string;
   jumpmark?: string;
   contactCards?: ContactCard[];
@@ -420,7 +431,7 @@ export interface ContactSectionResponse extends BaseResponse<ContactSectionRespo
 export interface ImprintSectionResponse extends BaseResponse<ImprintSectionResponse> {
   title?: string;
   jumpmark?: string;
-  text?: unknown[];
+  text?: RichTextNodes;
 }
 
 // AI Summary types

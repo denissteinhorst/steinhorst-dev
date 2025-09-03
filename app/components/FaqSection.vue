@@ -6,9 +6,7 @@ const { data, pending, error } = await useLazyAsyncData<FaqSectionResponse>(
   () => cmsRequest<FaqSectionResponse>("faq-section", [])
 );
 
-const headerText = computed<BlockNode[]>(
-  () => (data.value?.text ?? []) as BlockNode[]
-);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </script>
 
 <template>

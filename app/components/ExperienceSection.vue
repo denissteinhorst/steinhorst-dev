@@ -74,9 +74,7 @@ const toggleStations = () => {
   }
 };
 
-const headerText = computed<BlockNode[]>(
-  () => (data.value?.text ?? []) as BlockNode[]
-);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 
 // Map cards to Timeline items so UTimeline renders connected separators
 const timelineItems = computed(() => {

@@ -18,9 +18,7 @@ const { data, pending, error } = await useLazyAsyncData<ContactSectionResponse>(
 );
 
 // Header text from CMS
-const headerText = computed<BlockNode[]>(
-  () => (data.value?.text ?? []) as BlockNode[]
-);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </script>
 
 <template>

@@ -22,13 +22,9 @@ const { data, pending, error } = await useLazyAsyncData<ProjectSectionResponse>(
     )
 );
 
-const headerText = computed<BlockNode[]>(
-  () => (data.value?.text ?? []) as BlockNode[]
-);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 
-const footerText = computed<BlockNode[]>(
-  () => (data.value?.footnote ?? []) as BlockNode[]
-);
+const footerText = computed<RichTextNodes>(() => data.value?.footnote ?? []);
 
 // Filter state
 const showCount = ref<number>(4);

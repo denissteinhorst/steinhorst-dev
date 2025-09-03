@@ -12,9 +12,7 @@ const { data, pending, error } =
     )
   );
 
-const headerText = computed<BlockNode[]>(
-  () => (data.value?.text ?? []) as BlockNode[]
-);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </script>
 
 <template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { SkillItem } from "~/types/types";
 const { cmsRequest } = useStrapi();
 
 const { data, pending, error } = await useLazyAsyncData<SkillSectionResponse>(
@@ -15,13 +16,15 @@ const { data, pending, error } = await useLazyAsyncData<SkillSectionResponse>(
 
 const modalOpen = ref(false);
 
-const headerText = computed<BlockNode[]>(
-  () => (data.value?.text ?? []) as BlockNode[]
-);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 
 const handleButtonClick = () => {
   modalOpen.value = true;
 };
+
+// Map skill items to display strings with proper typing
+const toListItems = (items?: SkillItem[]): string[] =>
+  items?.map((i) => i.title || "") ?? [];
 </script>
 
 <template>
@@ -58,7 +61,7 @@ const handleButtonClick = () => {
           v-for="(card, index) in data.skillCards"
           :key="index"
           :title="card.title || ''"
-          :list-items="card.skillItems?.map((item) => item.title || '') || []"
+          :list-items="toListItems(card.skillItems)"
           :index="index"
         />
       </div>

@@ -15,8 +15,8 @@ const avatarUrl = computed<string | undefined>(() => {
   return url === null ? undefined : url;
 });
 
-const recommendationText = computed<BlockNode[]>(
-  () => (props.data.recommendation ?? []) as BlockNode[]
+const recommendationText = computed<RichTextNodes>(
+  () => props.data.recommendation ?? []
 );
 
 const hasAlternativeLanguage = computed(() => {

@@ -16,9 +16,7 @@ const { data, pending, error } = await useLazyAsyncData<HeroSectionResponse>(
     ])
 );
 
-const text = computed<BlockNode[]>(
-  () => (data.value?.text ?? []) as BlockNode[]
-);
+const text = computed<RichTextNodes>(() => data.value?.text ?? []);
 </script>
 
 <template>
