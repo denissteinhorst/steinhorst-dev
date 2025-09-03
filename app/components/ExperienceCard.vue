@@ -89,7 +89,7 @@ const renderRichTextAsText = (blocks?: RichTextBlock[]): string => {
   if (!blocks) return "";
 
   return blocks
-    .map((block) => {
+    .map((block: RichTextBlock): string => {
       if (block.type === "text" && block.text) {
         return block.text;
       }
@@ -107,8 +107,8 @@ const extractListItems = (blocks?: RichTextBlock[]): string[] => {
 
   const items: string[] = [];
 
-  const traverse = (blocks: RichTextBlock[]) => {
-    blocks.forEach((block) => {
+  const traverse = (blocks: RichTextBlock[]): void => {
+    blocks.forEach((block: RichTextBlock): void => {
       if (block.type === "list-item" && block.children) {
         const text = renderRichTextAsText(block.children);
         if (text.trim()) {
