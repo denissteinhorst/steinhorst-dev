@@ -367,11 +367,11 @@ $block: "ai-summary";
 }
 
 .#{$block} {
-  // Main wrapper - responsive block/inline behavior
+  // Main wrapper - align with navigation breakpoint
   display: block;
   width: 100%;
 
-  @media (min-width: 640px) {
+  @media (min-width: 1024px) {
     display: inline-block;
     width: auto;
   }
@@ -397,8 +397,10 @@ $block: "ai-summary";
     backdrop-filter: none;
     isolation: isolate;
 
-    @media (min-width: 640px) {
+    // Align with navigation breakpoint (1024px) instead of 640px
+    @media (min-width: 1024px) {
       width: auto;
+      justify-content: flex-start;
     }
 
     &:hover {
