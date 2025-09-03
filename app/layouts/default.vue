@@ -5,6 +5,9 @@ import "~/assets/scss/app.scss";
 const colorMode = useColorMode();
 const ambientBackground = ref<Element | null>(null);
 
+// Keep URL hash in sync with the section ≥50% in view (hero keeps path without hash)
+useScrollHashes();
+
 onMounted(() => {
   ambientBackground.value = document.querySelector(".ambient-background");
   updateAmbientBackground(colorMode.preference);

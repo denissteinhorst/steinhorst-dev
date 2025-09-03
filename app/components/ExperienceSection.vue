@@ -106,7 +106,7 @@ const visibleTimelineItems = computed(() => {
   </small>
   <SectionWrapper
     v-else-if="data"
-    :jumpmark="data.jumpmark || 'experience'"
+    :jumpmark="data.jumpmark || 'experiences'"
     variant="h2"
     :header-title="data.title || ''"
     :header-text="headerText"
