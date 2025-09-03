@@ -108,8 +108,8 @@ const extractDescriptionText = (richTextBlocks: RichTextBlock[]): string => {
   for (const block of richTextBlocks) {
     if (block.type === "paragraph" && block.children) {
       const textContent = block.children
-        .filter((item) => item.type === "text")
-        .map((item) => item.text)
+        .filter((item: RichTextBlock): boolean => item.type === "text")
+        .map((item: RichTextBlock): string => item.text || "")
         .join("")
         .trim();
 
