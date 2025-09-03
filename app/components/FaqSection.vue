@@ -108,12 +108,12 @@ $block: "faq-section";
       margin-left: -50vw;
       margin-right: -50vw;
       width: 100vw;
-      background-color: rgba(0, 0, 0, 0.05);
+      background-color: #fafafa;
       pointer-events: none;
       z-index: -1;
 
       @at-root .dark #{&} {
-        background-color: rgba(0, 0, 0, 0.2) !important;
+        background-color: rgba(0, 0, 0, 0.1) !important;
       }
 
       @media (min-width: 640px) {

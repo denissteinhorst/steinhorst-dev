@@ -46,7 +46,7 @@ const headerText = computed<BlockNode[]>(
           :data-aos-delay="index * 100"
           class="personality-section__card-wrapper"
         >
-          <base-card class="personality-section__card">
+          <base-card :is-in-wrapper="true" class="personality-section__card">
             <template v-if="card.variant === 'polarChart'">
               <polar-chart
                 :title="card.title"
@@ -87,12 +87,12 @@ $block: "personality-section";
       margin-left: -50vw;
       margin-right: -50vw;
       width: 100vw;
-      background-color: rgba(0, 0, 0, 0.05);
+      background-color: #fafafa;
       pointer-events: none;
       z-index: -1;
 
       @at-root .dark #{&} {
-        background-color: rgba(0, 0, 0, 0.2) !important;
+        background-color: rgba(0, 0, 0, 0.1) !important;
       }
 
       @media (min-width: 640px) {

@@ -3,6 +3,7 @@ const props = defineProps<{
   isActive?: boolean;
   isDark?: boolean;
   aosDelay?: number;
+  isInWrapper?: boolean;
 }>();
 </script>
 
@@ -12,6 +13,7 @@ const props = defineProps<{
     :class="{
       'base-card--active': props.isActive,
       'base-card--dark': props.isDark,
+      'base-card--in-wrapper': props.isInWrapper,
     }"
     v-bind="$attrs"
   >
@@ -34,7 +36,6 @@ $block: "base-card";
   transition: box-shadow 0.3s ease, border-color 0.3s ease,
     background-color 0.3s ease;
 
-  // Override UCard's default styling - comprehensive approach
   :deep(*) {
     &[class*="body"],
     &[class*="card-body"] {
@@ -46,7 +47,6 @@ $block: "base-card";
     }
   }
 
-  // Direct child override for UCard
   :deep(> div) {
     height: 100%;
     display: flex;
@@ -55,6 +55,14 @@ $block: "base-card";
 
   &--active {
     border: 1px solid var(--color-primary) !important;
+  }
+
+  &--in-wrapper {
+    background-color: #ffffff !important;
+
+    :deep(> div) {
+      background-color: #ffffff !important;
+    }
   }
 
   &--dark,
@@ -70,9 +78,6 @@ $block: "base-card";
       }
     }
 
-    // Force the inner UCard container (and similar wrappers) to use the
-    // dark background so toggling the global color mode doesn't override
-    // this card when `base-card--dark` or `is-dark` is set.
     :deep(> div) {
       background-color: rgba(17, 24, 39, 0.6) !important;
       border-color: rgba(55, 65, 81, 0.7) !important;
@@ -86,6 +91,14 @@ $block: "base-card";
 
   @at-root .dark #{&} {
     border-color: rgba(55, 65, 81, 0.6);
+  }
+
+  @at-root .dark .#{$block}--in-wrapper {
+    background-color: rgba(17, 24, 39, 0.6) !important;
+
+    :deep(> div) {
+      background-color: #3033367b !important;
+    }
   }
 }
 </style>
