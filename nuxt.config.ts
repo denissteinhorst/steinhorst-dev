@@ -20,10 +20,13 @@ export default defineNuxtConfig({
     storageKey: 'nuxt-color-mode'
   },
   runtimeConfig: {
+    // Server-only secrets (never exposed to client)
+    api_token: '',
+    // Public values (available on client). These can be overridden at runtime via
+    // env vars NUXT_PUBLIC_API_BASE and NUXT_PUBLIC_API_URL.
     public: {
-      api_base: process.env.STRAPI_BASE || 'https://cms.steinhorst.dev',
-      api_url: process.env.STRAPI_URL || 'https://cms.steinhorst.dev/api',
-      api_token: process.env.STRAPI_TOKEN || 'public',
+      api_base: 'https://cms.steinhorst.dev',
+      api_url: 'https://cms.steinhorst.dev/api',
     }
   },
   imports: {

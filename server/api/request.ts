@@ -6,8 +6,8 @@ interface StrapiResponse {
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const API_URL = config.public.api_url;
-  const API_TOKEN = config.public.api_token;
+  const API_URL = config.public.api_url as string;
+  const API_TOKEN = (config.api_token as string) || '';
 
   // Get query parameters from request
   const query = getQuery(event);
@@ -95,6 +95,10 @@ export default defineEventHandler(async (event) => {
     return params;
   };
 
+  if (!API_URL) {
+    throw createError({ statusCode: 500, statusMessage: 'API base URL is not configured' });
+  }
+
   // Construct URL
   const url = new URL(`${API_URL}/${endpoint}`);
 
@@ -110,37 +114,53 @@ export default defineEventHandler(async (event) => {
   });
 
   // Make the request to Strapi with the token
-  const response: StrapiResponse = await $fetch(url.toString(), {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${API_TOKEN}`
-    },
-    timeout: 8000 // Same timeout as in original useStrapi
-  });
-
-  // Normalize response payload
-  const rawData = response?.data ?? response;
-
-  // Helper to pick only requested fields from an object
-  const pickFields = (obj: unknown): unknown => {
-    if (!obj || typeof obj !== 'object') return obj;
-    if (fields.length === 0) return obj;
-    const picked: Record<string, unknown> = {};
-    for (const key of fields as string[]) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        picked[key] = (obj as Record<string, unknown>)[key];
-      }
+  try {
+    const headers: Record<string, string> = {};
+    if (API_TOKEN) {
+      headers.Authorization = `Bearer ${API_TOKEN}`;
     }
-    return picked;
-  };
+    const response: StrapiResponse = await $fetch(url.toString(), {
+      method: 'GET',
+      headers,
+      timeout: 8000 // Same timeout as in original useStrapi
+    });
 
-  // Process response based on whether it's a collection or single type
-  if (isCollection) {
-    const arr = Array.isArray(rawData) ? rawData : [];
-    // If fields requested, filter each item; otherwise return as-is
-    return fields.length > 0 ? arr.map(item => pickFields(item)) : arr;
-  } else {
-    // Single type: optionally filter top-level fields
-    return fields.length > 0 ? pickFields(rawData) : rawData;
+    // Normalize response payload
+    const rawData = response?.data ?? response;
+
+    // Helper to pick only requested fields from an object
+    const pickFields = (obj: unknown): unknown => {
+      if (!obj || typeof obj !== 'object') return obj;
+      if (fields.length === 0) return obj;
+      const picked: Record<string, unknown> = {};
+      for (const key of fields as string[]) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          picked[key] = (obj as Record<string, unknown>)[key];
+        }
+      }
+      return picked;
+    };
+
+    // Process response based on whether it's a collection or single type
+    if (isCollection) {
+      const arr = Array.isArray(rawData) ? rawData : [];
+      // If fields requested, filter each item; otherwise return as-is
+      return fields.length > 0 ? arr.map(item => pickFields(item)) : arr;
+    } else {
+      // Single type: optionally filter top-level fields
+      return fields.length > 0 ? pickFields(rawData) : rawData;
+    }
+  } catch (err: unknown) {
+    // Avoid leaking secrets; include minimal info
+    const e = err as { status?: number; response?: { status?: number }; message?: string } | undefined;
+    console.error('Strapi proxy error', {
+      url: url.toString(),
+      status: e?.status || e?.response?.status,
+      message: e?.message,
+    });
+    throw createError({
+      statusCode: 502,
+      statusMessage: 'Upstream CMS request failed',
+    });
   }
 });
