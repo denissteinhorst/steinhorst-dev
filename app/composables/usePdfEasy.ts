@@ -7,6 +7,32 @@
  * const { generatePdfFromMarkdown } = usePdfEasy()
  * const blobUrl = await generatePdfFromMarkdown(markdown)
  */
+
+/**
+ * Default PDF metadata and filename.
+ * Edit these constants to customize your document defaults.
+ * You can also override per-call via GenerateOptions.
+ */
+export interface PdfMeta {
+  title?: string
+  author?: string
+  subject?: string
+  keywords?: string[] | string
+  creator?: string
+  producer?: string
+  creationDate?: string | Date
+  modDate?: string | Date
+}
+
+export const PDFEASY_DEFAULT_FILENAME = 'document.pdf'
+export const PDFEASY_DEFAULT_META: PdfMeta = {
+  title: 'steinhorst-dev_zusammenfassung.pdf',
+  author: 'Denis Steinhorst',
+  subject: 'ai-generated PDF summary from www.steinhorst.dev',
+  keywords: ["denis", "steinhorst", "steinhorst-dev", "summary", "portfolio", "developer", "frontend", "backend", "fullstack", "software", "engineer", "web", "app", "vue", "nuxt", "javascript", "typescript", "nodejs"],
+  creator: 'www.steinhorst.dev',
+  producer: 'PDFKit'
+}
 export const usePdfEasy = () => {
   type ClientEmit = 'blob' | 'save' | 'open-link' | 'none'
 
@@ -14,6 +40,8 @@ export const usePdfEasy = () => {
     size?: 'a4' | 'a5' | 'letter' | string
     margins?: { top?: number; bottom?: number; left?: number; right?: number }
     clientEmit?: ClientEmit
+    filename?: string
+    meta?: PdfMeta
   }
 
   type TextStyle = {
@@ -32,7 +60,15 @@ export const usePdfEasy = () => {
   type PdfEasyContent = TextContent | ListContent | LineBreak | StackContent
 
   interface PdfEasyApi {
-    new: (opts: { size?: string; margins?: { top?: number; bottom?: number; left?: number; right?: number }; plugins?: unknown[] }) => void
+    new: (opts: {
+      size?: string
+      margins?: { top?: number; bottom?: number; left?: number; right?: number }
+      plugins?: unknown[]
+      // PDFKit document options: https://pdfkit.org/docs/getting_started.html#document-metadata
+      document?: { info?: Record<string, unknown> }
+      // Used by pdfeasy to name the file when clientEmit === 'save'
+      exports?: { name?: string }
+    }) => void
     add: (content: PdfEasyContent[]) => void
     run: (opts: { type: 'client' | 'server'; clientEmit?: ClientEmit; serverPath?: string; colorSchema?: 'CMYK' | 'RBG' }) => Promise<string | undefined>
   }
@@ -297,9 +333,55 @@ export const usePdfEasy = () => {
     if (!$pdf) throw new Error('PDFEasy ($pdf) is not available. Is nuxt-pdfeasy installed?')
 
     const { size = 'a4', margins = { top: 5, bottom: 5, left: 5, right: 5 }, clientEmit = 'blob' } = options
+    const meta: PdfMeta = { ...PDFEASY_DEFAULT_META, ...(options.meta ?? {}) }
+    const toSafeName = (s: string): string => s
+      .replace(/[\0<>:"/\\|?*\n\r]+/g, '')
+      .trim()
+      .replace(/\s+/g, '_')
+      .slice(0, 200)
+    const ensurePdfExt = (s: string): string => (s.toLowerCase().endsWith('.pdf') ? s : `${s}.pdf`)
+    let filename = options.filename ?? PDFEASY_DEFAULT_FILENAME
+    if (!options.filename && typeof meta.title === 'string' && meta.title.trim().length > 0) {
+      filename = ensurePdfExt(toSafeName(meta.title))
+    }
+    const exportName = filename.replace(/\.pdf$/i, '')
+    // Map our meta into PDFKit's document info fields
+    const info: Record<string, unknown> = {
+      ...(meta.title ? { Title: String(meta.title).replace(/\.pdf$/i, '') } : {}),
+      ...(meta.author ? { Author: meta.author } : {}),
+      ...(meta.subject ? { Subject: meta.subject } : {}),
+      ...(meta.keywords ? { Keywords: Array.isArray(meta.keywords) ? meta.keywords.join(', ') : meta.keywords } : {}),
+      ...(meta.creator ? { Creator: meta.creator } : {}),
+      ...(meta.producer ? { Producer: meta.producer } : {}),
+      ...(meta.creationDate ? { CreationDate: new Date(meta.creationDate) } : {}),
+      ...(meta.modDate ? { ModDate: new Date(meta.modDate) } : {}),
+    }
 
-    $pdf.new({ size, margins })
+    $pdf.new({ size, margins, document: { info }, exports: { name: exportName } })
     $pdf.add(mdToPdfEasy(markdown))
+
+    // Work around pdfeasy's default `save` name (it prefixes with '/') by doing a controlled download.
+    if (clientEmit === 'save') {
+      const url = await $pdf.run({ type: 'client', clientEmit: 'blob' })
+      if (url) {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        a.style.display = 'none'
+        document.body.appendChild(a)
+        a.click()
+        setTimeout(() => {
+          try {
+            document.body.removeChild(a)
+            URL.revokeObjectURL(url)
+          } catch (err) {
+            console.debug('[usePdfEasy] Cleanup after download failed', err)
+          }
+        }, 0)
+        return url
+      }
+      return undefined
+    }
 
     // returns a blob URL when clientEmit === 'blob'
     return await $pdf.run({ type: 'client', clientEmit })

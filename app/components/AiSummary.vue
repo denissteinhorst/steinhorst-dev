@@ -287,7 +287,7 @@ const downloadPdf = async () => {
             <span>Onlinesuche läuft…</span>
             <UIcon
               v-if="searchCheckedPhase"
-              name="i-heroicons-check-circle"
+              name="i-heroicons-check"
               class="ai-summary__progress-icon"
             />
           </div>
