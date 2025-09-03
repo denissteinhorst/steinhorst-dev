@@ -2,6 +2,7 @@
 
 <template>
   <div class="app">
+    <leave-notification :blind-top-offset-px="10" />
     <hero-section />
     <skill-section />
     <personality-section />

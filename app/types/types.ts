@@ -433,3 +433,14 @@ export interface AiSummaryResponse extends BaseResponse<AiSummaryResponse> {
   summary?: string;
   createdAt?: ISODateString;
 }
+
+/**
+ * Leave Notification payload returned by the CMS.
+ * Contains notification content with title, text, and QR code image.
+ */
+export interface LeaveNotificationResponse extends BaseResponse<LeaveNotificationResponse> {
+  title?: string;
+  text?: string;
+  qrcode?: StrapiImage[];
+  createdAt?: ISODateString;
+}
