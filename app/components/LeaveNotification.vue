@@ -17,6 +17,15 @@ const props = withDefaults(defineProps<{ blindTopOffsetPx?: number }>(), {
   blindTopOffsetPx: 0,
 });
 
+// Desktop detection
+const isDesktop = ref(true);
+
+const checkIfDesktop = (): void => {
+  if (!import.meta.client) return;
+  const mediaQuery = window.matchMedia("(min-width: 1024px)");
+  isDesktop.value = mediaQuery.matches;
+};
+
 const qrCodeUrl = computed<string | undefined>(() => {
   const qrcode = Array.isArray(data.value?.qrcode)
     ? data.value?.qrcode[0]
@@ -81,11 +90,18 @@ const handleMouseMove = (event: MouseEvent): void => {
 
 onMounted(() => {
   suppressedUntil.value = readSuppressedUntil();
-  window.addEventListener("mousemove", handleMouseMove, { passive: true });
+  checkIfDesktop();
+
+  // Only enable leave notification on desktop devices
+  if (isDesktop.value) {
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+  }
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener("mousemove", handleMouseMove);
+  if (isDesktop.value) {
+    window.removeEventListener("mousemove", handleMouseMove);
+  }
 });
 
 // Suppress re-open until tomorrow whenever the modal is closed
