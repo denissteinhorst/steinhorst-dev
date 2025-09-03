@@ -181,13 +181,10 @@ $block: "contact-card";
   }
 
   &__actions {
-    /* pin actions to the bottom of the card */
     position: absolute;
-    left: 1.25rem;
-    right: 1.25rem;
     bottom: 1.25rem;
     margin-top: 0;
-    width: auto;
+    width: calc(100% - 3rem);
   }
 
   &__button {
@@ -197,7 +194,6 @@ $block: "contact-card";
     align-items: center;
     gap: 0.5rem;
 
-    // Force dark mode styling for UButton content
     :deep() {
       color: #ffffff !important;
 

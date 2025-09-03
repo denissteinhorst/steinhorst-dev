@@ -57,7 +57,8 @@ $block: "base-card";
     border: 1px solid var(--color-primary) !important;
   }
 
-  &--dark {
+  &--dark,
+  &.is-dark {
     border-color: rgba(55, 65, 81, 0.7) !important;
     background-color: rgba(17, 24, 39, 0.6) !important;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
@@ -67,6 +68,14 @@ $block: "base-card";
       &[class*="card-body"] {
         background-color: transparent !important;
       }
+    }
+
+    // Force the inner UCard container (and similar wrappers) to use the
+    // dark background so toggling the global color mode doesn't override
+    // this card when `base-card--dark` or `is-dark` is set.
+    :deep(> div) {
+      background-color: rgba(17, 24, 39, 0.6) !important;
+      border-color: rgba(55, 65, 81, 0.7) !important;
     }
   }
 
