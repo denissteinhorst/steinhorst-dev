@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { StrapiBlocksText } from "#components";
-import { computed } from "vue";
-
 const { cmsRequest } = useStrapi();
 
 // Fetch contact section data from CMS
 const { data, pending, error } = await useLazyAsyncData<ContactSectionResponse>(
   "contact",
-  () =>
+  (): Promise<ContactSectionResponse> =>
     cmsRequest<ContactSectionResponse>(
       "contact-section",
       ["title", "text", "jumpmark", "contactCards"],
