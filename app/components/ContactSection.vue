@@ -99,11 +99,15 @@ $block: "contact-section";
     height: 100%;
     background: radial-gradient(
         ellipse 80% 60% at 10% 20%,
-        #a684ff 0%,
+        var(--color-primary) 0%,
         transparent 80%
       ),
       radial-gradient(ellipse 70% 50% at 90% 80%, #484848ff 0%, transparent 80%),
-      radial-gradient(ellipse 60% 40% at 50% 60%, #4e3390ff 0%, transparent 80%);
+      radial-gradient(
+        ellipse 60% 40% at 50% 60%,
+        var(--color-secondary) 0%,
+        transparent 80%
+      );
     filter: blur(48px) saturate(1.4);
     opacity: 0.95;
     transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);

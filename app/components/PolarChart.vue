@@ -54,9 +54,8 @@ const PERSONALITY_TRAITS = [
 ] as const;
 
 /**
- * Color palette that adapts to light/dark theme
- * Provides consistent colors for chart elements across themes
- * Uses light mode colors during SSR to prevent hydration mismatches
+ * Chart theme colors - kept as hardcoded values since they need to be used in JavaScript
+ * These values should match the CSS custom properties defined in theme.scss
  */
 const themeColors = computed(() => {
   // Always use light mode colors on SSR to prevent hydration mismatches

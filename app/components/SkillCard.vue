@@ -62,41 +62,33 @@ $block: "skill-card";
   }
 
   &__title {
-    font-size: 1.125rem;
+    font-size: var(--font-size-lg);
     font-weight: 600;
     line-height: 1.25;
     letter-spacing: -0.025em;
-    color: #111827;
-    margin-bottom: 12px;
+    color: var(--color-heading);
+    margin-bottom: var(--spacing-sm);
     margin-top: 0;
-
-    @at-root .dark #{&} {
-      color: #ffffff;
-    }
   }
 
   &__list {
     display: flex;
     flex-direction: column;
-    color: #4b5563;
-    font-size: 1rem;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-base);
     margin-left: 0;
     margin-bottom: 0;
-
-    @at-root .dark #{&} {
-      color: #d1d5db;
-    }
   }
 
   &__list-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--spacing-xs);
 
     &-marker {
       display: inline-block;
-      height: 0.5rem;
-      width: 0.5rem;
+      height: var(--spacing-xs);
+      width: var(--spacing-xs);
       border-radius: 2px;
       background-color: var(--color-primary);
       flex-shrink: 0;
@@ -107,13 +99,9 @@ $block: "skill-card";
     }
 
     &-separator {
-      color: #b7b7b7;
+      color: var(--color-text-separator);
       opacity: 1;
       margin: 0 0.125rem;
-
-      @at-root .dark #{&} {
-        color: #7b7c7e;
-      }
     }
   }
 }

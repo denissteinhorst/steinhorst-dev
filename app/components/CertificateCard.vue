@@ -129,7 +129,7 @@ $block: "certificate-card";
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    border-radius: 0.75rem;
+    border-radius: var(--radius-small);
     overflow: hidden;
     border: 1px solid rgb(229 231 235 / 0.7);
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);

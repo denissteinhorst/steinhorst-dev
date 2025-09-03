@@ -259,7 +259,7 @@ $block: "experience-card";
   &__mobile-logo {
     display: flex;
     flex-direction: column;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--spacing-xs);
     width: 100%;
 
     @media (min-width: 640px) {
@@ -268,41 +268,29 @@ $block: "experience-card";
   }
 
   &__header {
-    margin-bottom: 0.75rem;
+    margin-bottom: var(--spacing-sm);
   }
 
   &__title {
-    margin-top: 0.75rem;
-    font-size: 1.125rem;
+    margin-top: var(--spacing-sm);
+    font-size: var(--font-size-lg);
     font-weight: 600;
     line-height: 1.4;
-    color: var(--color-gray-900);
-
-    .dark & {
-      color: var(--color-gray-100);
-    }
+    color: var(--color-heading);
   }
 
   &__company-link {
-    color: var(--color-secondary-600);
+    color: var(--color-primary);
     text-decoration: none;
 
     &:hover {
       text-decoration: underline;
     }
-
-    .dark & {
-      color: var(--color-secondary-400);
-    }
   }
 
   &__position {
     font-weight: 400;
-    color: var(--color-gray-500);
-
-    .dark & {
-      color: var(--color-gray-400);
-    }
+    color: var(--color-text-muted);
   }
 
   &__date {
@@ -310,22 +298,14 @@ $block: "experience-card";
     margin-bottom: 0.375rem;
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas,
       "Liberation Mono", "Courier New", monospace;
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     letter-spacing: -0.025em;
-    color: var(--color-gray-500);
-
-    .dark & {
-      color: var(--color-gray-400);
-    }
+    color: var(--color-text-muted);
   }
 
   &__duration {
     margin-left: 0.25rem;
-    color: var(--color-gray-400);
-
-    .dark & {
-      color: var(--color-gray-500);
-    }
+    color: var(--color-text-secondary);
   }
 
   &__content {
@@ -341,14 +321,10 @@ $block: "experience-card";
 
   &__description {
     flex: 1;
-    color: var(--color-gray-700);
-    font-size: 1rem;
+    color: var(--color-text);
+    font-size: var(--font-size-base);
     line-height: 1.75;
     max-width: 36rem;
-
-    .dark & {
-      color: var(--color-gray-300);
-    }
   }
 
   &__summary {
@@ -356,35 +332,31 @@ $block: "experience-card";
   }
 
   &__duties {
-    margin-top: 0.75rem;
+    margin-top: var(--spacing-sm);
     padding-left: 1.25rem;
     list-style-type: disc;
 
     &:deep(li) {
-      margin-bottom: 0.5rem;
-      font-size: 0.875rem;
+      margin-bottom: var(--spacing-xs);
+      font-size: var(--font-size-sm);
     }
   }
 
   &__duty-item {
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-sm);
   }
 
   &__learning {
     margin-top: 1.25rem;
-    font-size: 0.75rem;
+    font-size: var(--font-size-xs);
     letter-spacing: 0.05em;
-    color: var(--color-gray-500);
+    color: var(--color-text-muted);
     font-weight: 500;
-
-    .dark & {
-      color: var(--color-gray-400);
-    }
   }
 
   &__quote-icon {
-    font-size: 1.125rem;
+    font-size: var(--font-size-lg);
     margin-right: 0.25rem;
   }
 
@@ -405,13 +377,13 @@ $block: "experience-card";
     justify-content: center;
     height: 5rem;
     width: 8rem;
-    border-radius: 0.375rem;
-    background-color: var(--color-white);
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-    margin-bottom: 0.5rem;
+    border-radius: var(--radius-small);
+    background-color: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-xs);
 
-    .dark & {
-      background-color: rgba(255, 255, 255, 0.9);
+    @at-root .dark #{&} {
+      background-color: #fafafa;
     }
 
     &--desktop {

@@ -31,8 +31,9 @@ $block: "base-card";
   display: flex !important;
   flex-direction: column !important;
   position: relative;
-  border: 1px solid rgba(229, 231, 235, 0.7);
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-default);
+  box-shadow: var(--shadow-sm);
   transition: box-shadow 0.3s ease, border-color 0.3s ease,
     background-color 0.3s ease;
 
@@ -51,6 +52,7 @@ $block: "base-card";
     height: 100%;
     display: flex;
     flex-direction: column;
+    border-radius: var(--radius-default);
   }
 
   &--active {
@@ -58,18 +60,19 @@ $block: "base-card";
   }
 
   &--in-wrapper {
-    background-color: #ffffff !important;
+    background-color: var(--color-surface-elevated) !important;
 
     :deep(> div) {
-      background-color: #ffffff !important;
+      background-color: var(--color-surface-elevated) !important;
+      border-radius: var(--radius-default);
     }
   }
 
   &--dark,
   &.is-dark {
-    border-color: rgba(55, 65, 81, 0.7) !important;
+    border-color: var(--color-border-dark) !important;
     background-color: rgba(17, 24, 39, 0.6) !important;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-dark-sm);
 
     :deep(*) {
       &[class*="body"],
@@ -80,24 +83,25 @@ $block: "base-card";
 
     :deep(> div) {
       background-color: rgba(17, 24, 39, 0.6) !important;
-      border-color: rgba(55, 65, 81, 0.7) !important;
+      border-color: var(--color-border-dark) !important;
+      border-radius: var(--radius-default);
     }
   }
 
   &:hover {
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
   }
 
   @at-root .dark #{&} {
-    border-color: rgba(55, 65, 81, 0.6);
+    border-color: var(--color-border-light);
   }
 
   @at-root .dark .#{$block}--in-wrapper {
-    background-color: rgba(17, 24, 39, 0.6) !important;
+    background-color: var(--color-surface-elevated) !important;
 
     :deep(> div) {
-      background-color: #3033367b !important;
+      background-color: var(--color-surface-dark) !important;
+      border-radius: var(--radius-default);
     }
   }
 }

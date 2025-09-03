@@ -42,33 +42,25 @@ $block: "project-card-last";
   }
 
   &__title {
-    font-size: 1.125rem;
+    font-size: var(--font-size-lg);
     font-weight: 600;
     line-height: 1.25;
     letter-spacing: -0.025em;
-    color: #101828;
-
-    @at-root .dark #{&} {
-      color: #ffffff;
-    }
+    color: var(--color-heading);
   }
 
   &__description {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: #4d5868;
-
-    @at-root .dark #{&} {
-      color: #cfd2d9;
-    }
+    margin-top: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
   }
 
   &__items {
     margin-top: auto;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0.5rem;
-    font-size: 0.875rem;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-sm);
     margin-left: 0;
 
     @media (min-width: 640px) {
@@ -94,19 +86,11 @@ $block: "project-card-last";
 
   &__item-name {
     font-weight: 500;
-    color: #101828;
-
-    @at-root .dark #{&} {
-      color: #e5e7eb;
-    }
+    color: var(--color-heading);
   }
 
   &__item-type {
-    color: #6b7483;
-
-    @at-root .dark #{&} {
-      color: #98a0ad;
-    }
+    color: var(--color-text-secondary);
   }
 
   &__bottom-border {

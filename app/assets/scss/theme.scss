@@ -12,9 +12,9 @@
 $colors: (
   // branding / interactive
   primary: #9861ff,
+  // #9861ff
   link: #9861ff,
   link-hover: #c7aaff,
-
   secondary: #61748d,
   success: #22c55e,
   warning: #f59e0b,
@@ -40,17 +40,43 @@ $font-sizes: (
 $theme-light: (
   heading: #404040,
   text: #495665,
+  text-muted: #4b5563,
+  text-secondary: #6b7483,
+  text-separator: #b7b7b7,
   bg: #fdfdfd,
   surface: #ffffff,
+  surface-elevated: #ffffff,
+  surface-dark: rgba(17, 24, 39, 0.6),
   border: #36415399,
+  border-light: rgba(229, 231, 235, 0.7),
+  border-dark: rgba(55, 65, 81, 0.7),
+  chart-tooltip-bg: #ffffff,
+  chart-tooltip-title: #0f172a,
+  chart-tooltip-body: #1e293b,
+  chart-tooltip-border: #334155,
+  chart-grid: rgba(100, 116, 139, 0.15),
+  chart-tick: #334155,
 ) !default;
 
 $theme-dark: (
   heading: #e5e5e5,
   text: #d1d5db,
+  text-muted: #d1d5db,
+  text-secondary: #98a0ad,
+  text-separator: #7b7c7e,
   bg: #1d2129,
   surface: #232833,
+  surface-elevated: rgba(17, 24, 39, 0.6),
+  surface-dark: #3033367b,
   border: #e5e7ebb3,
+  border-light: rgba(55, 65, 81, 0.6),
+  border-dark: rgba(55, 65, 81, 0.7),
+  chart-tooltip-bg: #0f172a,
+  chart-tooltip-title: #e2e8f0,
+  chart-tooltip-body: #f8fafc,
+  chart-tooltip-border: rgba(148, 163, 184, 0.4),
+  chart-grid: rgba(148, 163, 184, 0.22),
+  chart-tick: #cbd5e1,
 ) !default;
 
 // Helpers
@@ -66,9 +92,24 @@ $theme-dark: (
   // semantic theme variables
   --color-heading: #{map.get($theme, heading)};
   --color-text: #{map.get($theme, text)};
+  --color-text-muted: #{map.get($theme, text-muted)};
+  --color-text-secondary: #{map.get($theme, text-secondary)};
+  --color-text-separator: #{map.get($theme, text-separator)};
   --color-bg: #{map.get($theme, bg)};
   --color-surface: #{map.get($theme, surface)};
+  --color-surface-elevated: #{map.get($theme, surface-elevated)};
+  --color-surface-dark: #{map.get($theme, surface-dark)};
   --color-border: #{map.get($theme, border)};
+  --color-border-light: #{map.get($theme, border-light)};
+  --color-border-dark: #{map.get($theme, border-dark)};
+
+  // chart theme colors
+  --color-chart-tooltip-bg: #{map.get($theme, chart-tooltip-bg)};
+  --color-chart-tooltip-title: #{map.get($theme, chart-tooltip-title)};
+  --color-chart-tooltip-body: #{map.get($theme, chart-tooltip-body)};
+  --color-chart-tooltip-border: #{map.get($theme, chart-tooltip-border)};
+  --color-chart-grid: #{map.get($theme, chart-grid)};
+  --color-chart-tick: #{map.get($theme, chart-tick)};
 
   // expose palette entries as CSS vars as well
   --color-primary: #{color(primary)};
@@ -81,7 +122,6 @@ $theme-dark: (
   --color-info: #{color(info)};
 }
 
-// Export variables (light as default); Nuxt Color Mode usually toggles a `.dark` class
 :root {
   @include theme-vars($theme-light);
 
@@ -98,9 +138,42 @@ $theme-dark: (
   --font-size-6xl: #{fs("6xl")};
 
   // radii & shadows
-  --radius-default: 8px;
+  --radius-default: 12px;
+  --radius-small: 6px;
   --shadow-default: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
     rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
     rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
     rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-dark-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+
+  // scrollbar colors
+  --scrollbar-thumb: var(--color-primary);
+  --scrollbar-thumb-hover: var(--color-secondary);
+
+  // nuxt ui overrides
+  --ui-secondary: var(--color-primary);
+  --ui-primary: var(--color-primary);
+
+  // spacing tokens
+  --spacing-2xs: 0.25rem;
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 0.75rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+  --spacing-3xl: 4rem;
+  --spacing-4xl: 5rem;
+  --spacing-5xl: 6rem;
+}
+
+.dark {
+  @include theme-vars($theme-dark);
+
+  // dark mode scrollbar colors
+  --scrollbar-thumb: var(--color-primary);
+  --scrollbar-thumb-hover: var(--color-secondary);
 }

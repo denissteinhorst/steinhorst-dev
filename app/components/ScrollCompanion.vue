@@ -92,7 +92,6 @@ onUnmounted(() => {
             <UIcon
               name="i-lucide-arrow-up-circle"
               class="scroll-companion__icon scroll-companion__icon--clickable"
-              style="--color-secondary: var(--color-secondary, #8b5cf6)"
               aria-label="Zum Seitenanfang scrollen"
               @click="scrollToTop"
             />
@@ -127,7 +126,6 @@ onUnmounted(() => {
                 <UIcon
                   name="i-lucide-message-circle-more"
                   class="scroll-companion__icon scroll-companion__icon--clickable"
-                  style="--color-secondary: var(--color-secondary, #8b5cf6)"
                 />
               </NuxtLink>
             </UTooltip>
@@ -253,7 +251,7 @@ $block: "scroll-companion";
         content: "Ab September 2025 verfügbar – Let's talk";
         position: absolute;
         right: 10px;
-        color: var(--color-secondary, #8b5cf6);
+        color: var(--color-primary);
         font-size: 0.875rem;
         font-weight: 500;
         white-space: nowrap;
@@ -286,7 +284,7 @@ $block: "scroll-companion";
     transition: color 0.3s ease-out;
 
     &--clickable:hover {
-      color: var(--color-secondary, #8b5cf6) !important;
+      color: var(--color-primary) !important;
     }
   }
 
@@ -341,14 +339,14 @@ $block: "scroll-companion";
     }
 
     :deep(.ai-summary-btn:hover .bell-ring-icon) {
-      color: var(--color-secondary, #8b5cf6) !important;
+      color: var(--color-primary) !important;
     }
 
     :deep(button[aria-haspopup="dialog"]) {
       outline: none;
 
       &:focus-visible {
-        box-shadow: 0 0 0 2px var(--color-secondary, #8b5cf6);
+        box-shadow: 0 0 0 2px var(--color-primary);
         border-radius: 9999px;
       }
     }

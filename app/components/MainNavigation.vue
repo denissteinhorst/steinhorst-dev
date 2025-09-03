@@ -5,6 +5,37 @@ const route = useRoute();
 const router = useRouter();
 const { cmsRequest } = useStrapi();
 
+// Track actual browser hash for active state detection
+const currentHash = ref("");
+
+// Update hash when location changes (including replaceState from useScrollHashes)
+const updateCurrentHash = () => {
+  if (import.meta.client) {
+    currentHash.value = window.location.hash;
+  }
+};
+
+// Listen for hash changes and poll for URL changes (to catch replaceState)
+onMounted(() => {
+  if (import.meta.client) {
+    updateCurrentHash();
+    window.addEventListener("hashchange", updateCurrentHash);
+
+    // Poll for hash changes to catch replaceState from useScrollHashes
+    const hashWatcher = setInterval(() => {
+      const newHash = window.location.hash;
+      if (newHash !== currentHash.value) {
+        currentHash.value = newHash;
+      }
+    }, 100);
+
+    onUnmounted(() => {
+      window.removeEventListener("hashchange", updateCurrentHash);
+      clearInterval(hashWatcher);
+    });
+  }
+});
+
 const { data, pending, error } = await useLazyAsyncData<NavigationResponse>(
   "nav",
   () =>
@@ -38,9 +69,9 @@ const brandNameParts = computed(() => {
 
 const isActive = (to = ""): boolean => {
   if (!to) return false;
-  if (to.startsWith("#")) return route.hash === to;
+  if (to.startsWith("#")) return currentHash.value === to;
   const [path, hash] = to.split("#");
-  if (hash) return route.path === path && route.hash === `#${hash}`;
+  if (hash) return route.path === path && currentHash.value === `#${hash}`;
   return route.path === path;
 };
 
@@ -358,7 +389,7 @@ $block: "main-navigation";
       }
 
       &.text-primary {
-        color: var(--color-secondary, #90a1b9);
+        color: var(--color-primary, #90a1b9);
       }
     }
   }

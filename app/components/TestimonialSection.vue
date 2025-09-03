@@ -177,6 +177,15 @@ $block: "testimonial-section";
     display: flex;
     justify-content: center;
     margin-top: auto;
+
+    :deep(.bg-primary) {
+      background-color: var(--color-primary) !important;
+    }
+
+    :deep([data-state="active"]) {
+      background-color: var(--color-primary) !important;
+      border-color: var(--color-primary) !important;
+    }
   }
 }
 </style>

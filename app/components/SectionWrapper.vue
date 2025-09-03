@@ -103,20 +103,20 @@ const handleButtonClick = (event: MouseEvent) => {
 $block: "section-wrapper";
 
 .#{$block} {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  padding-top: var(--spacing-3xl);
+  padding-bottom: var(--spacing-3xl);
 
   @media (min-width: 640px) {
-    padding-top: 5rem;
-    padding-bottom: 5rem;
+    padding-top: var(--spacing-4xl);
+    padding-bottom: var(--spacing-4xl);
   }
   @media (min-width: 1024px) {
-    padding-top: 6rem;
-    padding-bottom: 6rem;
+    padding-top: var(--spacing-5xl);
+    padding-bottom: var(--spacing-5xl);
   }
 
   .section-header {
-    margin-bottom: 3rem;
+    margin-bottom: var(--spacing-2xl);
     text-align: left;
 
     &--left {
@@ -134,7 +134,7 @@ $block: "section-wrapper";
     &__inner {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: var(--spacing-md);
 
       @media (min-width: 768px) {
         flex-direction: row;
@@ -164,10 +164,10 @@ $block: "section-wrapper";
     }
 
     &__intro {
-      margin-top: 0.5rem;
-      color: rgba(75, 85, 99, 1);
+      margin-top: var(--spacing-xs);
+      color: var(--color-text-muted);
       line-height: 1.6;
-      font-size: 1rem;
+      font-size: var(--font-size-base);
 
       :deep(p) {
         padding-bottom: 0 !important;
@@ -185,7 +185,7 @@ $block: "section-wrapper";
     }
 
     &__actions {
-      margin-top: 1rem;
+      margin-top: var(--spacing-md);
       display: flex;
       align-items: center;
       justify-content: flex-start;
@@ -225,13 +225,13 @@ $block: "section-wrapper";
     &__button {
       display: inline-flex;
       align-items: center;
-      gap: 0.25rem;
+      gap: var(--spacing-2xs);
       text-decoration: none;
       cursor: pointer;
     }
 
     &__icon {
-      margin-left: 0.25rem;
+      margin-left: var(--spacing-2xs);
       width: 1rem;
       height: 1rem;
       display: inline-block;
@@ -239,21 +239,17 @@ $block: "section-wrapper";
   }
 
   .section-footer {
-    font-size: 0.875rem;
-    color: rgba(75, 85, 99, 1);
-    margin-top: 2rem;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin-top: var(--spacing-xl);
     text-align: left;
     line-height: 1.5;
     text-align: center;
 
     :deep(p) {
-      padding-bottom: 0.5rem;
-      font-size: 16px;
+      padding-bottom: var(--spacing-xs);
+      font-size: var(--font-size-base);
       color: var(--color-text-secondary);
-
-      @media (prefers-color-scheme: dark) {
-        color: #979fab;
-      }
     }
 
     :deep(a) {

@@ -102,7 +102,7 @@ $block: "contact-card";
     color: #ffffff;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(8px);
-    border-radius: 0.5rem;
+    border-radius: var(--radius-default);
     display: flex;
     flex-direction: column;
     position: relative;
@@ -113,7 +113,6 @@ $block: "contact-card";
 
     --color-text: #d1d5db;
     --color-heading: #ffffff;
-    --color-primary: #a684ff;
 
     &:hover {
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -148,10 +147,11 @@ $block: "contact-card";
     justify-content: center;
     width: 2.75rem;
     height: 2.75rem;
-    border-radius: 0.5rem;
+    border-radius: var(--radius-small);
     background-color: rgba(168, 132, 255, 0.15);
-    color: #a684ff;
-    border: 1px solid rgba(168, 132, 255, 0.2);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    opacity: 0.5;
     flex-shrink: 0;
   }
 

@@ -627,8 +627,27 @@ $block: "ai-summary";
   // Scroll styling
   &-scroll {
     scrollbar-width: thin;
-    scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
     -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+      cursor: pointer;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--scrollbar-thumb);
+      border-radius: 9999px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: var(--scrollbar-thumb-hover);
+      }
+    }
   }
 
   // Animations

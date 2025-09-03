@@ -321,7 +321,7 @@ $block: "testimonial-card-large";
     padding-right: 0.5rem; // keep space for custom scrollbar on desktop
     box-sizing: border-box;
     scrollbar-width: thin;
-    scrollbar-color: rgba(139, 92, 246, 0.7) transparent;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
 
     &::-webkit-scrollbar {
       width: 8px;
@@ -333,24 +333,12 @@ $block: "testimonial-card-large";
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: rgba(139, 92, 246, 0.7);
+      background-color: var(--scrollbar-thumb);
       border-radius: 9999px;
       cursor: pointer;
 
       &:hover {
-        background-color: rgba(124, 58, 237, 0.85);
-      }
-    }
-
-    @at-root .dark #{&} {
-      scrollbar-color: rgba(167, 139, 250, 0.85) transparent;
-
-      &::-webkit-scrollbar-thumb {
-        background-color: rgba(167, 139, 250, 0.85);
-
-        &:hover {
-          background-color: rgba(139, 92, 246, 0.95);
-        }
+        background-color: var(--scrollbar-thumb-hover);
       }
     }
   }

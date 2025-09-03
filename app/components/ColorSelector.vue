@@ -49,16 +49,13 @@ $block: "color-selector";
   height: 100%; // Ensures it takes full height of parent container
 
   &__icon {
-    color: #111827; // text-gray-900 - matches ScrollCompanion icons
+    color: #111827;
     cursor: pointer;
-    font-size: 1.25rem; // text-xl - matches ScrollCompanion icons
-    transition: color 0.2s ease; // matches ScrollCompanion transition
+    font-size: var(--font-size-xl);
+    transition: color 0.2s ease;
 
     &:hover {
-      color: var(
-        --color-secondary,
-        #8b5cf6
-      ) !important; // matches ScrollCompanion hover
+      color: var(--color-primary) !important;
     }
   }
 }
