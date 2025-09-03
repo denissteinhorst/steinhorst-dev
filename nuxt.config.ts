@@ -44,5 +44,57 @@ export default defineNuxtConfig({
         }
       }
     }
+  },
+  app: {
+    head: {
+      htmlAttrs: { lang: 'de' },
+      title: 'Denis Steinhorst – Fullstack Developer',
+      meta: [
+        { charset: 'utf-8' },
+        {
+          name: 'description',
+          // German description (page content is German to avoid language mismatch warnings)
+          content:
+            'Portfolio & Erfahrungen von Denis Steinhorst – Fullstack / Vue & Nuxt fokussierter Entwickler. Projekte, Skills, Referenzen & Kontakt.',
+        },
+        { property: 'og:type', content: 'website' },
+        {
+          property: 'og:title',
+          content: 'Denis Steinhorst – Fullstack Developer',
+        },
+        {
+          property: 'og:description',
+          content:
+            'Portfolio & Erfahrungen von Denis Steinhorst – Fullstack / Vue & Nuxt fokussierter Entwickler. Projekte, Skills, Referenzen & Kontakt.',
+        },
+        {
+          property: 'og:image',
+          content:
+            'https://www.steinhorst.dev/images/og_image.png',
+        },
+        {
+          property: 'og:url',
+          content: 'https://www.steinhorst.dev',
+        },
+        {
+          name: 'twitter:card', content: 'summary_large_image'
+        },
+        {
+          name: 'twitter:image', content: 'https://www.steinhorst.dev/images/og_image.png'
+        },
+        {
+          name: 'keywords',
+          content:
+            'Full Stack Entwickler, Vue.js, Nuxt.js, Node.js, JavaScript, Webentwicklung, Frontend, Backend, Software Engineer, Portfolio, Erfahrungen, Projekte, Referenzen',
+        },
+        { name: 'robots', content: 'index, follow' },
+        { name: 'theme-color', content: '#141517' },
+      ],
+      link: [
+        { rel: 'canonical', href: 'https://www.steinhorst.dev' },
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      ],
+      script: [],
+    },
   }
 })
