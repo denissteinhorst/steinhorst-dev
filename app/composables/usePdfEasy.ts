@@ -330,7 +330,7 @@ export const usePdfEasy = () => {
         // ignore to throw unified error below
       }
     }
-    if (!$pdf) throw new Error('PDFEasy ($pdf) is not available. Is nuxt-pdfeasy installed?')
+    if (!$pdf) throw new Error('PDFEasy ($pdf) is not available. Ensure the client plugin loads pdfeasy and you are calling this on the client.')
 
     const { size = 'a4', margins = { top: 5, bottom: 5, left: 5, right: 5 }, clientEmit = 'blob' } = options
     const meta: PdfMeta = { ...PDFEASY_DEFAULT_META, ...(options.meta ?? {}) }
