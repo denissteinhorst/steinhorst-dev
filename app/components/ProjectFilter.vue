@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
-
 /**
  * Option type for project count dropdown
  */
@@ -59,7 +57,7 @@ const availableProjectCountOptions = computed<ProjectFilterOptions[]>(() => {
 const visibleProjectCount = ref<number>(4);
 
 // Update visibility when project count changes
-watch(visibleProjectCount, (newCount) => {
+watch(visibleProjectCount, (newCount: number): void => {
   isShowingAllProjects.value = newCount === props.projectCount;
   emit("update:show-count", newCount);
 });
@@ -95,7 +93,7 @@ const activeFilterTerms = computed(() => {
 const isFilterActive = computed(() => activeFilterTerms.value.length > 0);
 
 // Handle filter state changes
-watch(isFilterActive, (filteringIsActive) => {
+watch(isFilterActive, (filteringIsActive: boolean): void => {
   emit("update:is-filtering", filteringIsActive);
 
   if (filteringIsActive) {
@@ -126,7 +124,7 @@ const getDefaultVisibleCount = (): number => {
 };
 
 // Initialize with appropriate count for current device
-onMounted(() => {
+onMounted((): void => {
   visibleProjectCount.value = getDefaultVisibleCount();
   emit("update:show-count", visibleProjectCount.value);
 });
