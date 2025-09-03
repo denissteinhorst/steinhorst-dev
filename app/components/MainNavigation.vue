@@ -64,6 +64,35 @@ watch(isMobileMenuOpen, (open) => {
     (el as HTMLElement | null)?.focus?.();
   }
 });
+
+// Handle brand click: if already on home route, just scroll to top/hero and clear hash (no navigation)
+const onBrandClick = (e: MouseEvent) => {
+  const targetPath = brandLink.value || "/";
+  if (route.path === targetPath) {
+    e.preventDefault();
+    // Clear hash without causing scroll jump
+    if (import.meta.client) {
+      const base = `${window.location.pathname}${window.location.search}`;
+      try {
+        window.history.replaceState(window.history.state, '', base);
+      } catch {
+        /* noop: best-effort to clear hash without navigation */
+      }
+    }
+    // Smooth scroll to hero heading if present, else top
+    const el = document.getElementById('hero-heading') || document.getElementById('hero');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      (el as HTMLElement).focus?.();
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    return;
+  }
+  // Navigate normally if not on home
+  e.preventDefault();
+  router.push(targetPath);
+};
 </script>
 
 <template>
@@ -87,7 +116,7 @@ watch(isMobileMenuOpen, (open) => {
         <div class="main-navigation__brand">
           <!-- Brand / Logo -->
           <slot name="brand">
-            <NuxtLink :to="brandLink" class="main-navigation__brand-link">
+            <NuxtLink :to="brandLink" class="main-navigation__brand-link" @click="onBrandClick">
               {{ brandNameParts.main
               }}<span class="text-primary"
                 >.{{ brandNameParts.secondary }}</span
