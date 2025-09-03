@@ -12,56 +12,43 @@ const emit = defineEmits<{
 const handleClick = () => {
   emit("click");
 };
-
-const aosDelay = computed(() => Math.min(props.index ?? 0, 5) * 100);
 </script>
 
 <template>
-  <div
-    data-aos="fade-up"
-    :data-aos-delay="aosDelay"
-    class="testimonial-card-compact-wrapper"
+  <BaseCard
+    :is-active="isActive"
+    class="testimonial-card-compact"
+    :class="{ 'testimonial-card-compact--active': isActive }"
+    role="listitem"
+    :aria-labelledby="`testimonial-${data.id}`"
+    @click="handleClick"
   >
-    <BaseCard
-      :is-active="isActive"
-      class="testimonial-card-compact"
-      :class="{ 'testimonial-card-compact--active': isActive }"
-      role="listitem"
-      :aria-labelledby="`testimonial-${data.id}`"
-      @click="handleClick"
-    >
-      <article class="testimonial-card-compact__article">
-        <span class="testimonial-card-compact__summary">
-          {{ data.summary }}
-        </span>
-        <div class="testimonial-card-compact__footer">
-          <div class="testimonial-card-compact__author-info">
-            <p class="testimonial-card-compact__author-name">
-              {{ data.author }}
-            </p>
-            <p class="testimonial-card-compact__author-position">
-              {{ data.position }} | {{ data.company }}
-            </p>
-          </div>
+    <article class="testimonial-card-compact__article">
+      <span class="testimonial-card-compact__summary">
+        {{ data.summary }}
+      </span>
+      <div class="testimonial-card-compact__footer">
+        <div class="testimonial-card-compact__author-info">
+          <p class="testimonial-card-compact__author-name">
+            {{ data.author }}
+          </p>
+          <p class="testimonial-card-compact__author-position">
+            {{ data.position }} | {{ data.company }}
+          </p>
         </div>
-      </article>
-    </BaseCard>
-  </div>
+      </div>
+    </article>
+  </BaseCard>
 </template>
 
 <style scoped lang="scss">
 $block: "testimonial-card-compact";
 
-.testimonial-card-compact-wrapper {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
 .#{$block} {
   transition: all 0.15s ease-in-out;
   cursor: pointer;
   padding-bottom: 0 !important;
+  height: 160px;
 
   :deep(p) {
     padding-bottom: 0;
@@ -74,7 +61,7 @@ $block: "testimonial-card-compact";
     min-height: 0;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 110px;
     padding-bottom: 0;
 
     @at-root .dark #{&} {
@@ -87,7 +74,7 @@ $block: "testimonial-card-compact";
     margin: 0;
     padding: 0;
     color: #374151;
-    flex: 1;
+    flex: 1 1 auto;
 
     @at-root .dark #{&} {
       color: #e5e7eb;
@@ -99,7 +86,7 @@ $block: "testimonial-card-compact";
     align-items: center;
     justify-content: flex-end;
     gap: 0.75rem;
-    margin-top: auto;
+    flex-shrink: 0;
   }
 
   &__author-info {

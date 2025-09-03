@@ -10,32 +10,23 @@ const emit = defineEmits<{
 
 const { buildImageUrl } = useStrapi();
 
-// Avatar image handling
 const avatarUrl = computed<string | undefined>(() => {
   const url = buildImageUrl(props.data.avatar, "small");
   return url === null ? undefined : url;
 });
 
-// Recommendation text handling
 const recommendationText = computed<BlockNode[]>(
   () => (props.data.recommendation ?? []) as BlockNode[]
 );
 
-// Alternative language support (mock implementation for now)
 const hasAlternativeLanguage = computed(() => {
-  // This would need to be implemented based on your CMS structure
-  // For now, returning false as placeholder
   return false;
 });
 
-// Display text based on language toggle
 const displayText = computed(() => {
-  // If alternative is shown and available, return alternative text
-  // For now, just return the main recommendation
   return recommendationText.value;
 });
 
-// Date formatting utility
 const formatDate = (dateStr: string | undefined): string => {
   if (!dateStr) return "";
 
@@ -48,7 +39,6 @@ const formatDate = (dateStr: string | undefined): string => {
   return `${dd}.${mm}.${yyyy}`;
 };
 
-// Event handlers
 const handleLanguageToggle = () => {
   emit("toggleLanguage");
 };
@@ -102,7 +92,12 @@ const handleLanguageToggle = () => {
       </header>
 
       <!-- Content: Scrollable recommendation text -->
-      <div class="testimonial-card-large__content">
+      <div
+        class="testimonial-card-large__content"
+        tabindex="0"
+        role="region"
+        aria-label="Empfehlungstext, scrollbarer Bereich"
+      >
         <div class="testimonial-card-large__text-wrapper">
           <StrapiBlocksText
             :key="`${data.id ?? 'noid'}-${showAlternative ? 'alt' : 'main'}`"
@@ -213,13 +208,15 @@ const handleLanguageToggle = () => {
 $block: "testimonial-card-large";
 
 .#{$block} {
-  height: 100%;
+  height: 807px;
 
   &__container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    gap: 1rem;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto; // middle row can shrink and scroll
+    height: 765px; // ensure fixed card height even if root class height doesn't apply
+    min-height: 0; // allow inner row to shrink/scroll in Safari
+    overflow: hidden; // prevent outer scroll; only center scrolls
+    row-gap: 1rem;
   }
 
   &__header {
@@ -317,17 +314,12 @@ $block: "testimonial-card-large";
   }
 
   &__content {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  &__text-wrapper {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 0.5rem;
+    min-height: 0; // allow the middle row to shrink below content height
+    overflow: auto; // this is the single scroll container
+    -webkit-overflow-scrolling: touch; // iOS momentum
+    overscroll-behavior: contain; // prevent page scroll chaining
+    padding-right: 0.5rem; // keep space for custom scrollbar on desktop
+    box-sizing: border-box;
     scrollbar-width: thin;
     scrollbar-color: rgba(139, 92, 246, 0.7) transparent;
 
@@ -361,7 +353,10 @@ $block: "testimonial-card-large";
         }
       }
     }
+  }
 
+  &__text-wrapper {
+    // no nested scroll; let the parent handle scrolling
     :deep(p) {
       padding-bottom: 0.75rem !important;
     }

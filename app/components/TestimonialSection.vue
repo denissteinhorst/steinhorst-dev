@@ -61,56 +61,15 @@ const handleLanguageToggle = () => {
   showAlternativeLanguage.value = !showAlternativeLanguage.value;
 };
 
-// Desktop height alignment: cap center column to min(left, right) height
-const leftColRef = ref<HTMLElement | null>(null);
-const rightColRef = ref<HTMLElement | null>(null);
-const centerMaxHeight = ref<number | null>(null);
-
-const updateCenterMaxHeight = () => {
-  if (typeof window === "undefined") return;
-  // Only constrain on ≥ 1024px (lg)
-  if (window.innerWidth < 1024) {
-    centerMaxHeight.value = null;
-    return;
-  }
-
-  nextTick(() => {
-    const lh = leftColRef.value?.offsetHeight || 0;
-    const rh = rightColRef.value?.offsetHeight || 0;
-    if (lh && rh) centerMaxHeight.value = Math.min(lh, rh);
-    else centerMaxHeight.value = lh || rh || null;
-  });
-};
-
-let resizeRaf: number | null = null;
-const onResize = () => {
-  if (resizeRaf) cancelAnimationFrame(resizeRaf);
-  resizeRaf = requestAnimationFrame(updateCenterMaxHeight);
-};
-
 onMounted(() => {
   // Ensure we start on first item if available
   if (testimonials.value.length > 0) page.value = 1;
-  nextTick(() => {
-    updateCenterMaxHeight();
-    // Minor delay to account for image/font layout shifts
-    setTimeout(updateCenterMaxHeight, 250);
-  });
-  if (typeof window !== "undefined")
-    window.addEventListener("resize", onResize);
 });
 
-onUnmounted(() => {
-  if (typeof window !== "undefined")
-    window.removeEventListener("resize", onResize);
-});
-
-// Recompute heights when page or language changes
+// Reset language toggle when page changes
 watch(page, () => {
   showAlternativeLanguage.value = false;
-  nextTick(updateCenterMaxHeight);
 });
-watch(showAlternativeLanguage, () => nextTick(updateCenterMaxHeight));
 </script>
 
 <template>
@@ -132,7 +91,7 @@ watch(showAlternativeLanguage, () => nextTick(updateCenterMaxHeight));
     <template #content>
       <div class="testimonial-section">
         <!-- Left column: Alternating items (even indices) -->
-        <div ref="leftColRef" class="testimonial-section__left-column">
+        <div class="testimonial-section__left-column">
           <testimonial-card-compact
             v-for="(card, index) in leftColumnItems"
             :key="card.id"
@@ -143,21 +102,14 @@ watch(showAlternativeLanguage, () => nextTick(updateCenterMaxHeight));
         </div>
 
         <!-- Center column: Large card with pagination -->
-        <div
-          class="testimonial-section__center-column"
-          :style="
-            centerMaxHeight ? { maxHeight: centerMaxHeight + 'px' } : undefined
-          "
-        >
-          <div class="testimonial-section__center-card">
-            <testimonial-card-large
-              v-if="currentTestimonial"
-              :key="currentTestimonial.id || activeIndex"
-              :data="currentTestimonial"
-              :show-alternative="showAlternativeLanguage"
-              @toggle-language="handleLanguageToggle"
-            />
-          </div>
+        <div class="testimonial-section__center-column">
+          <testimonial-card-large
+            v-if="currentTestimonial"
+            :key="currentTestimonial.id || activeIndex"
+            :data="currentTestimonial"
+            :show-alternative="showAlternativeLanguage"
+            @toggle-language="handleLanguageToggle"
+          />
 
           <!-- Pagination -->
           <div
@@ -175,7 +127,7 @@ watch(showAlternativeLanguage, () => nextTick(updateCenterMaxHeight));
         </div>
 
         <!-- Right column: Alternating items (odd indices) -->
-        <div ref="rightColRef" class="testimonial-section__right-column">
+        <div class="testimonial-section__right-column">
           <testimonial-card-compact
             v-for="(card, index) in rightColumnItems"
             :key="card.id"
@@ -206,7 +158,7 @@ $block: "testimonial-section";
 
   &__left-column,
   &__right-column {
-    display: none; // Hidden on mobile
+    display: none;
 
     @media (min-width: 1024px) {
       display: flex;
@@ -221,21 +173,8 @@ $block: "testimonial-section";
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    height: 100%;
-    min-height: 0;
-
-    @media (min-width: 1024px) {
-      height: 100%; // Use full available height from grid container
-    }
   }
 
-  &__center-card {
-    // Let the large card consume remaining space so its body can scroll
-    flex: 1;
-    min-height: 0; // required to allow inner scroll areas to shrink
-    display: flex; // so child 100% height can apply
-    overflow: hidden; // Ensure container doesn't grow beyond bounds
-  }
   &__pagination {
     display: flex;
     justify-content: center;
