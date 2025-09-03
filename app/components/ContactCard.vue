@@ -93,15 +93,18 @@ const getAriaLabel = (card: ContactCard): string => {
 $block: "contact-card";
 
 .#{$block} {
-  height: 100%;
+  height: 332px;
+  display: flex;
+  align-items: stretch;
 
   &__inner {
+    height: 100%;
+    flex: 1 1 auto;
     background-color: #111827;
     color: #ffffff;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(8px);
     border-radius: 0.5rem;
-    height: 100%;
     display: flex;
     flex-direction: column;
     position: relative;
@@ -110,7 +113,6 @@ $block: "contact-card";
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
 
-    // Force dark mode CSS variables for content
     --color-text: #d1d5db;
     --color-heading: #ffffff;
     --color-primary: #a684ff;
@@ -123,9 +125,11 @@ $block: "contact-card";
   &__body {
     display: flex;
     flex-direction: column;
-    height: 100%;
     padding: 1.25rem;
+    padding-bottom: 4.5rem;
     gap: 0.75rem;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   &__header {
@@ -137,6 +141,7 @@ $block: "contact-card";
   &__content {
     flex-grow: 1;
     width: 100%;
+    min-height: 0;
   }
 
   &__icon-wrapper {
@@ -176,8 +181,13 @@ $block: "contact-card";
   }
 
   &__actions {
-    margin-top: auto;
-    width: 100%;
+    /* pin actions to the bottom of the card */
+    position: absolute;
+    left: 1.25rem;
+    right: 1.25rem;
+    bottom: 1.25rem;
+    margin-top: 0;
+    width: auto;
   }
 
   &__button {
