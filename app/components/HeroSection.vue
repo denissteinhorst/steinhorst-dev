@@ -488,10 +488,31 @@ $block: "hero-section";
     object-fit: cover;
     border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
     transform: scale(1.065);
-    opacity: 0.3;
+    opacity: 0.25;
     mix-blend-mode: lighten;
-    filter: blur(70px) saturate(165%) brightness(120%);
+    filter: blur(24px) saturate(130%) brightness(110%);
     pointer-events: none;
+
+    /* Optimize for mobile devices */
+    @media (max-width: 767px) {
+      opacity: 0.15;
+      filter: blur(16px) saturate(120%) brightness(105%);
+      transform: scale(1.045);
+    }
+
+    /* Tablet optimization */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      opacity: 0.2;
+      filter: blur(32px) saturate(140%) brightness(115%);
+      transform: scale(1.055);
+    }
+
+    /* Desktop - full effect */
+    @media (min-width: 1024px) {
+      opacity: 0.3;
+      filter: blur(70px) saturate(165%) brightness(120%);
+      transform: scale(1.065);
+    }
   }
 
   &__aura {
@@ -503,11 +524,40 @@ $block: "hero-section";
       color-mix(in srgb, var(--color-primary) 55%, transparent),
       transparent 70%
     );
-    filter: blur(24px);
-    opacity: 0.3;
+    filter: blur(12px);
+    opacity: 0.2;
     mix-blend-mode: overlay;
     z-index: 9;
     pointer-events: none;
+
+    /* Mobile optimization - lighter aura */
+    @media (max-width: 767px) {
+      inset: -1rem;
+      filter: blur(8px);
+      opacity: 0.1;
+      background: radial-gradient(
+        circle at 60% 35%,
+        color-mix(in srgb, var(--color-primary) 35%, transparent),
+        transparent 60%
+      );
+    }
+
+    /* Tablet optimization */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      filter: blur(16px);
+      opacity: 0.15;
+      background: radial-gradient(
+        circle at 60% 35%,
+        color-mix(in srgb, var(--color-primary) 45%, transparent),
+        transparent 65%
+      );
+    }
+
+    /* Desktop - full effect */
+    @media (min-width: 1024px) {
+      filter: blur(24px);
+      opacity: 0.3;
+    }
   }
 
   &__portrait-img {
@@ -519,8 +569,22 @@ $block: "hero-section";
     border: 1px solid rgba(255, 255, 255, 1);
     z-index: 10;
     object-fit: cover;
-    transform: perspective(1200px) rotateY(-6deg) rotateX(4deg);
     will-change: transform;
+
+    /* Mobile - minimal transform for performance */
+    @media (max-width: 767px) {
+      transform: perspective(800px) rotateY(-2deg) rotateX(1deg);
+    }
+
+    /* Tablet - moderate transform */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
+    }
+
+    /* Desktop - full 3D effect */
+    @media (min-width: 1024px) {
+      transform: perspective(1200px) rotateY(-6deg) rotateX(4deg);
+    }
   }
 
   &:hover {
@@ -621,6 +685,24 @@ $block: "hero-section";
 @media (prefers-reduced-motion: reduce) {
   .hero-section__portrait img[aria-hidden] {
     transition: none;
+  }
+
+  .hero-section__glow {
+    filter: none !important;
+    opacity: 0 !important;
+  }
+
+  .hero-section__aura {
+    filter: none !important;
+    opacity: 0 !important;
+  }
+
+  .hero-section__portrait-img {
+    transform: none !important;
+  }
+
+  .shape-blob {
+    transition: none !important;
   }
 }
 </style>
