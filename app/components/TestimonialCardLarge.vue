@@ -19,27 +19,27 @@ const recommendationText = computed<RichTextNodes>(
   () => props.data.recommendation ?? []
 );
 
-const hasAlternativeLanguage = computed(() => {
+const hasAlternativeLanguage = computed((): boolean => {
   return false;
 });
 
-const displayText = computed(() => {
+const displayText = computed((): RichTextNodes => {
   return recommendationText.value;
 });
 
-const formatDate = (dateStr: string | undefined): string => {
-  if (!dateStr) return "";
+const formatDate = (dateString: string | undefined): string => {
+  if (!dateString) return "";
 
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return dateStr;
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
 
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const yyyy = date.getFullYear();
-  return `${dd}.${mm}.${yyyy}`;
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
 };
 
-const handleLanguageToggle = () => {
+const handleLanguageToggle = (): void => {
   emit("toggleLanguage");
 };
 </script>
