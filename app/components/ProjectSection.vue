@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-
 const { cmsRequest } = useStrapi();
 
 const { data, pending, error } = await useLazyAsyncData<ProjectSectionResponse>(
   "project",
-  () =>
+  (): Promise<ProjectSectionResponse> =>
     cmsRequest<ProjectSectionResponse>(
       "project-section",
       [
@@ -53,14 +51,14 @@ const extractTextFromRichText = (block: RichTextBlock): string => {
   }
   if (block.children?.length) {
     return block.children
-      .map((child) => extractTextFromRichText(child))
+      .map((child: RichTextBlock): string => extractTextFromRichText(child))
       .join("");
   }
   return "";
 };
 
 // Filter projects by tags
-const filteredProjects = computed(() => {
+const filteredProjects = computed((): ProjectCard[] => {
   if (!data.value?.projectCards) return [];
   if (selectedTags.value.length === 0) {
     return data.value.projectCards.slice(
@@ -69,12 +67,15 @@ const filteredProjects = computed(() => {
     );
   }
 
-  return data.value.projectCards.filter((card) => {
+  return data.value.projectCards.filter((card: ProjectCard): boolean => {
     const cardTags =
-      card.tagList?.map((tag) => extractTextFromRichText(tag).toLowerCase()) ||
-      [];
-    return selectedTags.value.some((tag) =>
-      cardTags.some((cardTag) => cardTag.includes(tag.toLowerCase()))
+      card.tagList?.map((tag: RichTextBlock): string =>
+        extractTextFromRichText(tag).toLowerCase()
+      ) || [];
+    return selectedTags.value.some((tag: string): boolean =>
+      cardTags.some((cardTag: string): boolean =>
+        cardTag.includes(tag.toLowerCase())
+      )
     );
   });
 });
