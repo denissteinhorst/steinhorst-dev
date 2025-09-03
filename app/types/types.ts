@@ -422,3 +422,14 @@ export interface ImprintSectionResponse extends BaseResponse<ImprintSectionRespo
   jumpmark?: string;
   text?: unknown[];
 }
+
+// AI Summary types
+/**
+ * AI Summary payload returned by the CMS.
+ * Mirrors common base fields and adds subtitle, summary and createdAt.
+ */
+export interface AiSummaryResponse extends BaseResponse<AiSummaryResponse> {
+  subtitle?: string;
+  summary?: string;
+  createdAt?: ISODateString;
+}

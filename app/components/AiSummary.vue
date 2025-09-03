@@ -1,5 +1,199 @@
+<script setup lang="ts">
+const { cmsRequest } = useStrapi();
+
+const { data, pending, error } = await useLazyAsyncData<AiSummaryResponse>(
+  "summary",
+  () => cmsRequest<AiSummaryResponse>("ai-summary", ["subtitle", "summary"])
+);
+
+// Use PDFEasy composable
+const { generatePdfFromMarkdown } = usePdfEasy();
+
+// Typing speed configuration (words per second)
+const WORDS_PER_SECOND = 32;
+const WORDS_PER_SECOND_FINAL = 9000;
+
+const open = ref(false);
+// Use only remote summary from API (no local fallback)
+const fullText = computed<string>(
+  () => (data.value?.summary as string | undefined)?.trim() ?? ""
+);
+
+// Build UI config for USlideover dynamically
+const slideoverUi = computed(() => ({
+  content: [
+    "ai-summary__panel",
+    "w-screen sm:w-[85vw] lg:w-[50vw] max-w-none",
+  ].join(" "),
+  footer: ["ai-summary__panel-footer"].join(" "),
+}));
+
+// Tokenize into "word + trailing whitespace" chunks (reactive)
+const tokens = computed<string[]>(() => fullText.value.match(/\S+\s*/g) || []);
+const currentText = ref("");
+const index = ref(0);
+const isComplete = ref(false);
+const hasStarted = ref(false);
+// Staged progress: search -> check -> typing
+const searchPhase = ref(false);
+const searchCheckedPhase = ref(false);
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+let checkTimer: ReturnType<typeof setTimeout> | null = null;
+
+let timer: ReturnType<typeof setTimeout> | null = null;
+
+// Acceleration curve
+const computeCurrentDelay = () => {
+  if (tokens.value.length === 0) return 0;
+  const progress = index.value / tokens.value.length;
+  const eased = Math.min(1, Math.pow(progress, 2));
+  const currentWps =
+    WORDS_PER_SECOND + (WORDS_PER_SECOND_FINAL - WORDS_PER_SECOND) * eased;
+  return 1000 / currentWps;
+};
+
+const scheduleNext = () => {
+  if (index.value >= tokens.value.length) {
+    isComplete.value = true;
+    timer = null;
+    return;
+  }
+  currentText.value += tokens.value[index.value++];
+  const delay = computeCurrentDelay();
+  timer = setTimeout(scheduleNext, delay);
+};
+
+const startTyping = () => {
+  if (timer || isComplete.value) return;
+  if (tokens.value.length === 0) {
+    // No content available; mark complete to stop progress states
+    hasStarted.value = true;
+    isComplete.value = true;
+    return;
+  }
+  hasStarted.value = true;
+  scheduleNext();
+};
+
+watch(open, async (val) => {
+  if (typeof document !== "undefined") {
+    if (val) {
+      document.documentElement.setAttribute("data-ai-summary-open", "true");
+    } else {
+      document.documentElement.removeAttribute("data-ai-summary-open");
+    }
+  }
+  if (!val) return;
+  await nextTick();
+  // Start staged phases immediately
+  // Clear previous timers
+  if (searchTimer) clearTimeout(searchTimer);
+  if (checkTimer) clearTimeout(checkTimer);
+  searchPhase.value = true;
+  searchCheckedPhase.value = false;
+  // After 1.5s, show checkmark for 0.5s
+  searchTimer = setTimeout(() => {
+    searchCheckedPhase.value = true;
+    checkTimer = setTimeout(() => {
+      // End search phases and start typing
+      searchPhase.value = false;
+      searchCheckedPhase.value = false;
+      startTyping();
+    }, 500);
+  }, 1500);
+});
+
+onBeforeUnmount(() => {
+  if (timer) clearTimeout(timer);
+  if (searchTimer) clearTimeout(searchTimer);
+  if (checkTimer) clearTimeout(checkTimer);
+  if (typeof document !== "undefined") {
+    document.documentElement.removeAttribute("data-ai-summary-open");
+  }
+});
+
+// Throttled markdown parsing
+const parsedMarkdown = ref("");
+let framePending = false;
+const scheduleFrame = (cb: () => void) =>
+  typeof window !== "undefined"
+    ? window.requestAnimationFrame(cb)
+    : setTimeout(cb, 16);
+
+watch(currentText, () => {
+  if (framePending) return;
+  framePending = true;
+  scheduleFrame(() => {
+    parsedMarkdown.value = currentText.value;
+    framePending = false;
+  });
+});
+
+parsedMarkdown.value = "";
+const progressPercentage = computed(() =>
+  Math.min(100, Math.round((index.value / (tokens.value.length || 1)) * 100))
+);
+
+// Derive availability states
+const hasContent = computed(() => tokens.value.length > 0);
+const canDownload = computed(() => isComplete.value && hasContent.value);
+
+// Sparkle particle generation
+interface SparkleConf {
+  left: number;
+  delay: number;
+  duration: number;
+  scale: number;
+  tx: number;
+}
+
+const sparkles = ref<SparkleConf[]>([]);
+const isClient = ref(false);
+
+const buildSparkles = (count = 5): SparkleConf[] =>
+  Array.from({ length: count }, () => ({
+    left: 15 + Math.random() * 70,
+    delay: Math.random() * 0.6,
+    duration: 0.7 + Math.random() * 0.7,
+    scale: 0.4 + Math.random() * 0.5,
+    tx: (Math.random() - 0.5) * 8,
+  }));
+
+const regenSparkles = () => {
+  if (!isClient.value) return;
+  sparkles.value = buildSparkles();
+};
+
+onMounted(() => {
+  isClient.value = true;
+  regenSparkles();
+});
+
+// PDF generation (only from API summary)
+const downloadPdf = async () => {
+  if (!canDownload.value) return;
+  try {
+    const md = data.value?.summary as string | undefined;
+    if (!md || md.trim().length === 0) return;
+    await generatePdfFromMarkdown(md, {
+      clientEmit: "save",
+      size: "a4",
+    });
+  } catch (e) {
+    // Optionally surface a toast; keep silent fallback here
+    console.error(e);
+  }
+};
+</script>
+
 <template>
-  <div class="ai-summary">
+  <div v-if="pending" class="summary-section">Loading summary-section...</div>
+
+  <div v-else-if="error" class="summary-section">
+    Failed to load summary-section.
+  </div>
+
+  <div v-else-if="data" class="ai-summary">
     <button
       type="button"
       aria-haspopup="dialog"
@@ -55,7 +249,7 @@
               />
               <span>AI Summary</span>
             </h2>
-            <p class="ai-summary__subtitle">Zusammenfassung: steinhorst.dev</p>
+            <p class="ai-summary__subtitle">{{ data.subtitle }}</p>
           </div>
           <UButton
             variant="ghost"
@@ -81,15 +275,32 @@
               <div class="ai-summary__loading">Lade Zusammenfassung…</div>
             </template>
           </ClientOnly>
+          <!-- Phase 1 & 2: Initial search and check confirmation -->
           <div
-            v-if="open && hasStarted && !isComplete"
+            v-if="open && (searchPhase || searchCheckedPhase)"
             class="ai-summary__progress"
           >
             <UIcon
               name="i-heroicons-cpu-chip"
               class="ai-summary__progress-icon"
             />
-            Tippt ({{ progressPercentage }}%) …
+            <span>Onlinesuche läuft…</span>
+            <UIcon
+              v-if="searchCheckedPhase"
+              name="i-heroicons-check-circle"
+              class="ai-summary__progress-icon"
+            />
+          </div>
+          <!-- Phase 3: Typing begins -->
+          <div
+            v-else-if="open && hasStarted && !isComplete"
+            class="ai-summary__progress"
+          >
+            <UIcon
+              name="i-heroicons-cpu-chip"
+              class="ai-summary__progress-icon"
+            />
+            <span>Schreibe… ({{ progressPercentage }}%)</span>
           </div>
         </div>
       </template>
@@ -107,7 +318,7 @@
             <UIcon name="i-lucide-calendar" class="ai-summary__footer-icon" />
             <span class="ai-summary__footer-text">Termin buchen</span>
           </UButton>
-          <template v-if="!isComplete">
+          <template v-if="!canDownload">
             <UTooltip
               text="Wird aktiv sobald die Zusammenfassung vollständig generiert wurde."
               :open-delay="150"
@@ -137,152 +348,20 @@
   </div>
 </template>
 
-<script setup lang="ts">
-// Import markdown as raw string
-import summarySource from "../data/summary.md?raw";
-
-// Typing speed configuration (words per second)
-const WORDS_PER_SECOND = 32;
-const WORDS_PER_SECOND_FINAL = 2000;
-const SLIDEOVER_OPEN_DELAY_MS = 320;
-
-const open = ref(false);
-const fullText = summarySource.trim();
-
-// Build UI config for USlideover dynamically
-const slideoverUi = computed(() => ({
-  content: [
-    "ai-summary__panel",
-    "w-screen sm:w-[85vw] lg:w-[50vw] max-w-none",
-  ].join(" "),
-  footer: ["ai-summary__panel-footer"].join(" "),
-}));
-
-// Tokenize into "word + trailing whitespace" chunks
-const tokens = fullText.match(/\S+\s*/g) || [];
-const currentText = ref("");
-const index = ref(0);
-const isComplete = ref(false);
-const hasStarted = ref(false);
-
-let timer: ReturnType<typeof setTimeout> | null = null;
-
-// Acceleration curve
-const computeCurrentDelay = () => {
-  if (tokens.length === 0) return 0;
-  const progress = index.value / tokens.length;
-  const eased = Math.min(1, Math.pow(progress, 2));
-  const currentWps =
-    WORDS_PER_SECOND + (WORDS_PER_SECOND_FINAL - WORDS_PER_SECOND) * eased;
-  return 1000 / currentWps;
-};
-
-const scheduleNext = () => {
-  if (index.value >= tokens.length) {
-    isComplete.value = true;
-    timer = null;
-    return;
-  }
-  currentText.value += tokens[index.value++];
-  const delay = computeCurrentDelay();
-  timer = setTimeout(scheduleNext, delay);
-};
-
-const startTyping = () => {
-  if (timer || isComplete.value) return;
-  hasStarted.value = true;
-  scheduleNext();
-};
-
-watch(open, async (val) => {
-  if (typeof document !== "undefined") {
-    if (val) {
-      document.documentElement.setAttribute("data-ai-summary-open", "true");
-    } else {
-      document.documentElement.removeAttribute("data-ai-summary-open");
-    }
-  }
-  if (!val) return;
-  await nextTick();
-  setTimeout(() => startTyping(), SLIDEOVER_OPEN_DELAY_MS);
-});
-
-onBeforeUnmount(() => {
-  if (timer) clearTimeout(timer);
-  if (typeof document !== "undefined") {
-    document.documentElement.removeAttribute("data-ai-summary-open");
-  }
-});
-
-// Throttled markdown parsing
-const parsedMarkdown = ref("");
-let framePending = false;
-const scheduleFrame = (cb: () => void) =>
-  typeof window !== "undefined"
-    ? window.requestAnimationFrame(cb)
-    : setTimeout(cb, 16);
-
-watch(currentText, () => {
-  if (framePending) return;
-  framePending = true;
-  scheduleFrame(() => {
-    parsedMarkdown.value = currentText.value;
-    framePending = false;
-  });
-});
-
-parsedMarkdown.value = "";
-const progressPercentage = computed(() =>
-  Math.min(100, Math.round((index.value / tokens.length) * 100))
-);
-
-// Sparkle particle generation
-interface SparkleConf {
-  left: number;
-  delay: number;
-  duration: number;
-  scale: number;
-  tx: number;
-}
-
-const sparkles = ref<SparkleConf[]>([]);
-const isClient = ref(false);
-
-const buildSparkles = (count = 5): SparkleConf[] =>
-  Array.from({ length: count }, () => ({
-    left: 15 + Math.random() * 70,
-    delay: Math.random() * 0.6,
-    duration: 0.7 + Math.random() * 0.7,
-    scale: 0.4 + Math.random() * 0.5,
-    tx: (Math.random() - 0.5) * 8,
-  }));
-
-const regenSparkles = () => {
-  if (!isClient.value) return;
-  sparkles.value = buildSparkles();
-};
-
-onMounted(() => {
-  isClient.value = true;
-  regenSparkles();
-});
-
-// PDF download functionality
-const downloadPdf = () => {
-  if (!isComplete.value) return;
-  const pdfPath = "/downloads/denis-steinhorst_portfolio_zusammenfassung.pdf";
-  const link = document.createElement("a");
-  link.href = pdfPath;
-  link.download = "denis-steinhorst_portfolio_zusammenfassung.pdf";
-  link.rel = "noopener";
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-</script>
-
 <style scoped lang="scss">
 $block: "ai-summary";
+
+:deep(h1) {
+  font-size: 2rem;
+}
+
+:deep(h2) {
+  font-size: 1.5rem;
+}
+
+:deep(h3) {
+  font-size: 1.5rem;
+}
 
 .#{$block} {
   // Main wrapper - responsive block/inline behavior

@@ -12,7 +12,8 @@ export default defineNuxtConfig({
     '@nuxtjs/seo',
     '@nuxtjs/color-mode',
     'nuxt-strapi-blocks-renderer',
-    '@nuxtjs/mdc'
+    '@nuxtjs/mdc',
+    'nuxt-pdfeasy'
   ],
   colorMode: {
     preference: 'light',
