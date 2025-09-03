@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
-
 const { cmsRequest, buildImageUrl } = useStrapi();
 
 const { data, pending, error } =
-  await useLazyAsyncData<LeaveNotificationResponse>("leaveNotification", () =>
-    cmsRequest<LeaveNotificationResponse>("leave-notification", [
-      "title",
-      "text",
-      "qrcode",
-    ])
+  await useLazyAsyncData<LeaveNotificationResponse>(
+    "leaveNotification",
+    (): Promise<LeaveNotificationResponse> =>
+      cmsRequest<LeaveNotificationResponse>("leave-notification", [
+        "title",
+        "text",
+        "qrcode",
+      ])
   );
 
 // Public API: only vertical offset for the activation band
@@ -89,7 +89,7 @@ onBeforeUnmount(() => {
 });
 
 // Suppress re-open until tomorrow whenever the modal is closed
-watch(isOpen, (newValue, oldValue) => {
+watch(isOpen, (newValue: boolean, oldValue: boolean): void => {
   if (oldValue === true && newValue === false) suppressForToday();
 });
 </script>
