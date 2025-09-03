@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
-
 const isActive = ref(false);
 const isStarting = ref(false);
 const isBottom = ref(false);
@@ -10,7 +8,7 @@ const showContactIcon = ref(true);
 let contactObserver: IntersectionObserver | null = null;
 let ticking = false;
 
-const scrollToTop = () => {
+const scrollToTop = (): void => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
