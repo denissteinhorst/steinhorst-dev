@@ -11,7 +11,8 @@ export default defineNuxtConfig({
     'nuxt-aos',
     '@nuxtjs/seo',
     '@nuxtjs/color-mode',
-    'nuxt-strapi-blocks-renderer'
+    'nuxt-strapi-blocks-renderer',
+    '@nuxtjs/mdc'
   ],
   colorMode: {
     preference: 'light',
