@@ -44,7 +44,7 @@ export const useSkillSearch = (skillCards: Ref<SkillCard[] | undefined>) => {
     const query = debouncedSkillQuery.value.trim().toLowerCase();
     if (!query) return null;
 
-    const matchedSkill = allSkills.value.find((skill) =>
+    const matchedSkill = allSkills.value.find((skill: string): boolean =>
       skill.toLowerCase().includes(query)
     );
 
@@ -56,8 +56,8 @@ export const useSkillSearch = (skillCards: Ref<SkillCard[] | undefined>) => {
   /**
    * Determines if the search is currently in a loading/debouncing state.
    */
-  const isSearching = computed(() =>
-    skillQuery.value.trim() && !debouncedSkillQuery.value.trim()
+  const isSearching = computed((): boolean =>
+    !!skillQuery.value.trim() && !debouncedSkillQuery.value.trim()
   );
 
   /**
