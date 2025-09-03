@@ -43,16 +43,16 @@ let checkTimer: ReturnType<typeof setTimeout> | null = null;
 let timer: ReturnType<typeof setTimeout> | null = null;
 
 // Acceleration curve
-const computeCurrentDelay = () => {
+const computeCurrentDelay = (): number => {
   if (tokens.value.length === 0) return 0;
   const progress = index.value / tokens.value.length;
   const eased = Math.min(1, Math.pow(progress, 2));
-  const currentWps =
+  const currentWordPerSecond =
     WORDS_PER_SECOND + (WORDS_PER_SECOND_FINAL - WORDS_PER_SECOND) * eased;
-  return 1000 / currentWps;
+  return 1000 / currentWordPerSecond;
 };
 
-const scheduleNext = () => {
+const scheduleNext = (): void => {
   if (index.value >= tokens.value.length) {
     isComplete.value = true;
     timer = null;
@@ -63,7 +63,7 @@ const scheduleNext = () => {
   timer = setTimeout(scheduleNext, delay);
 };
 
-const startTyping = () => {
+const startTyping = (): void => {
   if (timer || isComplete.value) return;
   if (tokens.value.length === 0) {
     // No content available; mark complete to stop progress states
@@ -115,15 +115,15 @@ onBeforeUnmount(() => {
 // Throttled markdown parsing
 const parsedMarkdown = ref("");
 let framePending = false;
-const scheduleFrame = (cb: () => void) =>
+const scheduleFrame = (callback: () => void): number | NodeJS.Timeout =>
   typeof window !== "undefined"
-    ? window.requestAnimationFrame(cb)
-    : setTimeout(cb, 16);
+    ? window.requestAnimationFrame(callback)
+    : setTimeout(callback, 16);
 
-watch(currentText, () => {
+watch(currentText, (): void => {
   if (framePending) return;
   framePending = true;
-  scheduleFrame(() => {
+  scheduleFrame((): void => {
     parsedMarkdown.value = currentText.value;
     framePending = false;
   });
@@ -150,38 +150,41 @@ interface SparkleConf {
 const sparkles = ref<SparkleConf[]>([]);
 const isClient = ref(false);
 
-const buildSparkles = (count = 5): SparkleConf[] =>
-  Array.from({ length: count }, () => ({
-    left: 15 + Math.random() * 70,
-    delay: Math.random() * 0.6,
-    duration: 0.7 + Math.random() * 0.7,
-    scale: 0.4 + Math.random() * 0.5,
-    tx: (Math.random() - 0.5) * 8,
-  }));
+const buildSparkles = (count: number = 5): SparkleConf[] =>
+  Array.from(
+    { length: count },
+    (): SparkleConf => ({
+      left: 15 + Math.random() * 70,
+      delay: Math.random() * 0.6,
+      duration: 0.7 + Math.random() * 0.7,
+      scale: 0.4 + Math.random() * 0.5,
+      tx: (Math.random() - 0.5) * 8,
+    })
+  );
 
-const regenSparkles = () => {
+const regenerateSparkles = (): void => {
   if (!isClient.value) return;
   sparkles.value = buildSparkles();
 };
 
-onMounted(() => {
+onMounted((): void => {
   isClient.value = true;
-  regenSparkles();
+  regenerateSparkles();
 });
 
 // PDF generation (only from API summary)
-const downloadPdf = async () => {
+const downloadPdf = async (): Promise<void> => {
   if (!canDownload.value) return;
   try {
-    const md = data.value?.summary as string | undefined;
-    if (!md || md.trim().length === 0) return;
-    await generatePdfFromMarkdown(md, {
+    const markdownContent = data.value?.summary as string | undefined;
+    if (!markdownContent || markdownContent.trim().length === 0) return;
+    await generatePdfFromMarkdown(markdownContent, {
       clientEmit: "save",
       size: "a4",
     });
-  } catch (e) {
+  } catch (error) {
     // Optionally surface a toast; keep silent fallback here
-    console.error(e);
+    console.error(error);
   }
 };
 </script>
@@ -200,7 +203,7 @@ const downloadPdf = async () => {
       :aria-expanded="open"
       class="ai-summary__btn ai-summary-btn"
       @click="open = true"
-      @mouseenter="regenSparkles()"
+      @mouseenter="regenerateSparkles()"
     >
       <span class="ai-summary__icon-wrapper">
         <UIcon
