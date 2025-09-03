@@ -82,17 +82,18 @@ const skipToHero = () => {
   (el as HTMLElement).focus?.();
 };
 
-const updateMobileMenu = (val: boolean) => (isMobileMenuOpen.value = val);
+const updateMobileMenu = (isOpen: boolean): boolean =>
+  (isMobileMenuOpen.value = isOpen);
 
-const closeMobileMenu = () => (isMobileMenuOpen.value = false);
+const closeMobileMenu = (): boolean => (isMobileMenuOpen.value = false);
 
-watch(isMobileMenuOpen, (open) => {
-  if (!open) {
-    const el =
+watch(isMobileMenuOpen, (isOpen: boolean): void => {
+  if (!isOpen) {
+    const element =
       menuButtonRef.value instanceof HTMLElement
         ? menuButtonRef.value
         : document.querySelector(".main-navigation__menu-button");
-    (el as HTMLElement | null)?.focus?.();
+    (element as HTMLElement | null)?.focus?.();
   }
 });
 
