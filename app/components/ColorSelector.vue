@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const colorMode = useColorMode();
 
-const setPreference = (preference: string) => {
+const setPreference = (preference: string): void => {
   colorMode.preference = preference;
 };
 </script>
