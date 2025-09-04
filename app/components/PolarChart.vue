@@ -38,6 +38,7 @@ interface Props {
 const { title = "", subtitle = "", text = "", tooltips } = defineProps<Props>();
 
 const colorMode = useColorMode();
+const { currentLocaleString } = useStrapi();
 const hydrated = ref(false);
 if (import.meta.client) {
   onMounted(() => {
@@ -45,13 +46,22 @@ if (import.meta.client) {
   });
 }
 
-// Personality trait order for consistent display
-const PERSONALITY_TRAITS = [
-  "Initiativ",
-  "Gewissenhaft",
-  "Stetig",
-  "Dominant",
-] as const;
+// Personality trait mapping for both locales
+const PERSONALITY_TRAITS_MAPPING = {
+  de: ["Initiativ", "Gewissenhaft", "Stetig", "Dominant"] as const,
+  en: ["Initiative", "Conscientious", "Steady", "Dominance"] as const,
+};
+
+// Get personality traits based on current locale
+const personalityTraits = computed(() => {
+  const locale =
+    currentLocaleString?.value as keyof typeof PERSONALITY_TRAITS_MAPPING;
+  // Fallback to 'de' if locale is undefined or not in mapping
+  if (!locale || !PERSONALITY_TRAITS_MAPPING[locale]) {
+    return PERSONALITY_TRAITS_MAPPING.de;
+  }
+  return PERSONALITY_TRAITS_MAPPING[locale];
+});
 
 /**
  * Chart theme colors - kept as hardcoded values since they need to be used in JavaScript
@@ -80,6 +90,9 @@ const themeColors = computed(() => {
  * This allows for consistent ordering regardless of input order
  */
 const tooltipsByTrait = computed(() => {
+  if (!tooltips || tooltips.length === 0) {
+    return {};
+  }
   return tooltips.reduce((accumulator, tooltip) => {
     accumulator[tooltip.title] = tooltip;
     return accumulator;
@@ -90,9 +103,8 @@ const tooltipsByTrait = computed(() => {
  * Ordered chart labels based on predefined personality trait sequence
  */
 const chartLabels = computed(() => {
-  return PERSONALITY_TRAITS.map(
-    (trait) => tooltipsByTrait.value[trait]?.title || trait
-  );
+  const traits = personalityTraits.value || [];
+  return traits.map((trait) => tooltipsByTrait.value[trait]?.title || trait);
 });
 
 /**
@@ -160,7 +172,8 @@ const chartConfiguration = computed(() => {
       ];
 
   // Extract percentage data in correct order
-  const chartData = PERSONALITY_TRAITS.map(
+  const traits = personalityTraits.value || [];
+  const chartData = traits.map(
     (trait) => tooltipsByTrait.value[trait]?.percentage || 0
   );
 
@@ -182,7 +195,8 @@ const chartConfiguration = computed(() => {
  * Pre-processes rich text into readable bullet points
  */
 const tooltipContent = computed(() => {
-  return PERSONALITY_TRAITS.map((trait) => {
+  const traits = personalityTraits.value || [];
+  return traits.map((trait) => {
     const tooltip = tooltipsByTrait.value[trait];
     return tooltip ? extractBulletPoints(tooltip.text) : [];
   });

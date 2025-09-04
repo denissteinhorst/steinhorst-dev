@@ -9,6 +9,7 @@ const emit = defineEmits<{
 }>();
 
 const { buildImageUrl } = useStrapi();
+const { $t, $getLocale } = useI18n();
 
 const avatarUrl = computed<string | undefined>(() => {
   const url = buildImageUrl(props.data.avatar, "small");
@@ -42,6 +43,47 @@ const formatDate = (dateString: string | undefined): string => {
 const handleLanguageToggle = (): void => {
   emit("toggleLanguage");
 };
+
+// Translation indicator logic based on current locale and isTranslated flag
+const translationIndicatorText = computed((): string => {
+  const currentLocale = $getLocale();
+  const isGerman = currentLocale === "de";
+  const isTranslated = props.data.isTranslated;
+
+  if (isGerman && isTranslated) {
+    // German locale + translated = true: Originally English, translated to German
+    return String(
+      $t(
+        "experience_section.testimonial.translation_indicator.translated_from_english"
+      )
+    );
+  } else if (isGerman && !isTranslated) {
+    // German locale + translated = false: Original German comment
+    return String(
+      $t("experience_section.testimonial.translation_indicator.original_german")
+    );
+  } else if (!isGerman && isTranslated) {
+    // English locale + translated = true: Originally German, translated to English
+    return String(
+      $t(
+        "experience_section.testimonial.translation_indicator.translated_from_german"
+      )
+    );
+  } else {
+    // English locale + translated = false: Original English comment
+    return String(
+      $t(
+        "experience_section.testimonial.translation_indicator.original_english"
+      )
+    );
+  }
+});
+
+const languageToggleText = computed((): string => {
+  return props.showAlternative
+    ? String($t("experience_section.testimonial.show_german"))
+    : String($t("experience_section.testimonial.show_english"));
+});
 </script>
 
 <template>
@@ -96,7 +138,9 @@ const handleLanguageToggle = (): void => {
         class="testimonial-card-large__content"
         tabindex="0"
         role="region"
-        aria-label="Empfehlungstext, scrollbarer Bereich"
+        :aria-label="
+          String($t('experience_section.testimonial.scroll_area_label'))
+        "
       >
         <div class="testimonial-card-large__text-wrapper">
           <StrapiBlocksText
@@ -121,36 +165,17 @@ const handleLanguageToggle = (): void => {
             name="i-heroicons-language-20-solid"
             class="testimonial-card-large__language-icon"
           />
-          {{
-            showAlternative
-              ? "Deutsche Übersetzung anzeigen"
-              : "Englischen Originaltext anzeigen"
-          }}
+          {{ languageToggleText }}
         </UButton>
 
         <!-- Translation indicator -->
-        <div
-          v-if="data.isTranslated"
-          class="testimonial-card-large__translation-indicator"
-        >
+        <div class="testimonial-card-large__translation-indicator">
           <UIcon
             name="i-heroicons-language-20-solid"
             class="testimonial-card-large__translation-icon"
           />
           <span class="testimonial-card-large__translation-text">
-            Deutsche Übersetzung des englischen Kommentars.
-          </span>
-        </div>
-        <div
-          v-else-if="!data.isTranslated"
-          class="testimonial-card-large__translation-indicator"
-        >
-          <UIcon
-            name="i-heroicons-language-20-solid"
-            class="testimonial-card-large__translation-icon"
-          />
-          <span class="testimonial-card-large__translation-text">
-            Deutscher original Text.
+            {{ translationIndicatorText }}
           </span>
         </div>
 
@@ -163,7 +188,7 @@ const handleLanguageToggle = (): void => {
               >|</span
             >
             <UTooltip
-              text="Originales Feedback ansehen"
+              :text="String($t('experience_section.testimonial.view_original'))"
               :delay-duration="0"
               :content="{ side: 'bottom', sideOffset: 6 }"
             >
@@ -173,7 +198,7 @@ const handleLanguageToggle = (): void => {
                 rel="noopener noreferrer"
                 class="testimonial-card-large__source-link"
               >
-                Quelle
+                {{ $t("experience_section.testimonial.source") }}
                 <UIcon
                   name="i-heroicons-arrow-top-right-on-square-20-solid"
                   class="testimonial-card-large__source-icon"

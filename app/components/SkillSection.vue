@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import type { SkillItem } from "~/types/types";
-const { cmsRequest } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } = await useLazyAsyncData<SkillSectionResponse>(
-  "skills",
+  () => `skills-${currentLocaleString.value}`,
   () =>
     cmsRequest<SkillSectionResponse>(
       "skill-section",
       ["title", "text", "jumpmark", "quickFilter", "skillCards"],
-      undefined,
       false,
       ["quickFilter", "skillCards.skillItems"]
     )

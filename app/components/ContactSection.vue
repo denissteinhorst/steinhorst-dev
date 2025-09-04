@@ -1,14 +1,13 @@
 <script setup lang="ts">
-const { cmsRequest } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi();
 
 // Fetch contact section data from CMS
 const { data, pending, error } = await useLazyAsyncData<ContactSectionResponse>(
-  "contact",
+  () => `contact-${currentLocaleString.value}`,
   (): Promise<ContactSectionResponse> =>
     cmsRequest<ContactSectionResponse>(
       "contact-section",
       ["title", "text", "jumpmark", "contactCards"],
-      undefined,
       false,
       ["contactCards"]
     )

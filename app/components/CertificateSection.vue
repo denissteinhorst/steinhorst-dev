@@ -1,15 +1,16 @@
 <script setup lang="ts">
-const { cmsRequest } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } =
-  await useLazyAsyncData<CertificateSectionResponse>("certificates", () =>
-    cmsRequest<CertificateSectionResponse>(
-      "certificate-section",
-      ["title", "text", "jumpmark", "certificationCards"],
-      undefined,
-      false,
-      ["certificationCards.logo"]
-    )
+  await useLazyAsyncData<CertificateSectionResponse>(
+    () => `certificates-${currentLocaleString.value}`,
+    () =>
+      cmsRequest<CertificateSectionResponse>(
+        "certificate-section",
+        ["title", "text", "jumpmark", "certificationCards"],
+        false,
+        ["certificationCards.logo"]
+      )
   );
 
 const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);

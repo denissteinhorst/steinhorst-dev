@@ -1,23 +1,24 @@
 <script setup lang="ts">
-const { cmsRequest } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } =
-  await useLazyAsyncData<ExperienceSectionResponse>("experience", () =>
-    cmsRequest<ExperienceSectionResponse>(
-      "experience-section",
-      [
-        "title",
-        "text",
-        "contactToggle",
-        "expandToggle",
-        "collapseToggle",
-        "jumpmark",
-        "experienceCards",
-      ],
-      undefined,
-      false,
-      ["experienceCards.logo"]
-    )
+  await useLazyAsyncData<ExperienceSectionResponse>(
+    () => `experience-${currentLocaleString.value}`,
+    () =>
+      cmsRequest<ExperienceSectionResponse>(
+        "experience-section",
+        [
+          "title",
+          "text",
+          "contactToggle",
+          "expandToggle",
+          "collapseToggle",
+          "jumpmark",
+          "experienceCards",
+        ],
+        false,
+        ["experienceCards.logo"]
+      )
   );
 
 // State to manage the number of visible stations (default: 3 for desktop, 2 for mobile)

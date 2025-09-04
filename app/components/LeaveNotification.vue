@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const { cmsRequest, buildImageUrl } = useStrapi();
+const { cmsRequest, buildImageUrl, currentLocaleString } = useStrapi();
 
 const { data, pending, error } =
   await useLazyAsyncData<LeaveNotificationResponse>(
-    "leaveNotification",
+    () => `leaveNotification-${currentLocaleString.value}`,
     (): Promise<LeaveNotificationResponse> =>
       cmsRequest<LeaveNotificationResponse>("leave-notification", [
         "title",
@@ -134,10 +134,11 @@ watch(isOpen, (newValue: boolean, oldValue: boolean): void => {
             <UButton
               aria-label="Schließen"
               icon="i-lucide-x"
-              color="gray"
+              color="neutral"
               variant="ghost"
               size="sm"
               class="leave-notification__close-button"
+              style="cursor: pointer"
               @click="isOpen = false"
             />
           </div>

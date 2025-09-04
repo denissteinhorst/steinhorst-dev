@@ -1,8 +1,8 @@
 <script setup lang="ts">
-const { cmsRequest } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } = await useLazyAsyncData<FaqSectionResponse>(
-  "faq",
+  () => `faq-${currentLocaleString.value}`,
   () => cmsRequest<FaqSectionResponse>("faq-section", [])
 );
 

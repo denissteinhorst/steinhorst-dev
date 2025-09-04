@@ -1,18 +1,19 @@
 <script setup lang="ts">
-const { cmsRequest } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } =
-  await useLazyAsyncData<PersonalitySectionResponse>("personality", () =>
-    cmsRequest<PersonalitySectionResponse>(
-      "personality-section",
-      ["title", "text", "jumpmark", "personalityCards"],
-      undefined,
-      false,
-      [
-        "personalityCards.polarChartTooltips",
-        "personalityCards.barChartTooltips",
-      ]
-    )
+  await useLazyAsyncData<PersonalitySectionResponse>(
+    () => `personality-${currentLocaleString.value}`,
+    () =>
+      cmsRequest<PersonalitySectionResponse>(
+        "personality-section",
+        ["title", "text", "jumpmark", "personalityCards"],
+        false,
+        [
+          "personalityCards.polarChartTooltips",
+          "personalityCards.barChartTooltips",
+        ]
+      )
   );
 
 const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
@@ -20,11 +21,11 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 
 <template>
   <section v-if="pending" class="personality-section">
-    Loading skill-section...
+    Loading personality-section...
   </section>
 
   <section v-else-if="error" class="personality-section">
-    Failed to load skill-section.
+    Failed to load personality-section.
   </section>
 
   <section-wrapper

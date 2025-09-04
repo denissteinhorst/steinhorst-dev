@@ -1,15 +1,16 @@
 <script setup lang="ts">
-const { cmsRequest } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } =
-  await useLazyAsyncData<TestimonialSectionResponse>("testimonials", () =>
-    cmsRequest<TestimonialSectionResponse>(
-      "testimonial-section",
-      ["title", "text", "jumpmark", "recommendationCards"],
-      undefined,
-      false,
-      ["recommendationCards.avatar"]
-    )
+  await useLazyAsyncData<TestimonialSectionResponse>(
+    () => `testimonials-${currentLocaleString.value}`,
+    () =>
+      cmsRequest<TestimonialSectionResponse>(
+        "testimonial-section",
+        ["title", "text", "jumpmark", "recommendationCards"],
+        false,
+        ["recommendationCards.avatar"]
+      )
   );
 
 const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);

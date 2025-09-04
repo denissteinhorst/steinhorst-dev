@@ -1,8 +1,8 @@
 <script setup lang="ts">
-const { cmsRequest, buildImageUrl } = useStrapi();
+const { cmsRequest, buildImageUrl, currentLocaleString } = useStrapi();
 
 const { data, pending, error } = await useLazyAsyncData<HeroSectionResponse>(
-  "hero",
+  () => `hero-section-${currentLocaleString.value}`,
   () =>
     cmsRequest<HeroSectionResponse>("hero-section", [
       "titleBefore",
@@ -46,25 +46,107 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
     <UContainer class="hero-section__container">
       <div class="hero-section__inner">
         <div class="hero-section__grid">
-          <!-- Left: content -->
+          <!-- Left: complete content area -->
           <div class="hero-section__col hero-section__col--content">
-            <header class="hero-section__header">
-              <div class="hero-section__badge">
-                <job-search-badge />
-              </div>
+            <div class="hero-section__content-wrapper">
+              <header class="hero-section__header">
+                <div class="hero-section__badge">
+                  <job-search-badge />
+                </div>
 
-              <h1 id="hero-heading" tabindex="-1" class="hero-section__title">
-                <span v-if="data.titleBefore">{{ data.titleBefore }} </span>
-                <span v-if="data.emphasis" class="hero-section__emphasis">{{
-                  data.emphasis
-                }}</span>
-                <span v-if="data.titleAfter"> {{ data.titleAfter }}</span>
-              </h1>
+                <h1 id="hero-heading" tabindex="-1" class="hero-section__title">
+                  <span v-if="data.titleBefore">{{ data.titleBefore }} </span>
+                  <span v-if="data.emphasis" class="hero-section__emphasis">{{
+                    data.emphasis
+                  }}</span>
+                  <span v-if="data.titleAfter"> {{ data.titleAfter }}</span>
+                </h1>
 
-              <div class="hero-section__text">
-                <StrapiBlocksText :nodes="text" />
+                <div class="hero-section__text">
+                  <StrapiBlocksText :nodes="text" />
+                </div>
+              </header>
+
+              <!-- Desktop: highlights + actions -->
+              <div class="hero-section__desktop-actions">
+                <ul
+                  class="hero-section__highlights hero-section__highlights--desktop"
+                  aria-label="Highlights"
+                >
+                  <li
+                    v-for="tag in data.heroTags || []"
+                    :key="tag.id"
+                    class="hero-section__highlight-item"
+                  >
+                    <span>{{ tag.text }}</span>
+                  </li>
+                </ul>
+
+                <div
+                  class="hero-section__actions hero-section__actions--desktop"
+                >
+                  <template
+                    v-for="(link, idx) in data.heroLinks || []"
+                    :key="link.id ?? link.text ?? idx"
+                  >
+                    <UButton
+                      v-if="link.type === 'button'"
+                      :href="link.link ?? '#'"
+                      :target="link.target || '_self'"
+                      size="md"
+                      color="secondary"
+                      class="hero-section__cta"
+                    >
+                      <UIcon
+                        v-if="link.icon"
+                        :name="link.icon"
+                        class="hero-section__icon"
+                      />
+                      {{ link.text }}
+                    </UButton>
+
+                    <template v-else>
+                      <UTooltip
+                        v-if="link.tooltip"
+                        :text="link.tooltip"
+                        :delay-duration="0"
+                        :content="{ side: 'bottom', sideOffset: 6 }"
+                      >
+                        <a
+                          :href="link.link ?? '#'"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="hero-section__social-link"
+                        >
+                          <UIcon
+                            :name="link.icon || 'i-lucide-mail'"
+                            class="hero-section__icon"
+                          />
+                          <span class="hero-section__social-text">{{
+                            link.text
+                          }}</span>
+                        </a>
+                      </UTooltip>
+                      <a
+                        v-else
+                        :href="link.link ?? '#'"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="hero-section__social-link"
+                      >
+                        <UIcon
+                          :name="link.icon || 'i-lucide-mail'"
+                          class="hero-section__icon"
+                        />
+                        <span class="hero-section__social-text">{{
+                          link.text
+                        }}</span>
+                      </a>
+                    </template>
+                  </template>
+                </div>
               </div>
-            </header>
+            </div>
           </div>
 
           <!-- Right: portrait / media -->
@@ -105,84 +187,6 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
             </ul>
 
             <div class="hero-section__actions">
-              <template
-                v-for="(link, idx) in data.heroLinks || []"
-                :key="link.id ?? link.text ?? idx"
-              >
-                <UButton
-                  v-if="link.type === 'button'"
-                  :href="link.link ?? '#'"
-                  :target="link.target || '_self'"
-                  size="md"
-                  color="secondary"
-                  class="hero-section__cta"
-                >
-                  <UIcon
-                    v-if="link.icon"
-                    :name="link.icon"
-                    class="hero-section__icon"
-                  />
-                  {{ link.text }}
-                </UButton>
-
-                <template v-else>
-                  <UTooltip
-                    v-if="link.tooltip"
-                    :text="link.tooltip"
-                    :delay-duration="0"
-                    :content="{ side: 'bottom', sideOffset: 6 }"
-                  >
-                    <a
-                      :href="link.link ?? '#'"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="hero-section__social-link"
-                    >
-                      <UIcon
-                        :name="link.icon || 'i-lucide-mail'"
-                        class="hero-section__icon"
-                      />
-                      <span class="hero-section__social-text">{{
-                        link.text
-                      }}</span>
-                    </a>
-                  </UTooltip>
-                  <a
-                    v-else
-                    :href="link.link ?? '#'"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="hero-section__social-link"
-                  >
-                    <UIcon
-                      :name="link.icon || 'i-lucide-mail'"
-                      class="hero-section__icon"
-                    />
-                    <span class="hero-section__social-text">{{
-                      link.text
-                    }}</span>
-                  </a>
-                </template>
-              </template>
-            </div>
-          </div>
-
-          <!-- Desktop: highlights + actions alongside content -->
-          <div class="hero-section__desktop-actions">
-            <ul
-              class="hero-section__highlights hero-section__highlights--desktop"
-              aria-label="Highlights"
-            >
-              <li
-                v-for="tag in data.heroTags || []"
-                :key="tag.id"
-                class="hero-section__highlight-item"
-              >
-                <span>{{ tag.text }}</span>
-              </li>
-            </ul>
-
-            <div class="hero-section__actions hero-section__actions--desktop">
               <template
                 v-for="(link, idx) in data.heroLinks || []"
                 :key="link.id ?? link.text ?? idx"
@@ -390,13 +394,14 @@ $block: "hero-section";
 
   &__grid {
     display: grid;
-    gap: 2.5rem;
+    gap: 1.5rem;
     align-items: center;
     grid-template-columns: 1fr;
 
     @media (min-width: 1024px) {
-      grid-template-columns: repeat(12, 1fr);
-      gap: 2rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
     }
   }
 
@@ -407,8 +412,9 @@ $block: "hero-section";
       margin: 0 auto;
 
       @media (min-width: 1024px) {
-        grid-column: 1 / span 7;
+        grid-column: 1;
         margin: 0;
+        max-width: none;
       }
     }
 
@@ -416,12 +422,28 @@ $block: "hero-section";
       grid-column: 1 / -1;
       margin: 0 auto;
       max-width: 28rem;
-      margin-top: 4.8rem;
+      margin-top: 2rem;
 
       @media (min-width: 1024px) {
-        grid-column: 8 / -1;
+        grid-column: 2;
         max-width: none;
+        margin-top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
+    }
+  }
+
+  &__content-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-align: center;
+
+    @media (min-width: 1024px) {
+      justify-content: center;
+      text-align: left;
     }
   }
 
@@ -464,6 +486,13 @@ $block: "hero-section";
     color: var(--color-text);
     line-height: 1.6;
     max-width: 60ch;
+    margin-left: auto;
+    margin-right: auto;
+
+    @media (min-width: 1024px) {
+      margin-left: 0;
+      margin-right: 0;
+    }
   }
 
   /* portrait */
@@ -472,6 +501,11 @@ $block: "hero-section";
     width: 100%;
     max-width: 28rem;
     margin: 0 auto;
+    transform: scale(0.75);
+
+    @media (min-width: 1024px) {
+      transform: scale(1);
+    }
   }
 
   .shape-blob {
@@ -626,10 +660,6 @@ $block: "hero-section";
     }
   }
 
-  .hero-section__cta {
-    min-width: 9rem;
-  }
-
   &__social-link {
     color: var(--color-text);
     display: inline-flex;
@@ -673,11 +703,11 @@ $block: "hero-section";
 
   &__desktop-actions {
     display: none;
+    margin-top: 1.5rem;
 
     @media (min-width: 1024px) {
       display: block;
-      grid-column: 1 / span 7;
-      margin-top: 1.25rem;
+      margin-top: 1.5rem;
     }
   }
 }

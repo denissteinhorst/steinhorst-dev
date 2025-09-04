@@ -1,8 +1,8 @@
 <script setup lang="ts">
-const { cmsRequest } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } = await useLazyAsyncData<ProjectSectionResponse>(
-  "project",
+  () => `project-${currentLocaleString.value}`,
   (): Promise<ProjectSectionResponse> =>
     cmsRequest<ProjectSectionResponse>(
       "project-section",
@@ -14,7 +14,6 @@ const { data, pending, error } = await useLazyAsyncData<ProjectSectionResponse>(
         "projectCards",
         "footnote",
       ],
-      undefined,
       false,
       ["projectCards.logo", "lastProjectCard"]
     )

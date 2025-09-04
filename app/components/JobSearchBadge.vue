@@ -1,8 +1,8 @@
 <script setup lang="ts">
-const { cmsRequest } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } = await useLazyAsyncData<JobBadgeResponse>(
-  "badge",
+  () => `badge-${currentLocaleString.value}`,
   () => cmsRequest<JobBadgeResponse>("job-badge", [])
 );
 </script>

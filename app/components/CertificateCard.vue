@@ -63,15 +63,15 @@ const logoUrl = computed<string | undefined>(() => {
           class="certificate-card__button"
           target="_blank"
           rel="noopener noreferrer"
-          :aria-label="`${data.link} (öffnet in neuem Tab)`"
+          :aria-label="`${data.link} (${$t('ui.opens_in_new_tab')})`"
         >
           <UIcon
             name="i-heroicons-arrow-top-right-on-square"
             class="certificate-card__button-icon"
             aria-hidden="true"
           />
-          <span class="certificate-card__button-text">Anzeigen</span>
-          <span class="sr-only">(öffnet in neuem Tab)</span>
+          <span class="certificate-card__button-text">{{ data.linkText }}</span>
+          <span class="sr-only">({{ $t("ui.opens_in_new_tab") }})</span>
         </UButton>
       </UTooltip>
       <UButton
@@ -83,7 +83,7 @@ const logoUrl = computed<string | undefined>(() => {
         class="certificate-card__button"
         target="_blank"
         rel="noopener noreferrer"
-        :aria-label="`${data.link} (öffnet in neuem Tab)`"
+        :aria-label="`${data.link} (${$t('ui.opens_in_new_tab')})`"
       >
         <UIcon
           name="i-heroicons-arrow-top-right-on-square"
@@ -91,7 +91,7 @@ const logoUrl = computed<string | undefined>(() => {
           aria-hidden="true"
         />
         <span class="certificate-card__button-text">Anzeigen</span>
-        <span class="sr-only">(öffnet in neuem Tab)</span>
+        <span class="sr-only">({{ $t("ui.opens_in_new_tab") }})</span>
       </UButton>
     </div>
 

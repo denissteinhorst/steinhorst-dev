@@ -152,11 +152,13 @@ onBeforeUnmount(() => {
           >
             <template #description>
               {{
-                quickFilter?.hintSuccess?.includes("{skill}")
-                  ? quickFilter.hintSuccess.replace(
-                      "{skill}",
-                      skillResult.skill
-                    )
+                quickFilter?.hintSuccess
+                  ? quickFilter.hintSuccess.includes("%SKILL%")
+                    ? quickFilter.hintSuccess.replace(
+                        "%SKILL%",
+                        skillResult.skill
+                      )
+                    : quickFilter.hintSuccess
                   : `Ja, mit ${skillResult.skill} habe ich bereits gearbeitet!`
               }}
             </template>
@@ -173,8 +175,13 @@ onBeforeUnmount(() => {
           >
             <template #description>
               {{
-                quickFilter?.hintError?.includes("{skill}")
-                  ? quickFilter.hintError.replace("{skill}", skillResult.skill)
+                quickFilter?.hintError
+                  ? quickFilter.hintError.includes("%SKILL%")
+                    ? quickFilter.hintError.replace(
+                        "%SKILL%",
+                        skillResult.skill
+                      )
+                    : quickFilter.hintError
                   : `Nein, mit ${skillResult.skill} habe ich noch nicht gearbeitet oder kenne es nicht gut genug.`
               }}
             </template>

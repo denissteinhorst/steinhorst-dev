@@ -1,31 +1,3 @@
-<template>
-  <div class="bar-chart">
-    <h3 class="bar-chart__title" :style="{ color: themeColors.titleColor }">
-      {{ title }}
-    </h3>
-    <div class="bar-chart__canvas-wrapper">
-      <Bar
-        id="motivation-profile"
-        :data="chartConfiguration"
-        :options="chartDisplayOptions"
-        :plugins="[averageLinePlugin]"
-      />
-    </div>
-    <p
-      class="bar-chart__subtitle"
-      :style="{ color: themeColors.subtitleColor }"
-    >
-      {{ subtitle }}
-    </p>
-    <p
-      class="bar-chart__description"
-      :style="{ color: themeColors.descriptionColor }"
-    >
-      {{ text }}
-    </p>
-  </div>
-</template>
-
 <script setup lang="ts">
 import type { Chart, TooltipItem } from "chart.js";
 import { Bar } from "vue-chartjs";
@@ -37,6 +9,7 @@ interface Props {
   tooltips: BarChartTooltip[];
 }
 
+const { $t } = useI18n();
 const { title = "", subtitle = "", text = "", tooltips } = defineProps<Props>();
 
 // Motivation dimension data structure
@@ -48,7 +21,7 @@ interface MotivationDimension {
 }
 
 // Motivation trait identifiers for consistent color mapping
-type MotivationTrait =
+type MotivationTraitDE =
   | "Durchsetzung"
   | "Integration"
   | "Sicherheit"
@@ -56,26 +29,75 @@ type MotivationTrait =
   | "Erkenntnis"
   | "Empathie";
 
-// Color scheme for each motivation trait
+type MotivationTraitEN =
+  | "Assertiveness"
+  | "Integration"
+  | "Security"
+  | "Individuality"
+  | "Insight"
+  | "Empathy";
+
+type MotivationTrait = MotivationTraitDE | MotivationTraitEN;
+
+// Motivation trait mapping for both locales
+const MOTIVATION_TRAITS_MAPPING = {
+  de: [
+    "Durchsetzung",
+    "Integration",
+    "Sicherheit",
+    "Individualität",
+    "Erkenntnis",
+    "Empathie",
+  ] as const,
+  en: [
+    "Assertiveness",
+    "Integration",
+    "Security",
+    "Individuality",
+    "Insight",
+    "Empathy",
+  ] as const,
+};
+
+// Color scheme for each motivation trait (using German keys as base, but accessible by both)
 const TRAIT_COLOR_MAP: Record<MotivationTrait, { base: string }> = {
+  // German keys
   Durchsetzung: { base: "#ef4444" }, // Red
   Integration: { base: "#f59e0b" }, // Orange
   Sicherheit: { base: "#22c55e" }, // Green
   Individualität: { base: "#3b82f6" }, // Blue
   Erkenntnis: { base: "#856dca" }, // Purple
   Empathie: { base: "#ec4899" }, // Pink
+  // English keys (same colors)
+  Assertiveness: { base: "#ef4444" }, // Red
+  Security: { base: "#22c55e" }, // Green
+  Individuality: { base: "#3b82f6" }, // Blue
+  Insight: { base: "#856dca" }, // Purple
+  Empathy: { base: "#ec4899" }, // Pink
 };
 
 // Composables
 
 // SSR-safe color mode composable
 const colorMode = useColorMode();
+const { currentLocaleString } = useStrapi();
 const hydrated = ref(false);
 if (import.meta.client) {
   onMounted(() => {
     hydrated.value = true;
   });
 }
+
+// Get motivation traits based on current locale
+const motivationTraits = computed(() => {
+  const locale =
+    currentLocaleString?.value as keyof typeof MOTIVATION_TRAITS_MAPPING;
+  // Fallback to 'de' if locale is undefined or not in mapping
+  if (!locale || !MOTIVATION_TRAITS_MAPPING[locale]) {
+    return MOTIVATION_TRAITS_MAPPING.de;
+  }
+  return MOTIVATION_TRAITS_MAPPING[locale];
+});
 
 /**
  * Color palette that adapts to light/dark theme
@@ -124,14 +146,33 @@ const extractDescriptionText = (richTextBlocks: RichTextBlock[]): string => {
 /**
  * Processes tooltip data into structured motivation dimensions
  * Each dimension contains inner/outer values and descriptive text
+ * Ordered according to locale-specific trait sequence
  */
 const motivationDimensions = computed((): MotivationDimension[] => {
-  return tooltips.map((tooltip) => ({
-    name: tooltip.title,
-    innerValue: tooltip.innerValue,
-    outerValue: tooltip.outerValue,
-    description: extractDescriptionText(tooltip.text),
-  }));
+  // Early return if tooltips are not available
+  if (!tooltips || tooltips.length === 0) {
+    return [];
+  }
+
+  // Create a mapping of tooltip data by trait name
+  const tooltipsByTrait = tooltips.reduce((acc, tooltip) => {
+    acc[tooltip.title] = tooltip;
+    return acc;
+  }, {} as Record<string, BarChartTooltip>);
+
+  // Get traits safely - fallback to empty array if not available
+  const traits = motivationTraits.value || [];
+
+  // Return dimensions in the correct order based on current locale
+  return traits.map((trait) => {
+    const tooltip = tooltipsByTrait[trait];
+    return {
+      name: trait,
+      innerValue: tooltip?.innerValue || 0,
+      outerValue: tooltip?.outerValue || 0,
+      description: tooltip ? extractDescriptionText(tooltip.text) : "",
+    };
+  });
 });
 
 // Extract data arrays for chart configuration
@@ -163,6 +204,32 @@ const createRgbaColor = (hexColor: string, alpha: number): string => {
 };
 
 /**
+ * Safely gets the color for a motivation trait with fallback
+ * Returns a default color if the trait is not found in the color map
+ */
+const getTraitColor = (traitName: string): string => {
+  // Ensure we have a valid trait name
+  if (!traitName) {
+    if (import.meta.dev) {
+      console.warn(`Empty trait name provided to getTraitColor`);
+    }
+    return "#6b7280";
+  }
+
+  const traitColor = TRAIT_COLOR_MAP[traitName as MotivationTrait];
+
+  // Debug logging for development
+  if (import.meta.dev && !traitColor) {
+    console.warn(
+      `No color mapping found for trait: "${traitName}". Available traits:`,
+      Object.keys(TRAIT_COLOR_MAP)
+    );
+  }
+
+  return traitColor?.base || "#6b7280"; // Default gray color as fallback
+};
+
+/**
  * Chart data configuration with stacked bar datasets
  * Inner values form the base, outer differences stack on top
  */
@@ -170,11 +237,11 @@ const chartConfiguration = computed(() => ({
   labels: dimensionLabels.value,
   datasets: [
     {
-      label: "Inneres Selbstbild",
+      label: $t("personality_section.internal_self_image") as string,
       data: innerSelfValues.value,
-      backgroundColor: dimensionLabels.value.map((label) =>
-        createRgbaColor(TRAIT_COLOR_MAP[label as MotivationTrait].base, 0.8)
-      ),
+      backgroundColor: dimensionLabels.value
+        .filter((label): label is string => Boolean(label))
+        .map((label) => createRgbaColor(getTraitColor(label), 0.8)),
       borderRadius: {
         topLeft: 4,
         topRight: 4,
@@ -186,11 +253,11 @@ const chartConfiguration = computed(() => ({
       categoryPercentage: 0.7,
     },
     {
-      label: "Äußeres Selbstbild",
+      label: $t("personality_section.external_self_image") as string,
       data: outerSelfDifferences.value,
-      backgroundColor: dimensionLabels.value.map((label) =>
-        createRgbaColor(TRAIT_COLOR_MAP[label as MotivationTrait].base, 0.35)
-      ),
+      backgroundColor: dimensionLabels.value
+        .filter((label): label is string => Boolean(label))
+        .map((label) => createRgbaColor(getTraitColor(label), 0.35)),
       borderRadius: {
         topLeft: 4,
         topRight: 4,
@@ -274,11 +341,10 @@ const chartDisplayOptions = computed(() => ({
 
         const dataPoint = contextData?.tooltip?.dataPoints?.[0];
         if (dataPoint) {
-          const traitName = dimensionLabels.value[
-            dataPoint.dataIndex
-          ] as MotivationTrait;
-          const baseColor = TRAIT_COLOR_MAP[traitName]?.base;
-          if (baseColor) return baseColor;
+          const traitName = dimensionLabels.value[dataPoint.dataIndex];
+          if (traitName) {
+            return getTraitColor(traitName);
+          }
         }
         return themeColors.value.tooltipBorder;
       },
@@ -298,10 +364,14 @@ const chartDisplayOptions = computed(() => ({
           // Show dataset-specific info with proper labeling
           if (context.datasetIndex === 0) {
             // Inner dataset
-            return `Inneres Selbstbild: ${dimension.innerValue}`;
+            return `${$t("personality_section.internal_self_image")}: ${
+              dimension.innerValue
+            }`;
           } else if (context.datasetIndex === 1) {
             // Outer dataset - show total outer value
-            return `Äußeres Selbstbild: ${dimension.outerValue}`;
+            return `${$t("personality_section.external_self_image")}: ${
+              dimension.outerValue
+            }`;
           }
 
           return "";
@@ -397,6 +467,34 @@ const averageLinePlugin = {
   },
 };
 </script>
+
+<template>
+  <div class="bar-chart">
+    <h3 class="bar-chart__title" :style="{ color: themeColors.titleColor }">
+      {{ title }}
+    </h3>
+    <div class="bar-chart__canvas-wrapper">
+      <Bar
+        id="motivation-profile"
+        :data="chartConfiguration"
+        :options="chartDisplayOptions"
+        :plugins="[averageLinePlugin]"
+      />
+    </div>
+    <p
+      class="bar-chart__subtitle"
+      :style="{ color: themeColors.subtitleColor }"
+    >
+      {{ subtitle }}
+    </p>
+    <p
+      class="bar-chart__description"
+      :style="{ color: themeColors.descriptionColor }"
+    >
+      {{ text }}
+    </p>
+  </div>
+</template>
 
 <style scoped lang="scss">
 $block: "bar-chart";
