@@ -220,7 +220,7 @@ $block: "contact-card";
     :deep() {
       width: 100% !important;
       justify-content: center !important;
-      
+
       color: #ffffff !important;
 
       .bg-gray-50 {
