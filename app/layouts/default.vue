@@ -3,20 +3,34 @@ import "~/assets/scss/app.scss";
 
 // useColorMode is auto-imported by @nuxtjs/color-mode module
 const colorMode = useColorMode();
-const ambientBackground = ref<Element | null>(null);
+const route = useRoute();
+const ambientBackground = ref<HTMLElement | null>(null);
+
+// Show ambient background on all routes except those that explicitly disable it via page meta
+const showAmbient = computed<boolean>(() => route.meta?.ambient !== false);
 
 // Keep URL hash in sync with the section ≥50% in view (hero keeps path without hash)
 useScrollHashes();
 
 onMounted(() => {
-  ambientBackground.value = document.querySelector(".ambient-background");
-  updateAmbientBackground(colorMode.preference);
+  // If the element exists on initial mount, apply the appropriate mode class
+  if (ambientBackground.value) {
+    updateAmbientBackground(colorMode.preference);
+  }
 });
 
 watch(
   () => colorMode.preference,
   (newPreference) => {
     updateAmbientBackground(newPreference);
+  }
+);
+
+// When the ambient background element is (re)mounted due to route changes, sync its mode class
+watch(
+  () => ambientBackground.value,
+  (el) => {
+    if (el) updateAmbientBackground(colorMode.preference);
   }
 );
 
@@ -35,7 +49,12 @@ function updateAmbientBackground(preference: string) {
     <div class="layout-root">
       <main-navigation />
       <!-- Ambient background (starts after hero/first viewport) -->
-      <div class="ambient-background" aria-hidden="true"></div>
+      <div
+        v-if="showAmbient"
+        ref="ambientBackground"
+        class="ambient-background"
+        aria-hidden="true"
+      ></div>
       <main id="main-content" tabindex="-1">
         <NuxtPage />
       </main>
@@ -56,7 +75,6 @@ function updateAmbientBackground(preference: string) {
   display: flex;
   flex-direction: column;
   position: relative;
-  background: #181818; /* fallback base */
   /* Ensure stacking context so negative z-index child stays behind */
   isolation: isolate;
 }
