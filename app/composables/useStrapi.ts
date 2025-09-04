@@ -6,7 +6,23 @@ import type { StrapiImage } from '~/types/types';
 
 export const useStrapi = () => {
 
-  const locale = ref('de'); // TODO: Replace with useI18n() when i18n is set up
+  const { $getLocale } = useI18n();
+
+
+  // It seems, that the $getLocale() doesn't know the locale set in the url on first load
+  // So we check if /en is present in the path and return 'en' if so, otherwise 'de'
+  const getCurrentLocale = (): string => {
+    const locale = $getLocale();
+    if (locale) {
+      return locale;
+    }
+    const route = useRoute();
+    if (route.path.startsWith('/en')) {
+      return 'en';
+    }
+    return 'de';
+  }
+
 
   interface IStrapiResponseData {
     [key: string]: unknown;
@@ -16,7 +32,6 @@ export const useStrapi = () => {
    * Retrieve data from Strapi API endpoint via server proxy
    * @param {string} endpoint - API endpoint to fetch from
    * @param {string[]} fields - Optional array of fields to include
-   * @param {string} locale - Optional locale parameter (e.g. 'en', 'de'). If not provided, uses the current i18n locale
    * @param {boolean} isCollection - Whether the endpoint is a collection type (default: false)
    * @param {string[]} populates - Optional array of relations to populate using dot notation (e.g. ['quickFilter', 'skillCards.skillItems'])
    * @returns Filtered JSON response from Strapi
@@ -24,10 +39,11 @@ export const useStrapi = () => {
   const cmsRequest = async <T = unknown>(
     endpoint: string,
     fields: string[] = [],
-    customLocale?: string,
     isCollection: boolean = false,
     populates: string[] = []
   ): Promise<T> => {
+
+
     try {
       // Input validation for endpoint parameter
       if (!endpoint || typeof endpoint !== 'string') {
@@ -50,14 +66,7 @@ export const useStrapi = () => {
         query.populates = populates;
       }
 
-      // Add locale to query, preferring:
-      // 1. Custom locale if provided
-      // 2. Current i18n locale if available
-      if (customLocale) {
-        query.locale = customLocale;
-      } else if (locale.value) {
-        query.locale = locale.value;
-      }
+      query.locale = getCurrentLocale();
 
       // Fetch data through our server proxy
       const response: IStrapiResponseData = await $fetch('/api/request', {
@@ -142,5 +151,6 @@ export const useStrapi = () => {
   return {
     cmsRequest,
     buildImageUrl,
+    currentLocaleString: computed(() => getCurrentLocale()),
   };
 };

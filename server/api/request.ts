@@ -119,6 +119,8 @@ export default defineEventHandler(async (event) => {
     if (API_TOKEN) {
       headers.Authorization = `Bearer ${API_TOKEN}`;
     }
+    console.log('🔥 url.toString():', url.toString());
+
     const response: StrapiResponse = await $fetch(url.toString(), {
       method: 'GET',
       headers,
