@@ -144,7 +144,7 @@ const visibleTimelineItems = computed(() => {
                 color="secondary"
                 size="sm"
               >
-                Kontakt aufnehmen
+                {{ $t("ui.contact_me") }}
               </UButton>
             </div>
           </template>
