@@ -45,5 +45,14 @@
       "filter_instructions": "Enter one or more terms. Partial matches work. Multiple filters possible. Clear all filters to return to normal view.",
       "current_status": "Showing {showing} of {total} projects."
     }
+  },
+  "ai_summary": {
+    "close": "Close",
+    "loading": "Loading summary…",
+    "searching": "Online search in progress…",
+    "writing": "Writing… ({percentage}%)",
+    "book_appointment": "Book appointment",
+    "pdf_download": "PDF Download",
+    "pdf_tooltip": "Will be activated once the summary is fully generated."
   }
 }

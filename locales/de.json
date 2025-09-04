@@ -45,5 +45,14 @@
       "filter_instructions": "Gib einen oder mehrere Begriffe ein. Teiltreffer genügen. Mehrere Filter möglich. Lösche alle Filter um zur normalen Ansicht zurückzukehren.",
       "current_status": "Zeige {showing} von {total} Projekten."
     }
+  },
+  "ai_summary": {
+    "close": "Schließen",
+    "loading": "Lade Zusammenfassung…",
+    "searching": "Onlinesuche läuft…",
+    "writing": "Schreibe… ({percentage}%)",
+    "book_appointment": "Termin buchen",
+    "pdf_download": "PDF Download",
+    "pdf_tooltip": "Wird aktiv sobald die Zusammenfassung vollständig generiert wurde."
   }
 }

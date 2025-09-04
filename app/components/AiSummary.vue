@@ -1,9 +1,13 @@
 <script setup lang="ts">
 const { cmsRequest, currentLocaleString } = useStrapi();
+const { $t } = useI18n();
 
 const { data, pending, error } = await useLazyAsyncData<AiSummaryResponse>(
   () => `summary-${currentLocaleString.value}`,
-  () => cmsRequest<AiSummaryResponse>("ai-summary", ["subtitle", "summary"])
+  () => cmsRequest<AiSummaryResponse>("ai-summary", ["subtitle", "summary"]),
+  {
+    watch: [currentLocaleString],
+  }
 );
 
 // Use PDFEasy composable
@@ -258,11 +262,11 @@ const downloadPdf = async (): Promise<void> => {
             variant="ghost"
             square
             color="neutral"
-            aria-label="Schließen"
+            :aria-label="$t('ai_summary.close')"
             @click="open = false"
           >
             <UIcon name="i-lucide-x" class="ai-summary__close-icon" />
-            <span class="sr-only">Schließen</span>
+            <span class="sr-only">{{ $t("ai_summary.close") }}</span>
           </UButton>
         </div>
       </template>
@@ -275,7 +279,9 @@ const downloadPdf = async (): Promise<void> => {
               class="ai-summary__content prose dark:prose-invert"
             />
             <template #fallback>
-              <div class="ai-summary__loading">Lade Zusammenfassung…</div>
+              <div class="ai-summary__loading">
+                {{ $t("ai_summary.loading") }}
+              </div>
             </template>
           </ClientOnly>
           <!-- Phase 1 & 2: Initial search and check confirmation -->
@@ -287,7 +293,7 @@ const downloadPdf = async (): Promise<void> => {
               name="i-heroicons-cpu-chip"
               class="ai-summary__progress-icon"
             />
-            <span>Onlinesuche läuft…</span>
+            <span>{{ $t("ai_summary.searching") }}</span>
             <UIcon
               v-if="searchCheckedPhase"
               name="i-heroicons-check"
@@ -303,14 +309,16 @@ const downloadPdf = async (): Promise<void> => {
               name="i-heroicons-cpu-chip"
               class="ai-summary__progress-icon"
             />
-            <span>Schreibe… ({{ progressPercentage }}%)</span>
+            <span>{{
+              $t("ai_summary.writing", { percentage: progressPercentage })
+            }}</span>
           </div>
         </div>
       </template>
       <template #footer>
         <div class="ai-summary__footer">
           <UButton
-            label="Termin buchen"
+            :label="$t('ai_summary.book_appointment')"
             color="secondary"
             variant="soft"
             :ui="{ base: 'rounded-md' }"
@@ -319,13 +327,12 @@ const downloadPdf = async (): Promise<void> => {
             rel="noopener noreferrer"
           >
             <UIcon name="i-lucide-calendar" class="ai-summary__footer-icon" />
-            <span class="ai-summary__footer-text">Termin buchen</span>
+            <span class="ai-summary__footer-text">{{
+              $t("ai_summary.book_appointment")
+            }}</span>
           </UButton>
           <template v-if="!canDownload">
-            <UTooltip
-              text="Wird aktiv sobald die Zusammenfassung vollständig generiert wurde."
-              :open-delay="150"
-            >
+            <UTooltip :text="$t('ai_summary.pdf_tooltip')" :open-delay="150">
               <UButton
                 label="PDF Download"
                 color="primary"
