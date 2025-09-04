@@ -25,6 +25,7 @@
     "eslint": "^9.33.0",
     "nuxt": "^4.0.3",
     "nuxt-aos": "^1.2.5",
+    "nuxt-i18n-micro": "^1.94.0",
     "nuxt-strapi-blocks-renderer": "^1.1.0",
     "pdfeasy": "^1.4.0",
     "typescript": "^5.9.2",

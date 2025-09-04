@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     'nuxt-strapi-blocks-renderer',
     '@nuxtjs/mdc',
-
+    'nuxt-i18n-micro',
   ],
   colorMode: {
     preference: 'light',
@@ -47,6 +47,15 @@ export default defineNuxtConfig({
         }
       }
     }
+  },
+  i18n: {
+    locales: [
+      { code: 'de', iso: 'de-DE', dir: 'ltr' },
+      { code: 'en', iso: 'en-US', dir: 'ltr' },
+    ],
+    defaultLocale: 'de',
+    translationDir: 'locales',
+    meta: true,
   },
   app: {
     head: {
