@@ -95,20 +95,31 @@ $block: "faq-section";
 .#{$block} {
   &__wrapper {
     position: relative;
+    overflow: hidden;
 
     &::before {
       content: "";
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      position: absolute;
+      top: -2rem;
+      bottom: -2rem;
+      left: -100vw;
+      right: -100vw;
       background-color: #fafafa;
       pointer-events: none;
       z-index: -1;
 
       @at-root .dark #{&} {
         background-color: rgba(0, 0, 0, 0.1) !important;
+      }
+
+      @media (min-width: 640px) {
+        top: -2.5rem;
+        bottom: -2.5rem;
+      }
+
+      @media (min-width: 1024px) {
+        top: 0;
+        bottom: 0;
       }
     }
   }
