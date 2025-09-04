@@ -3,7 +3,7 @@ import type { NavigationElement, NavigationResponse } from "~/types/types";
 
 const route = useRoute();
 const router = useRouter();
-const { cmsRequest } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi();
 
 // Track actual browser hash for active state detection
 const currentHash = ref("");
@@ -37,7 +37,7 @@ onMounted(() => {
 });
 
 const { data, pending, error } = await useLazyAsyncData<NavigationResponse>(
-  "nav",
+  () => `nav-${currentLocaleString.value}`,
   () =>
     cmsRequest<NavigationResponse>("navigation", [
       "brandName",
@@ -186,11 +186,19 @@ const onBrandClick = (e: MouseEvent) => {
             <li class="main-navigation__extra">
               <ai-summary :title="specialName" :target="specialLink" />
             </li>
+
+            <li class="main-navigation__extra">
+              <language-selector />
+            </li>
           </ul>
         </nav>
 
         <!-- Mobile trigger and panel -->
         <div class="main-navigation__mobile" aria-label="Mobile navigation">
+          <div class="main-navigation__mobile-language">
+            <language-selector />
+          </div>
+
           <UButton
             ref="menuButtonRef"
             variant="ghost"
@@ -444,6 +452,12 @@ $block: "main-navigation";
   /* Mobile */
   &__mobile {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__mobile-language {
     display: flex;
     align-items: center;
   }
