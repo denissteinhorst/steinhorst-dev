@@ -397,6 +397,15 @@ $block: "ai-summary";
     backdrop-filter: none;
     isolation: isolate;
 
+    // Mobile navigation context - improve contrast in light mode
+    @media (max-width: 1023.98px) {
+      color: rgb(71, 85, 105);
+
+      :root.dark & {
+        color: rgb(226, 232, 240);
+      }
+    }
+
     // Align with navigation breakpoint (1024px) instead of 640px
     @media (min-width: 1024px) {
       width: auto;
@@ -406,6 +415,15 @@ $block: "ai-summary";
     &:hover {
       background-color: transparent;
       color: white;
+
+      // Mobile navigation context hover state
+      @media (max-width: 1023.98px) {
+        color: rgb(59, 130, 246);
+
+        :root.dark & {
+          color: white;
+        }
+      }
 
       .#{$block}__icon {
         transform: rotate(12deg) scale(1.1);
@@ -439,6 +457,15 @@ $block: "ai-summary";
     width: 1rem;
     color: rgb(196, 181, 253);
     transition: transform 150ms ease;
+
+    // Mobile navigation context - improve contrast in light mode
+    @media (max-width: 1023.98px) {
+      color: rgb(139, 92, 246);
+
+      :root.dark & {
+        color: rgb(196, 181, 253);
+      }
+    }
   }
 
   &__label {
