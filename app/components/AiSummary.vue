@@ -2,13 +2,44 @@
 const { cmsRequest, currentLocaleString } = useStrapi();
 const { $t } = useI18n();
 
-const { data, pending, error } = await useLazyAsyncData<AiSummaryResponse>(
-  () => `summary-${currentLocaleString.value}`,
+// Fetch summary per-locale and keep it reactive when locale changes.
+// Using a reactive key ensures Nuxt will re-run the fetch when
+// `currentLocaleString` updates (for example via the LanguageSelector).
+const summaryKey = computed(() => `summary-${currentLocaleString.value}`);
+const { data, pending, error, refresh } = useAsyncData<AiSummaryResponse>(
+  summaryKey,
   () => cmsRequest<AiSummaryResponse>("ai-summary", ["subtitle", "summary"]),
-  {
-    watch: [currentLocaleString],
-  }
+  { immediate: true, server: true }
 );
+
+// If locale changes, refresh the data and reset any typing/progress state so
+// the slideover and typing animation don't get stuck in an inconsistent state.
+const resetTyping = (): void => {
+  if (timer) clearTimeout(timer);
+  if (searchTimer) clearTimeout(searchTimer);
+  if (checkTimer) clearTimeout(checkTimer);
+  timer = null;
+  searchTimer = null;
+  checkTimer = null;
+  index.value = 0;
+  currentText.value = "";
+  isComplete.value = false;
+  hasStarted.value = false;
+  searchPhase.value = false;
+  searchCheckedPhase.value = false;
+};
+
+watch(currentLocaleString, async () => {
+  try {
+    await refresh();
+  } catch {
+    // ignore refresh errors here; UI will show `error` if needed
+  }
+  // reset typing state so the component is usable after locale switch
+  resetTyping();
+  // also ensure the slideover is closed to avoid stale UI
+  open.value = false;
+});
 
 // Use PDFEasy composable
 const { generatePdfFromMarkdown } = usePdfEasy();
@@ -318,7 +349,7 @@ const downloadPdf = async (): Promise<void> => {
       <template #footer>
         <div class="ai-summary__footer">
           <UButton
-            :label="$t('ai_summary.book_appointment')"
+            :label="String($t('ai_summary.book_appointment'))"
             color="secondary"
             variant="soft"
             :ui="{ base: 'rounded-md' }"
@@ -332,7 +363,10 @@ const downloadPdf = async (): Promise<void> => {
             }}</span>
           </UButton>
           <template v-if="!canDownload">
-            <UTooltip :text="$t('ai_summary.pdf_tooltip')" :open-delay="150">
+            <UTooltip
+              :text="String($t('ai_summary.pdf_tooltip'))"
+              :open-delay="150"
+            >
               <UButton
                 label="PDF Download"
                 color="primary"
