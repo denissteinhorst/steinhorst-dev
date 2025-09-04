@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { t } = useI18n();
 const currentYear = new Date().getFullYear();
 </script>
 
@@ -7,11 +8,12 @@ const currentYear = new Date().getFullYear();
     <div class="footer-section__content">
       <div class="footer-section__grid">
         <p class="footer-section__text">
-          &copy; {{ currentYear }} Denis Steinhorst. Alle Rechte vorbehalten.
+          &copy; {{ currentYear }} Denis Steinhorst.
+          {{ t("footer_section.copyright") }}
         </p>
         <div class="footer-section__links">
           <NuxtLink to="/imprint" class="footer-section__link">
-            Impressum
+            {{ t("footer_section.imprint") }}
           </NuxtLink>
         </div>
       </div>

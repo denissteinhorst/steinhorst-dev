@@ -54,5 +54,9 @@
     "book_appointment": "Termin buchen",
     "pdf_download": "PDF Download",
     "pdf_tooltip": "Wird aktiv sobald die Zusammenfassung vollständig generiert wurde."
+  },
+  "footer_section": {
+    "copyright": "Alle Rechte vorbehalten.",
+    "imprint": "Impressum"
   }
 }

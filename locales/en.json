@@ -54,5 +54,9 @@
     "book_appointment": "Book appointment",
     "pdf_download": "PDF Download",
     "pdf_tooltip": "Will be activated once the summary is fully generated."
+  },
+  "footer_section": {
+    "copyright": "All rights reserved.",
+    "imprint": "Imprint"
   }
 }
