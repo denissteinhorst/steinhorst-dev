@@ -60,6 +60,7 @@ const getAriaLabel = (card: ContactCard): string => {
             color="secondary"
             variant="solid"
             size="sm"
+            block
             :aria-label="getAriaLabel(data)"
             class="contact-card__button"
           >
@@ -95,6 +96,10 @@ $block: "contact-card";
   display: flex;
   align-items: stretch;
 
+  @media (max-width: 768px) {
+    height: 280px;
+  }
+
   &__inner {
     height: 100%;
     flex: 1 1 auto;
@@ -127,18 +132,31 @@ $block: "contact-card";
     gap: 0.75rem;
     flex: 1 1 auto;
     min-height: 0;
+
+    @media (max-width: 768px) {
+      align-items: center;
+      text-align: center;
+    }
   }
 
   &__header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+
+    @media (max-width: 768px) {
+      justify-content: center;
+    }
   }
 
   &__content {
     flex-grow: 1;
     width: 100%;
     min-height: 0;
+
+    @media (max-width: 768px) {
+      text-align: center;
+    }
   }
 
   &__icon-wrapper {
@@ -181,18 +199,28 @@ $block: "contact-card";
   &__actions {
     position: absolute;
     bottom: 1.25rem;
+    left: 1.25rem;
+    right: 1.25rem;
     margin-top: 0;
-    width: calc(100% - 3rem);
   }
 
   &__button {
-    width: 100%;
-    justify-content: center;
-    display: flex;
+    width: 100% !important;
+    justify-content: center !important;
+    display: flex !important;
     align-items: center;
     gap: 0.5rem;
 
+    :deep(button) {
+      width: 100% !important;
+      justify-content: center !important;
+      display: flex !important;
+    }
+
     :deep() {
+      width: 100% !important;
+      justify-content: center !important;
+      
       color: #ffffff !important;
 
       .bg-gray-50 {
