@@ -98,29 +98,17 @@ $block: "faq-section";
 
     &::before {
       content: "";
-      position: absolute;
-      top: -2rem;
-      bottom: -2rem;
+      position: fixed;
+      top: 0;
+      bottom: 0;
       left: 0;
       right: 0;
-      margin-left: calc(-50vw + 50%);
-      margin-right: calc(-50vw + 50%);
       background-color: #fafafa;
       pointer-events: none;
       z-index: -1;
 
       @at-root .dark #{&} {
         background-color: rgba(0, 0, 0, 0.1) !important;
-      }
-
-      @media (min-width: 640px) {
-        top: -2.5rem;
-        bottom: -2.5rem;
-      }
-
-      @media (min-width: 1024px) {
-        top: 0;
-        bottom: 0;
       }
     }
   }
