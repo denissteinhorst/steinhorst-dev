@@ -117,18 +117,20 @@ $block: "section-wrapper";
 
   .section-header {
     margin-bottom: var(--spacing-2xl);
-    text-align: left;
+    text-align: center;
 
-    &--left {
-      text-align: left;
-    }
+    @media (min-width: 768px) {
+      &--left {
+        text-align: left;
+      }
 
-    &--center {
-      text-align: center;
-    }
+      &--center {
+        text-align: center;
+      }
 
-    &--right {
-      text-align: right;
+      &--right {
+        text-align: right;
+      }
     }
 
     &__inner {
@@ -188,7 +190,7 @@ $block: "section-wrapper";
       margin-top: var(--spacing-md);
       display: flex;
       align-items: center;
-      justify-content: flex-start;
+      justify-content: center;
 
       @media (min-width: 768px) {
         margin-top: 0;
@@ -207,7 +209,7 @@ $block: "section-wrapper";
     }
 
     &--right &__actions {
-      justify-content: flex-end;
+      justify-content: center;
 
       @media (min-width: 768px) {
         justify-content: flex-end;
@@ -216,6 +218,8 @@ $block: "section-wrapper";
     }
 
     &--left &__actions {
+      justify-content: center;
+
       @media (min-width: 768px) {
         justify-content: flex-end;
         align-self: flex-end;
