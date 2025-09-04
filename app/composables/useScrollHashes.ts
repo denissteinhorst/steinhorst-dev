@@ -121,13 +121,66 @@ export const useScrollHashes = (options: ScrollHashesOptions = {}) => {
     })
   }
 
+  // MutationObserver to catch DOM replacements (e.g. locale switch that updates
+  // sections without a full navigation). Debounced to avoid rapid re-observations.
+  let mutationObserver: MutationObserver | undefined
+  let mutationTimer: ReturnType<typeof setTimeout> | undefined
+  const scheduleObserve = (delay = 50) => {
+    if (!import.meta.client) return
+    if (mutationTimer) clearTimeout(mutationTimer)
+    mutationTimer = setTimeout(() => {
+      observe()
+      mutationTimer = undefined
+    }, delay)
+  }
+
   onMounted(() => {
     // Defer to ensure DOM is ready
     requestAnimationFrame(() => observe())
+
+    if (import.meta.client && typeof MutationObserver !== 'undefined') {
+      mutationObserver = new MutationObserver(() => scheduleObserve())
+      // Observe the whole document for subtree changes that may replace section nodes
+      try {
+        mutationObserver.observe(document.body, { childList: true, subtree: true })
+      } catch {
+        // ignore if document.body isn't available or observe throws
+      }
+    }
   })
+
+  // Re-observe when the route changes (covers locale switches that update the route
+  // or replace the page content without a full reload). Wait for the DOM update
+  // before scanning elements.
+  try {
+    const route = useRoute()
+    watch(
+      () => route.fullPath,
+      () => {
+        if (!import.meta.client) return
+        // allow the DOM to update after navigation/locale switch
+        nextTick(() => {
+          observe()
+        })
+      }
+    )
+  } catch {
+    // If useRoute isn't available in the environment, silently ignore.
+  }
 
   onBeforeUnmount(() => {
     if (stopObserver) stopObserver()
+    if (mutationObserver) {
+      try {
+        mutationObserver.disconnect()
+      } catch {
+        /* ignore */
+      }
+    }
+    if (mutationTimer) {
+      clearTimeout(mutationTimer)
+      mutationTimer = undefined
+    }
   })
 
   const refresh = () => observe()
