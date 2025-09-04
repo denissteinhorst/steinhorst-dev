@@ -113,8 +113,8 @@ const filteredProjects = computed((): ProjectCard[] => {
         <div
           v-for="(card, index) in filteredProjects"
           :key="index"
-          data-aos="fade-up"
-          :data-aos-delay="Math.min(index, 5) * 100"
+          data-aos="none"
+          :data-aos-delay="100"
           class="project-section__card-wrapper"
         >
           <project-card :data="card" />

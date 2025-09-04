@@ -48,6 +48,9 @@ export default defineNuxtConfig({
       }
     }
   },
+  aos: {
+    once: true,
+  },
   i18n: {
     locales: [
       { code: 'de', iso: 'de-DE', dir: 'ltr' },

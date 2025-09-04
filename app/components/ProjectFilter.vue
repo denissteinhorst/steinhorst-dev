@@ -31,6 +31,8 @@ const emit = defineEmits<{
   "update:is-filtering": [value: boolean]; // Whether filtering is active
 }>();
 
+const { t } = useI18n();
+
 // Controls whether all projects are shown
 const isShowingAllProjects = ref(false);
 
@@ -46,7 +48,9 @@ const availableProjectCountOptions = computed<ProjectFilterOptions[]>(() => {
       const isMaxCount = displayCount >= props.projectCount;
 
       return {
-        label: isMaxCount ? "alle" : displayCount.toString(),
+        label: isMaxCount
+          ? (t("project_section.filter.all") as string)
+          : displayCount.toString(),
         value: isMaxCount ? props.projectCount : displayCount,
       };
     }
@@ -156,7 +160,7 @@ const handleFilterInputChange = (event: Event): void => {
       <div class="project-filter__count-selector">
         <template v-if="!isFilterActive">
           <label for="project-count-select" class="project-filter__label">
-            Projekte anzeigen:
+            {{ t("project_section.filter.projects_to_show") }}
           </label>
           <USelect
             id="project-count-select"
@@ -168,27 +172,26 @@ const handleFilterInputChange = (event: Event): void => {
             aria-describedby="project-count-instructions"
           />
           <span id="project-count-instructions" class="sr-only">
-            Wähle Anzahl der sichtbaren Projektkarten.
+            {{ t("project_section.filter.select_project_count") }}
           </span>
         </template>
         <template v-else>
-          <span class="project-filter__count-info">
-            Zeige
-            <strong class="project-filter__count-highlight">
-              {{ props.filteredCount }}
-            </strong>
-            von
-            <strong class="project-filter__count-highlight">
-              {{ props.projectCount }}
-            </strong>
-            Projekten.
+          <span
+            class="project-filter__count-info"
+            v-html="
+              t('project_section.filter.showing_count', {
+                filtered: props.filteredCount,
+                total: props.projectCount,
+              })
+            "
+          >
           </span>
           <button
             type="button"
             class="project-filter__reset-button"
             @click="clearAllFilters"
           >
-            Filter zurücksetzen
+            {{ t("project_section.filter.reset_filters") }}
             <UIcon
               name="i-lucide-x"
               class="project-filter__reset-icon"
@@ -201,13 +204,13 @@ const handleFilterInputChange = (event: Event): void => {
       <!-- Tag filter -->
       <div class="project-filter__tag-container">
         <label for="project-tags-filter" class="project-filter__label">
-          Projekte filtern:
+          {{ t("project_section.filter.filter_projects") }}
         </label>
         <UInputTags
           id="project-tags-filter"
           v-model="selectedFilterTags"
           :items="props.allTags"
-          placeholder="z.B.: Vue, Nuxt, GTM etc."
+          :placeholder="(t('project_section.filter.placeholder') as string)"
           :add-on-tab="true"
           :add-on-enter="true"
           :add-on-blur="true"
@@ -233,22 +236,25 @@ const handleFilterInputChange = (event: Event): void => {
               variant="link"
               size="sm"
               icon="i-lucide-circle-x"
-              aria-label="Filter löschen"
+              :aria-label="(t('project_section.filter.clear_filters') as string)"
               @click="clearAllFilters"
             />
           </template>
         </UInputTags>
       </div>
       <p id="project-tags-instructions" class="sr-only">
-        Gib einen oder mehrere Begriffe ein. Teiltreffer genügen. Mehrere Filter
-        möglich. Lösche alle Filter um zur normalen Ansicht zurückzukehren.
+        {{ t("project_section.filter.filter_instructions") }}
       </p>
     </div>
 
     <!-- Screen reader status -->
     <p id="project-status" class="sr-only" aria-live="polite">
-      Zeige {{ isFilterActive ? props.filteredCount : visibleProjectCount }} von
-      {{ props.projectCount }} Projekten.
+      {{
+        t("project_section.filter.current_status", {
+          showing: isFilterActive ? props.filteredCount : visibleProjectCount,
+          total: props.projectCount,
+        })
+      }}
     </p>
   </div>
 </template>

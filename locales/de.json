@@ -31,5 +31,19 @@
   "personality_section": {
     "internal_self_image": "Inneres Selbstbild",
     "external_self_image": "Äußeres Selbstbild"
+  },
+  "project_section": {
+    "filter": {
+      "projects_to_show": "Projekte anzeigen:",
+      "filter_projects": "Projekte filtern:",
+      "placeholder": "z.B.: Vue, Nuxt, GTM etc.",
+      "clear_filters": "Filter löschen",
+      "reset_filters": "Filter zurücksetzen",
+      "showing_count": "Zeige {filtered} von {total} Projekten.",
+      "all": "alle",
+      "select_project_count": "Wähle Anzahl der sichtbaren Projektkarten.",
+      "filter_instructions": "Gib einen oder mehrere Begriffe ein. Teiltreffer genügen. Mehrere Filter möglich. Lösche alle Filter um zur normalen Ansicht zurückzukehren.",
+      "current_status": "Zeige {showing} von {total} Projekten."
+    }
   }
 }

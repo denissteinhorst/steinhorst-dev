@@ -31,5 +31,19 @@
   "personality_section": {
     "internal_self_image": "Internal self-image",
     "external_self_image": "External self-image"
+  },
+  "project_section": {
+    "filter": {
+      "projects_to_show": "Show projects:",
+      "filter_projects": "Filter projects:",
+      "placeholder": "e.g.: Vue, Nuxt, GTM etc.",
+      "clear_filters": "Clear filters",
+      "reset_filters": "Reset filters",
+      "showing_count": "Showing {filtered} of {total} projects.",
+      "all": "all",
+      "select_project_count": "Select number of visible project cards.",
+      "filter_instructions": "Enter one or more terms. Partial matches work. Multiple filters possible. Clear all filters to return to normal view.",
+      "current_status": "Showing {showing} of {total} projects."
+    }
   }
 }
