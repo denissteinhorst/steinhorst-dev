@@ -705,7 +705,6 @@ $block: "navigation-section";
 
     &[data-active="true"] {
       color: var(--color-primary, #a78bfa);
-      font-weight: 700;
       background: rgba(167, 139, 250, 0.15);
 
       &::before {
@@ -808,7 +807,6 @@ $block: "navigation-section";
 
     &[data-active="true"] {
       color: var(--color-primary, #a78bfa);
-      font-weight: 700;
     }
   }
 
