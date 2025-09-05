@@ -432,6 +432,8 @@ export interface ImprintSectionResponse extends BaseResponse<ImprintSectionRespo
   title?: string;
   jumpmark?: string;
   text?: RichTextNodes;
+  noticeTitle?: string;
+  noticeText?: string;
 }
 
 // AI Summary types

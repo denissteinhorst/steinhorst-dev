@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { cmsRequest, currentLocaleString } = useStrapi();
+const { cmsRequest } = useStrapi();
 
 definePageMeta({
   // Signal the layout to hide the ambient background on this route
@@ -8,7 +8,12 @@ definePageMeta({
 
 const { data, pending, error } = await useLazyAsyncData<ImprintSectionResponse>(
   "imprint",
-  () => cmsRequest<ImprintSectionResponse>("imprint-section", [])
+  () =>
+    cmsRequest<ImprintSectionResponse>(
+      "imprint-section",
+      ["title", "text", "noticeTitle", "noticeText"],
+      false
+    )
 );
 
 const imprintText = computed<RichTextNodes>(() => data.value?.text ?? []);
@@ -30,21 +35,14 @@ const imprintText = computed<RichTextNodes>(() => data.value?.text ?? []);
   <section v-else-if="data" class="imprint-section">
     <div class="imprint-section__container">
       <UAlert
-        v-if="currentLocaleString === 'en'"
         class="imprint-section__alert"
         color="neutral"
         variant="subtle"
-        title="Information"
-        description="This English translation of the Imprint was generated with online tools and may contain inaccuracies or ambiguities. It hasn't been reviewed by a lawyer and doesn't constitute legal advice. No legal liability is assumed. If anything is unclear, please get in touch so we can clarify together."
-        icon="i-lucide-info"
-      />
-      <UAlert
-        v-else-if="currentLocaleString === 'de'"
-        class="imprint-section__alert"
-        color="neutral"
-        variant="subtle"
-        title="Information"
-        description="Dieses Impressums wurde mit Hilfe von Online-Tools erstellt und kann Ungenauigkeiten oder Unklarheiten enthalten. Sie wurde nicht von einem Anwalt überprüft und stellt keine rechtliche Beratung dar. Es wird keine rechtliche Haftung übernommen. Falls etwas unklar ist, nehmen Sie bitte Kontakt mit uns auf, damit wir es gemeinsam klären können."
+        :title="
+          data.noticeTitle ||
+          'Hinweis zur Rechtssicherheit / Note on Legal Validity'
+        "
+        :description="data.noticeText || ''"
         icon="i-lucide-info"
       />
 
