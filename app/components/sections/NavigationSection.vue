@@ -5,9 +5,10 @@ const route = useRoute();
 const router = useRouter();
 const { cmsRequest, currentLocaleString } = useStrapi();
 
-// Track scroll position for navigation transparency
-const scrollY = ref(0);
-const isScrolled = computed(() => scrollY.value > 50);
+// Track scroll position for navigation transparency (VueUse ensures smooth updates cross-browser)
+const { y } = useWindowScroll();
+// Low threshold so the transition begins immediately across browsers
+const isScrolled = computed(() => y.value > 2);
 
 // Track actual browser hash for active state detection
 const currentHash = ref("");
@@ -19,34 +20,39 @@ const updateCurrentHash = () => {
   }
 };
 
-// Handle scroll for navigation background
-const handleScroll = () => {
-  if (import.meta.client) {
-    scrollY.value = window.scrollY;
-  }
-};
+// No manual scroll handlers needed; useWindowScroll handles updates efficiently.
 
 // Listen for hash changes and scroll events
 onMounted(() => {
   if (import.meta.client) {
     updateCurrentHash();
-    handleScroll();
-
-    window.addEventListener("hashchange", updateCurrentHash);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    // Poll for hash changes to catch replaceState from useScrollHashes
-    const hashWatcher = setInterval(() => {
-      const newHash = window.location.hash;
-      if (newHash !== currentHash.value) {
-        currentHash.value = newHash;
-      }
-    }, 100);
-
+    window.addEventListener("hashchange", updateCurrentHash, { passive: true });
+    // Ensure we catch history.replaceState updates (used by useScrollHashes)
+    const originalReplaceState = window.history.replaceState.bind(
+      window.history
+    ) as (data: unknown, title: string, url?: string | URL | null) => void;
+    const handleReplace = () => updateCurrentHash();
+    try {
+      // Patch replaceState so we also update the reactive hash when other code updates it
+      window.history.replaceState = ((
+        data: unknown,
+        title: string,
+        url?: string | URL | null
+      ) => {
+        originalReplaceState(data, title, url);
+        handleReplace();
+      }) as History["replaceState"];
+    } catch {
+      // no-op: if patching fails, active hash won't update via replaceState
+    }
     onUnmounted(() => {
       window.removeEventListener("hashchange", updateCurrentHash);
-      window.removeEventListener("scroll", handleScroll);
-      clearInterval(hashWatcher);
+      // best-effort: restore original replaceState
+      try {
+        window.history.replaceState = originalReplaceState;
+      } catch {
+        /* ignore */
+      }
     });
   }
 });
@@ -422,26 +428,26 @@ $block: "navigation-section";
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  // Optimize transitions for iOS Safari - separate backdrop-filter for better performance
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  // Force hardware acceleration for smoother animations
+  transform: translateZ(0);
+  will-change: background-color, box-shadow;
+
+  // Keep transitions lightweight
 
   // Scrolled state: opaque and with effects
   &--scrolled {
-    background: rgba(0, 0, 0, 0.85);
-    -webkit-backdrop-filter: blur(16px) saturate(180%);
-    backdrop-filter: blur(16px) saturate(180%);
+    background: rgba(0, 0, 0, 1);
     box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.15),
       0 0 0 1px rgba(255, 255, 255, 0.05);
 
-    @supports (backdrop-filter: blur(16px)) {
-      background: rgba(0, 0, 0, 0.75);
-    }
+    // Avoid backdrop-filter for smoother Safari performance
 
     @media (prefers-color-scheme: dark) {
-      background: rgba(0, 0, 0, 0.6);
-
-      @supports (backdrop-filter: blur(16px)) {
-        background: rgba(0, 0, 0, 0.8);
-      }
+      background: rgba(0, 0, 0, 1);
+      // Keep simple color change only
     }
 
     .#{$block}__separator {
@@ -463,7 +469,11 @@ $block: "navigation-section";
     );
     filter: drop-shadow(0 0 6px var(--color-secondary, #90a1b9));
     opacity: 0;
-    transition: opacity 0.3s ease;
+    // Faster transition for separator on iOS Safari
+    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    // Force hardware acceleration
+    transform: translateZ(0);
+    will-change: opacity;
   }
 
   &__container {
@@ -475,12 +485,8 @@ $block: "navigation-section";
     align-items: center;
     gap: 16px;
     height: 72px;
-    transition: height 0.3s ease;
-
-    // Compact height when scrolled
-    .#{$block}--scrolled & {
-      height: 56px;
-    }
+    // Fixed height for smoother cross-browser behavior (no height transition)
+    transform: translateZ(0);
   }
 
   &__skip-link {
@@ -518,7 +524,10 @@ $block: "navigation-section";
     border-radius: 0.375rem;
     padding: 0.25rem 0.5rem;
     margin: -0.25rem -0.5rem;
-    transition: color 0.2s ease;
+    // Optimize transition for iOS Safari
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    // Force hardware acceleration
+    transform: translateZ(0);
 
     // Better visibility on transparent background
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -562,18 +571,22 @@ $block: "navigation-section";
   &__burger-item {
     display: flex;
     align-items: center;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateX(0);
+    // Optimize transition for iOS Safari with specific properties
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(0) translateZ(0); // Add translateZ for hardware acceleration
     opacity: 1;
     width: auto;
     overflow: visible;
+    // Hint to browser about what will change
+    will-change: transform, opacity;
 
     // When scrolled, slide the burger menu out to the left and collapse
     .#{$block}--scrolled & {
-      transform: translateX(-100px);
+      transform: translateX(-100px) translateZ(0);
       opacity: 0;
       pointer-events: none;
-      width: 0;
+      width: 0; // snap width without transitioning it (prevents layout jank on Safari)
       overflow: hidden;
       margin: 0;
       padding: 0;
@@ -590,8 +603,11 @@ $block: "navigation-section";
     color: rgba(248, 250, 252, 0.9);
     cursor: pointer;
     border-radius: 0.375rem;
-    transition: all 0.2s ease;
+    // Optimize transition for iOS Safari
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    // Force hardware acceleration
+    transform: translateZ(0);
 
     &:hover {
       color: #fff;
@@ -608,26 +624,31 @@ $block: "navigation-section";
     width: 20px;
     height: 20px;
     position: absolute;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    // Optimize icon transitions for iOS Safari
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    // Force hardware acceleration
+    backface-visibility: hidden;
+    will-change: opacity, transform;
   }
 
   &__burger-icon {
     opacity: 1;
-    transform: rotate(0deg) scale(1);
+    transform: rotate(0deg) scale(1) translateZ(0);
 
     &--hovering {
       opacity: 0;
-      transform: rotate(90deg) scale(0.8);
+      transform: rotate(90deg) scale(0.8) translateZ(0);
     }
   }
 
   &__chevron-icon {
     opacity: 0;
-    transform: rotate(-90deg) scale(0.8);
+    transform: rotate(-90deg) scale(0.8) translateZ(0);
 
     &--hovering {
       opacity: 1;
-      transform: rotate(0deg) scale(1);
+      transform: rotate(0deg) scale(1) translateZ(0);
     }
   }
 
@@ -692,9 +713,15 @@ $block: "navigation-section";
     color: rgba(248, 250, 252, 0.95);
     text-decoration: none;
     border-radius: 0.5rem;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    // Optimize transitions for iOS Safari
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
     position: relative;
+    // Force hardware acceleration
+    backface-visibility: hidden;
+    will-change: color, background-color, transform;
 
     &:not(:last-child) {
       margin-bottom: 2px;
@@ -703,7 +730,7 @@ $block: "navigation-section";
     &:hover {
       color: #fff;
       background: rgba(255, 255, 255, 0.15);
-      transform: translateX(2px);
+      transform: translateX(2px) translateZ(0);
     }
 
     &:focus-visible {
@@ -753,23 +780,29 @@ $block: "navigation-section";
   &__item {
     display: flex;
     align-items: center;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    // Optimize transition for iOS Safari
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   // Animation for regular navigation items
   &__nav-item {
-    transform: translateX(0);
+    transform: translateX(0) translateZ(0); // Add translateZ for hardware acceleration
     opacity: 1;
     width: auto;
     overflow: visible;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    // Optimize for iOS Safari with specific properties
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    // Hint to browser about what will change
+    will-change: transform, opacity;
 
     // When not scrolled (collapsed state), hide nav items to the right
     .#{$block}:not(.#{$block}--scrolled) & {
-      transform: translateX(100px);
+      transform: translateX(100px) translateZ(0);
       opacity: 0;
       pointer-events: none;
-      width: 0;
+      width: 0; // snap width; no width transition
       overflow: hidden;
       margin: 0;
       padding: 0;
@@ -790,7 +823,10 @@ $block: "navigation-section";
     letter-spacing: 0.025em;
     color: rgba(248, 250, 252, 0.9);
     text-decoration: none;
-    transition: color 0.2s ease;
+    // Optimize transition for iOS Safari
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    // Force hardware acceleration
+    transform: translateZ(0);
 
     // Better visibility on transparent background
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
@@ -832,7 +868,10 @@ $block: "navigation-section";
 
   &__menu-button {
     border: 0;
-    transition: color 0.2s ease;
+    // Optimize transition for iOS Safari
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    // Force hardware acceleration
+    transform: translateZ(0);
 
     &:hover {
       color: rgba(255, 255, 255, 0.8);
@@ -934,6 +973,22 @@ $block: "navigation-section";
 
     &__mobile {
       display: none;
+    }
+  }
+
+  // Keep CSS simple; avoid device-specific overrides that may cause inconsistencies
+
+  // Reduce animations on devices with limited resources
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    &__inner,
+    &__separator,
+    &__burger-item,
+    &__nav-item,
+    &__burger-icon,
+    &__chevron-icon {
+      transition: none !important;
+      animation: none !important;
     }
   }
 }
