@@ -5,6 +5,10 @@ const route = useRoute();
 const router = useRouter();
 const { cmsRequest, currentLocaleString } = useStrapi();
 
+// Track scroll position for navigation transparency
+const scrollY = ref(0);
+const isScrolled = computed(() => scrollY.value > 50);
+
 // Track actual browser hash for active state detection
 const currentHash = ref("");
 
@@ -15,11 +19,21 @@ const updateCurrentHash = () => {
   }
 };
 
-// Listen for hash changes and poll for URL changes (to catch replaceState)
+// Handle scroll for navigation background
+const handleScroll = () => {
+  if (import.meta.client) {
+    scrollY.value = window.scrollY;
+  }
+};
+
+// Listen for hash changes and scroll events
 onMounted(() => {
   if (import.meta.client) {
     updateCurrentHash();
+    handleScroll();
+
     window.addEventListener("hashchange", updateCurrentHash);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     // Poll for hash changes to catch replaceState from useScrollHashes
     const hashWatcher = setInterval(() => {
@@ -31,6 +45,7 @@ onMounted(() => {
 
     onUnmounted(() => {
       window.removeEventListener("hashchange", updateCurrentHash);
+      window.removeEventListener("scroll", handleScroll);
       clearInterval(hashWatcher);
     });
   }
@@ -130,7 +145,11 @@ const onBrandClick = (e: MouseEvent) => {
 </script>
 
 <template>
-  <div class="navigation-section" role="navigation">
+  <div
+    class="navigation-section"
+    :class="{ 'navigation-section--scrolled': isScrolled }"
+    role="navigation"
+  >
     <!-- Skip link (WCAG) -->
     <a
       v-if="showSkipLink"
@@ -293,34 +312,36 @@ $block: "navigation-section";
   top: 0;
   z-index: 50;
   color: #fff;
-  background: rgba(0, 0, 0, 0.9);
 
-  -webkit-backdrop-filter: blur(14px) saturate(150%);
-  backdrop-filter: blur(14px) saturate(150%);
-  box-shadow: 0 0 15px 5px rgba(0, 0, 0, 0.5);
+  // Default state: transparent and minimal
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  @supports (backdrop-filter: blur(14px)) {
-    background: rgba(0, 0, 0, 0.75);
-  }
+  // Scrolled state: opaque and with effects
+  &--scrolled {
+    background: rgba(0, 0, 0, 0.85);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
+    box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.15),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
 
-  @media (prefers-color-scheme: dark) {
-    background: rgba(0, 0, 0, 0.6);
-
-    @supports (backdrop-filter: blur(14px)) {
-      background: rgba(0, 0, 0, 0.8);
+    @supports (backdrop-filter: blur(16px)) {
+      background: rgba(0, 0, 0, 0.75);
     }
-  }
 
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -10;
-    background: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.1),
-      rgba(255, 255, 255, 0) 70%
-    );
+    @media (prefers-color-scheme: dark) {
+      background: rgba(0, 0, 0, 0.6);
+
+      @supports (backdrop-filter: blur(16px)) {
+        background: rgba(0, 0, 0, 0.8);
+      }
+    }
+
+    .#{$block}__separator {
+      opacity: 1;
+    }
   }
 
   &__separator {
@@ -336,6 +357,8 @@ $block: "navigation-section";
       rgba(0, 0, 0, 0) 100%
     );
     filter: drop-shadow(0 0 6px var(--color-secondary, #90a1b9));
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
 
   &__container {
@@ -346,7 +369,13 @@ $block: "navigation-section";
     display: flex;
     align-items: center;
     gap: 16px;
-    height: 56px;
+    height: 72px;
+    transition: height 0.3s ease;
+
+    // Compact height when scrolled
+    .#{$block}--scrolled & {
+      height: 56px;
+    }
   }
 
   &__skip-link {
@@ -376,16 +405,26 @@ $block: "navigation-section";
   }
 
   &__brand-link {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1.125rem;
     line-height: 1;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.025em;
     outline: none;
-    border-radius: 0.125rem;
+    border-radius: 0.375rem;
+    padding: 0.25rem 0.5rem;
+    margin: -0.25rem -0.5rem;
+    transition: color 0.2s ease;
+
+    // Better visibility on transparent background
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 
     &:focus-visible {
       outline: 2px solid var(--color-primary, #a78bfa);
       outline-offset: 2px;
+    }
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.8);
     }
 
     @media (min-width: 768px) {
@@ -425,20 +464,29 @@ $block: "navigation-section";
 
   &__link {
     display: inline-block;
-    padding: 0.375rem 0.75rem;
+    padding: 0.5rem 0.875rem;
     font-size: 0.875rem;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    color: #f8fafc;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    color: rgba(248, 250, 252, 0.9);
     text-decoration: none;
     transition: color 0.2s ease;
 
+    // Better visibility on transparent background
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+
     &:hover {
-      color: var(--color-secondary, #90a1b9);
+      color: #fff;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary, #a78bfa);
+      outline-offset: 2px;
     }
 
     &[data-active="true"] {
       color: var(--color-primary, #a78bfa);
+      font-weight: 700;
     }
   }
 
@@ -464,6 +512,16 @@ $block: "navigation-section";
 
   &__menu-button {
     border: 0;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary, #a78bfa);
+      outline-offset: 2px;
+    }
   }
 
   &__menu-icon {

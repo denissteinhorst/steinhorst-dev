@@ -253,6 +253,7 @@ $block: "hero-section";
   position: relative;
   overflow: hidden;
   isolation: isolate;
+  margin-top: -72px;
 
   /* Keep this hero visually dark regardless of global color mode.
     Define local CSS variables that override root/theme variables for
@@ -265,22 +266,21 @@ $block: "hero-section";
 
   color: var(--color-text);
   background: var(--color-bg);
-  margin-top: -56px;
   min-height: 100vh;
   display: flex;
   align-items: center;
-  padding-top: calc(4rem + 56px);
+  padding-top: calc(4rem + 72px);
   padding-bottom: 4rem;
 
   @media (min-width: 1024px) {
-    padding-top: calc(5rem + 56px);
+    padding-top: calc(5rem + 72px);
     padding-bottom: 5rem;
   }
 
   &__background-blur {
     position: absolute;
-    top: -200px;
-    left: -320px;
+    left: -220px;
+    top: -220px;
     background-image: url("/images/hero_image.jpeg");
     background-size: cover;
     background-position: center;
@@ -473,7 +473,7 @@ $block: "hero-section";
     line-height: 1.05;
     color: var(--color-heading);
     font-size: var(--font-size-3xl);
-    scroll-margin-top: 72px;
+    scroll-margin-top: 80px;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     letter-spacing: -0.025em;
 
