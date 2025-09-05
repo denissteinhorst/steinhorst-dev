@@ -167,7 +167,7 @@ onUnmounted(() => {
                 <AiSummary
                   :icon-only="true"
                   class="scroll-companion__ai-summary"
-                  :title="$t('ui.ai_summary') as string"
+                  :title="$t('ui.ai_summary')"
                   target="companion"
                 />
               </span>
