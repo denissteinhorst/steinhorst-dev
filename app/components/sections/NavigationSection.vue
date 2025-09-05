@@ -235,60 +235,7 @@ const onBrandClick = (e: MouseEvent) => {
         <!-- Desktop navigation -->
         <nav aria-label="Primäre Navigation" class="navigation-section__nav">
           <ul class="navigation-section__list">
-            <!-- Burger menu for desktop - always present for proper positioning -->
-            <li
-              class="navigation-section__item navigation-section__burger-item"
-            >
-              <div
-                ref="desktopDropdownRef"
-                class="navigation-section__desktop-burger"
-                @mouseenter="handleDesktopDropdownEnter"
-                @mouseleave="handleDesktopDropdownLeave"
-              >
-                <button
-                  class="navigation-section__desktop-burger-button"
-                  :aria-expanded="isDesktopDropdownOpen"
-                  aria-label="Navigation anzeigen"
-                >
-                  <UIcon
-                    name="i-lucide-menu"
-                    class="navigation-section__burger-icon"
-                    :class="{
-                      'navigation-section__burger-icon--hovering':
-                        isDesktopDropdownOpen,
-                    }"
-                  />
-                  <UIcon
-                    name="i-lucide-chevron-down"
-                    class="navigation-section__chevron-icon"
-                    :class="{
-                      'navigation-section__chevron-icon--hovering':
-                        isDesktopDropdownOpen,
-                    }"
-                  />
-                </button>
-
-                <div
-                  v-if="isDesktopDropdownOpen && !isScrolled"
-                  class="navigation-section__desktop-dropdown"
-                  role="menu"
-                >
-                  <NuxtLink
-                    v-for="link in mainLinks"
-                    :key="link.link"
-                    :to="link.link"
-                    :aria-label="link.title"
-                    :aria-current="isActive(link.link) ? 'page' : undefined"
-                    class="navigation-section__dropdown-link"
-                    :data-active="isActive(link.link) ? 'true' : 'false'"
-                    role="menuitem"
-                    @click="isDesktopDropdownOpen = false"
-                  >
-                    {{ link.title }}
-                  </NuxtLink>
-                </div>
-              </div>
-            </li>
+            <!-- Actions (burger + AI summary + language) grouped for consistent spacing and separators -->
 
             <!-- Regular nav items - always present for animation -->
             <li
@@ -308,17 +255,76 @@ const onBrandClick = (e: MouseEvent) => {
               </NuxtLink>
             </li>
 
-            <!-- Always present extras - just styled differently -->
-            <li class="navigation-section__extra">
-              <AiSummary
-                key="desktop-ai-summary"
-                :title="specialName"
-                :target="specialLink"
-              />
-            </li>
+            <!-- Grouped actions at the far right -->
+            <li class="navigation-section__actions">
+              <!-- Burger menu for desktop -->
+              <div
+                class="navigation-section__action-item navigation-section__burger-item"
+              >
+                <div
+                  ref="desktopDropdownRef"
+                  class="navigation-section__desktop-burger"
+                  @mouseenter="handleDesktopDropdownEnter"
+                  @mouseleave="handleDesktopDropdownLeave"
+                >
+                  <button
+                    class="navigation-section__desktop-burger-button"
+                    :aria-expanded="isDesktopDropdownOpen"
+                    aria-label="Navigation anzeigen"
+                  >
+                    <UIcon
+                      name="i-lucide-menu"
+                      class="navigation-section__burger-icon"
+                      :class="{
+                        'navigation-section__burger-icon--hovering':
+                          isDesktopDropdownOpen,
+                      }"
+                    />
+                    <UIcon
+                      name="i-lucide-chevron-down"
+                      class="navigation-section__chevron-icon"
+                      :class="{
+                        'navigation-section__chevron-icon--hovering':
+                          isDesktopDropdownOpen,
+                      }"
+                    />
+                  </button>
 
-            <li class="navigation-section__extra">
-              <LanguageSelector key="desktop-language-selector" />
+                  <div
+                    v-if="isDesktopDropdownOpen && !isScrolled"
+                    class="navigation-section__desktop-dropdown"
+                    role="menu"
+                  >
+                    <NuxtLink
+                      v-for="link in mainLinks"
+                      :key="link.link"
+                      :to="link.link"
+                      :aria-label="link.title"
+                      :aria-current="isActive(link.link) ? 'page' : undefined"
+                      class="navigation-section__dropdown-link"
+                      :data-active="isActive(link.link) ? 'true' : 'false'"
+                      role="menuitem"
+                      @click="isDesktopDropdownOpen = false"
+                    >
+                      {{ link.title }}
+                    </NuxtLink>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AI Summary -->
+              <div class="navigation-section__action-item">
+                <AiSummary
+                  key="desktop-ai-summary"
+                  :title="specialName"
+                  :target="specialLink"
+                />
+              </div>
+
+              <!-- Language selector -->
+              <div class="navigation-section__action-item">
+                <LanguageSelector key="desktop-language-selector" />
+              </div>
             </li>
           </ul>
         </nav>
@@ -846,11 +852,35 @@ $block: "navigation-section";
     }
   }
 
-  &__extra {
+  /* Right-aligned actions container */
+  &__actions {
+    margin-left: auto;
     display: flex;
     align-items: center;
-    padding-left: 6px;
-    border-left: 1px solid rgba(148, 163, 184, 0.4);
+    gap: 0; // separators provide visual spacing; inner items handle padding
+    list-style: none;
+    flex: 0 0 auto; // avoid shrinking that could distort spacing
+  }
+
+  &__action-item {
+    display: flex;
+    align-items: center;
+    padding-inline: 10px; // equal inner spacing on both sides
+    height: 100%;
+    white-space: nowrap; // prevent wrapping/line breaks
+
+    // vertical separator between items (only between, not around the group)
+    & + & {
+      border-left: 1px solid rgba(148, 163, 184, 0.4);
+    }
+  }
+
+  // Slightly increase spacing right of the first separator and left of the last separator
+  &__actions > &__action-item:first-child {
+    padding-right: 14px;
+  }
+  &__actions > &__action-item:last-child {
+    padding-left: 14px;
   }
 
   /* Mobile */
