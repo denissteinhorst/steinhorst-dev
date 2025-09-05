@@ -253,12 +253,12 @@ const onBrandClick = (e: MouseEvent) => {
                     <!-- Mobile: Kontakt -->
                     <li class="navigation-section__mobile-item">
                       <NuxtLink
-                        to="/#contact"
+                        to="#contact"
                         aria-label="Kontakt"
                         class="navigation-section__mobile-link"
                         @click="isMobileMenuOpen = false"
                         @keydown.space.prevent="
-                          (isMobileMenuOpen = false), router.push('/#contact')
+                          (isMobileMenuOpen = false), router.push('#contact')
                         "
                       >
                         Kontakt

@@ -139,7 +139,7 @@ const visibleTimelineItems = computed(() => {
             <ExperienceCard :data="item.card" :index="item.index" />
             <div v-if="item.isFirst" class="experience-section__contact-cta">
               <UButton
-                to="/#contact"
+                to="#contact"
                 variant="outline"
                 color="secondary"
                 size="sm"
