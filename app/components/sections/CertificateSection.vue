@@ -25,7 +25,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
     Failed to load certificate-section.
   </section>
 
-  <section-wrapper
+  <SectionWrapper
     v-else-if="data"
     :jumpmark="data.jumpmark || 'certificates'"
     variant="h2"
@@ -42,12 +42,12 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
             :data-aos-delay="Math.min(index, 5) * 100"
             class="certificate-section__card-wrapper"
           >
-            <certificate-card :data="card" />
+            <CertificateCard :data="card" />
           </div>
         </div>
       </div>
     </template>
-  </section-wrapper>
+  </SectionWrapper>
 </template>
 
 <style scoped lang="scss">

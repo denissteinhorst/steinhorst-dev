@@ -89,7 +89,7 @@ const filteredProjects = computed((): ProjectCard[] => {
     Failed to load project-section.
   </section>
 
-  <section-wrapper
+  <SectionWrapper
     v-else-if="data"
     variant="h2"
     :jumpmark="data.jumpmark || ''"
@@ -99,7 +99,7 @@ const filteredProjects = computed((): ProjectCard[] => {
   >
     <template #content>
       <!-- PROJECT FILTER -->
-      <project-filter
+      <ProjectFilter
         :project-count="data.projectCards?.length || 0"
         :all-tags="allTags"
         :filtered-count="filteredProjects.length"
@@ -117,7 +117,7 @@ const filteredProjects = computed((): ProjectCard[] => {
           :data-aos-delay="100"
           class="project-section__card-wrapper"
         >
-          <project-card :data="card" />
+          <ProjectCard :data="card" />
         </div>
 
         <div
@@ -130,11 +130,11 @@ const filteredProjects = computed((): ProjectCard[] => {
           :data-aos-delay="Math.min(filteredProjects.length, 5) * 100"
           class="project-section__card-wrapper"
         >
-          <project-card-last :data="data.lastProjectCard" />
+          <ProjectCardLast :data="data.lastProjectCard" />
         </div>
       </div>
     </template>
-  </section-wrapper>
+  </SectionWrapper>
 </template>
 
 <style scoped lang="scss">

@@ -2,15 +2,15 @@
 
 <template>
   <div class="app">
-    <leave-notification :blind-top-offset-px="10" />
-    <hero-section />
-    <skill-section />
-    <personality-section />
-    <project-section />
-    <experience-section />
-    <certificate-section />
-    <faq-section />
-    <testimonial-section />
-    <contact-section />
+    <LeaveNotification :blind-top-offset-px="10" />
+    <HeroSection />
+    <SkillSection />
+    <PersonalitySection />
+    <ProjectSection />
+    <ExperienceSection />
+    <CertificateSection />
+    <FaqSection />
+    <TestimonialSection />
+    <ContactSection />
   </div>
 </template>

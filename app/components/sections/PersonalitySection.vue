@@ -28,7 +28,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
     Failed to load personality-section.
   </section>
 
-  <section-wrapper
+  <SectionWrapper
     v-else-if="data"
     variant="h2"
     :jumpmark="data.jumpmark || ''"
@@ -45,9 +45,9 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
           :data-aos-delay="index * 100"
           class="personality-section__card-wrapper"
         >
-          <base-card :is-in-wrapper="true" class="personality-section__card">
+          <BaseCard :is-in-wrapper="true" class="personality-section__card">
             <template v-if="card.variant === 'polarChart'">
-              <polar-chart
+              <PolarChart
                 :title="card.title"
                 :subtitle="card.subtitle"
                 :text="card.text"
@@ -55,18 +55,18 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
               />
             </template>
             <template v-else-if="card.variant === 'barChart'">
-              <bar-chart
+              <BarChart
                 :title="card.title"
                 :subtitle="card.subtitle"
                 :text="card.text"
                 :tooltips="card.barChartTooltips || []"
               />
             </template>
-          </base-card>
+          </BaseCard>
         </div>
       </div>
     </template>
-  </section-wrapper>
+  </SectionWrapper>
 </template>
 
 <style scoped lang="scss">

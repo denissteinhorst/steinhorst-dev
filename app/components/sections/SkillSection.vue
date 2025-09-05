@@ -35,7 +35,7 @@ const toListItems = (items?: SkillItem[]): string[] =>
     Failed to load skill-section.
   </section>
 
-  <section-wrapper
+  <SectionWrapper
     v-else-if="data"
     variant="h2"
     :jumpmark="data.jumpmark || ''"
@@ -56,7 +56,7 @@ const toListItems = (items?: SkillItem[]): string[] =>
 
       <!-- SKILL CARD GRID -->
       <div class="skill-section__grid">
-        <skill-card
+        <SkillCard
           v-for="(card, index) in data.skillCards"
           :key="index"
           :title="card.title || ''"
@@ -65,7 +65,7 @@ const toListItems = (items?: SkillItem[]): string[] =>
         />
       </div>
     </template>
-  </section-wrapper>
+  </SectionWrapper>
 </template>
 
 <style scoped lang="scss">

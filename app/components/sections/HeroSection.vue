@@ -51,7 +51,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
             <div class="hero-section__content-wrapper">
               <header class="hero-section__header">
                 <div class="hero-section__badge">
-                  <job-search-badge />
+                  <JobSearchBadge />
                 </div>
 
                 <h1 id="hero-heading" tabindex="-1" class="hero-section__title">

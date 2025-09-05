@@ -80,7 +80,7 @@ watch(page, () => {
     Failed to load testimonial-section.
   </section>
 
-  <section-wrapper
+  <SectionWrapper
     v-else-if="data"
     :jumpmark="data.jumpmark || 'testimonials'"
     variant="h2"
@@ -91,7 +91,7 @@ watch(page, () => {
       <div class="testimonial-section">
         <!-- Left column: Alternating items (even indices) -->
         <div class="testimonial-section__left-column">
-          <testimonial-card-compact
+          <TestimonialCardCompact
             v-for="(card, index) in leftColumnItems"
             :key="card.id"
             :data="card"
@@ -102,7 +102,7 @@ watch(page, () => {
 
         <!-- Center column: Large card with pagination -->
         <div class="testimonial-section__center-column">
-          <testimonial-card-large
+          <TestimonialCardLarge
             v-if="currentTestimonial"
             :key="currentTestimonial.id || activeIndex"
             :data="currentTestimonial"
@@ -127,7 +127,7 @@ watch(page, () => {
 
         <!-- Right column: Alternating items (odd indices) -->
         <div class="testimonial-section__right-column">
-          <testimonial-card-compact
+          <TestimonialCardCompact
             v-for="(card, index) in rightColumnItems"
             :key="card.id"
             :data="card"
@@ -137,7 +137,7 @@ watch(page, () => {
         </div>
       </div>
     </template>
-  </section-wrapper>
+  </SectionWrapper>
 </template>
 
 <style scoped lang="scss">

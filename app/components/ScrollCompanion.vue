@@ -105,7 +105,7 @@ onUnmounted(() => {
 
         <!-- 2) Color mode toggle -->
         <div class="scroll-companion__section">
-          <color-selector />
+          <ColorSelector />
         </div>
 
         <!-- 3) Contact or AI Summary -->
@@ -135,7 +135,7 @@ onUnmounted(() => {
               :content="{ side: 'top', sideOffset: 5 }"
             >
               <span class="scroll-companion__ai-wrapper">
-                <ai-summary
+                <AiSummary
                   :icon-only="true"
                   class="scroll-companion__ai-summary"
                   title="KI Zusammenfassung"

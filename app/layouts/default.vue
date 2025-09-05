@@ -47,7 +47,7 @@ function updateAmbientBackground(preference: string) {
   <UApp>
     <NuxtRouteAnnouncer />
     <div class="layout-root">
-      <main-navigation />
+      <MainNavigation />
       <!-- Ambient background (starts after hero/first viewport) -->
       <div
         v-if="showAmbient"
@@ -58,8 +58,8 @@ function updateAmbientBackground(preference: string) {
       <main id="main-content" tabindex="-1">
         <NuxtPage />
       </main>
-      <scroll-companion />
-      <footer-section />
+      <ScrollCompanion />
+      <FooterSection />
     </div>
   </UApp>
 </template>

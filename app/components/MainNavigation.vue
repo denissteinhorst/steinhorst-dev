@@ -184,11 +184,11 @@ const onBrandClick = (e: MouseEvent) => {
             </li>
 
             <li class="main-navigation__extra">
-              <ai-summary :title="specialName" :target="specialLink" />
+              <AiSummary :title="specialName" :target="specialLink" />
             </li>
 
             <li class="main-navigation__extra">
-              <language-selector />
+              <LanguageSelector />
             </li>
           </ul>
         </nav>
@@ -196,7 +196,7 @@ const onBrandClick = (e: MouseEvent) => {
         <!-- Mobile trigger and panel -->
         <div class="main-navigation__mobile" aria-label="Mobile navigation">
           <div class="main-navigation__mobile-language">
-            <language-selector />
+            <LanguageSelector />
           </div>
 
           <UButton
@@ -267,7 +267,7 @@ const onBrandClick = (e: MouseEvent) => {
 
                     <!-- Mobile: Extra slot (e.g., AI Summary) -->
                     <li class="main-navigation__mobile-extra">
-                      <ai-summary :title="specialName" :target="specialLink" />
+                      <AiSummary :title="specialName" :target="specialLink" />
                     </li>
                   </ul>
                 </nav>

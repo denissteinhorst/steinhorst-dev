@@ -35,8 +35,8 @@ const handleButtonClick = (event: MouseEvent) => {
 </script>
 
 <template>
-  <section :id="jumpmark" class="section-wrapper">
-    <UContainer class="section-wrapper--container">
+  <section :id="jumpmark" class="SectionWrapper">
+    <UContainer class="SectionWrapper--container">
       <header
         class="section-header"
         :class="`section-header--${props.textAlign || 'left'}`"
@@ -100,7 +100,7 @@ const handleButtonClick = (event: MouseEvent) => {
 </template>
 
 <style scoped lang="scss">
-$block: "section-wrapper";
+$block: "SectionWrapper";
 
 .#{$block} {
   padding-top: var(--spacing-3xl);

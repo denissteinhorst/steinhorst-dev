@@ -18,7 +18,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
     Failed to load faq-section.
   </section>
 
-  <section-wrapper
+  <SectionWrapper
     v-else-if="data"
     :jumpmark="data.jumpmark || 'faqs'"
     variant="h2"
@@ -86,7 +86,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
         </div>
       </div>
     </template>
-  </section-wrapper>
+  </SectionWrapper>
 </template>
 
 <style scoped lang="scss">
