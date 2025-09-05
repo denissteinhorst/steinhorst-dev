@@ -44,6 +44,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
     </div>
 
     <UContainer class="hero-section__container">
+      <div class="hero-section__background-blur" aria-hidden="true"></div>
       <div class="hero-section__inner">
         <div class="hero-section__grid">
           <!-- Left: complete content area -->
@@ -152,15 +153,6 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
           <!-- Right: portrait / media -->
           <div class="hero-section__col hero-section__col--media">
             <figure class="hero-section__portrait">
-              <img
-                :src="buildImageUrl(data.image) || '/images/hero-image.png'"
-                :alt="data.image?.alternativeText || 'Portrait'"
-                aria-hidden="true"
-                class="hero-section__glow"
-              />
-
-              <div class="hero-section__aura" aria-hidden="true"></div>
-
               <img
                 :src="buildImageUrl(data.image) || '/images/hero-image.png'"
                 :alt="
@@ -283,6 +275,20 @@ $block: "hero-section";
   @media (min-width: 1024px) {
     padding-top: calc(5rem + 56px);
     padding-bottom: 5rem;
+  }
+
+  &__background-blur {
+    position: absolute;
+    top: -200px;
+    left: -320px;
+    background-image: url("/images/hero_image.jpeg");
+    background-size: cover;
+    background-position: center;
+    filter: blur(50px) brightness(0.45) contrast(1.1) saturate(0.5);
+    min-height: 100vh;
+    min-width: 100vw;
+    pointer-events: none;
+    z-index: -1;
   }
 
   &__bg-glow {
@@ -514,86 +520,6 @@ $block: "hero-section";
       filter 0.4s ease, transform 0.6s ease;
   }
 
-  &__glow {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-    transform: scale(1.065);
-    opacity: 0.25;
-    mix-blend-mode: lighten;
-    filter: blur(24px) saturate(130%) brightness(110%);
-    pointer-events: none;
-
-    /* Optimize for mobile devices */
-    @media (max-width: 767px) {
-      opacity: 0.15;
-      filter: blur(16px) saturate(120%) brightness(105%);
-      transform: scale(1.045);
-    }
-
-    /* Tablet optimization */
-    @media (min-width: 768px) and (max-width: 1023px) {
-      opacity: 0.2;
-      filter: blur(32px) saturate(140%) brightness(115%);
-      transform: scale(1.055);
-    }
-
-    /* Desktop - full effect */
-    @media (min-width: 1024px) {
-      opacity: 0.3;
-      filter: blur(70px) saturate(165%) brightness(120%);
-      transform: scale(1.065);
-    }
-  }
-
-  &__aura {
-    position: absolute;
-    inset: -1.5rem;
-    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-    background: radial-gradient(
-      circle at 60% 35%,
-      color-mix(in srgb, var(--color-primary) 55%, transparent),
-      transparent 70%
-    );
-    filter: blur(12px);
-    opacity: 0.2;
-    mix-blend-mode: overlay;
-    z-index: 9;
-    pointer-events: none;
-
-    /* Mobile optimization - lighter aura */
-    @media (max-width: 767px) {
-      inset: -1rem;
-      filter: blur(8px);
-      opacity: 0.1;
-      background: radial-gradient(
-        circle at 60% 35%,
-        color-mix(in srgb, var(--color-primary) 35%, transparent),
-        transparent 60%
-      );
-    }
-
-    /* Tablet optimization */
-    @media (min-width: 768px) and (max-width: 1023px) {
-      filter: blur(16px);
-      opacity: 0.15;
-      background: radial-gradient(
-        circle at 60% 35%,
-        color-mix(in srgb, var(--color-primary) 45%, transparent),
-        transparent 65%
-      );
-    }
-
-    /* Desktop - full effect */
-    @media (min-width: 1024px) {
-      filter: blur(24px);
-      opacity: 0.3;
-    }
-  }
-
   &__portrait-img {
     position: relative;
     width: 100%;
@@ -713,20 +639,6 @@ $block: "hero-section";
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-section__portrait img[aria-hidden] {
-    transition: none;
-  }
-
-  .hero-section__glow {
-    filter: none !important;
-    opacity: 0 !important;
-  }
-
-  .hero-section__aura {
-    filter: none !important;
-    opacity: 0 !important;
-  }
-
   .hero-section__portrait-img {
     transform: none !important;
   }
