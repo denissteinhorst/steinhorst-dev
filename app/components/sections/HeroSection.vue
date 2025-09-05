@@ -469,22 +469,26 @@ $block: "hero-section";
 
   &__title {
     margin: 1rem 0 0.5rem;
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.05;
     color: var(--color-heading);
     font-size: var(--font-size-3xl);
     scroll-margin-top: 72px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.025em;
 
     @media (min-width: 640px) {
       font-size: var(--font-size-4xl);
     }
     @media (min-width: 1024px) {
       font-size: var(--font-size-6xl);
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
   }
 
   &__emphasis {
     color: var(--color-primary);
+    position: relative;
   }
 
   &__text {
@@ -492,8 +496,10 @@ $block: "hero-section";
     color: var(--color-text);
     line-height: 1.6;
     max-width: 60ch;
+    font-weight: 500;
     margin-left: auto;
     margin-right: auto;
+    text-shadow: 0 1px 1px rgb(0, 0, 0);
 
     @media (min-width: 1024px) {
       margin-left: 0;
@@ -507,10 +513,12 @@ $block: "hero-section";
     width: 100%;
     max-width: 28rem;
     margin: 0 auto;
-    transform: scale(0.75);
+    transform: scale(0.7);
+    opacity: 0.85;
 
     @media (min-width: 1024px) {
-      transform: scale(1);
+      transform: scale(0.9);
+      opacity: 0.9;
     }
   }
 
@@ -525,25 +533,26 @@ $block: "hero-section";
     width: 100%;
     display: block;
     border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(255, 255, 255, 1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     z-index: 10;
     object-fit: cover;
     will-change: transform;
+    filter: saturate(0.9) brightness(0.95);
 
     /* Mobile - minimal transform for performance */
     @media (max-width: 767px) {
-      transform: perspective(800px) rotateY(-2deg) rotateX(1deg);
+      transform: perspective(600px) rotateY(-1deg) rotateX(0.5deg);
     }
 
     /* Tablet - moderate transform */
     @media (min-width: 768px) and (max-width: 1023px) {
-      transform: perspective(1000px) rotateY(-4deg) rotateX(2deg);
+      transform: perspective(800px) rotateY(-2deg) rotateX(1deg);
     }
 
-    /* Desktop - full 3D effect */
+    /* Desktop - subtle 3D effect */
     @media (min-width: 1024px) {
-      transform: perspective(1200px) rotateY(-6deg) rotateX(4deg);
+      transform: perspective(1000px) rotateY(-3deg) rotateX(2deg);
     }
   }
 
