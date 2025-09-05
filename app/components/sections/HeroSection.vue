@@ -271,10 +271,6 @@ $block: "hero-section";
   @media (min-width: 1024px) {
     padding: calc(2.5rem + 72px) 0 2.5rem;
   }
-
-  &:hover .#{$block}-img {
-    border-radius: 32% 68% 65% 35% / 28% 34% 72% 68%;
-  }
 }
 
 /* Background Elements */
@@ -414,12 +410,6 @@ $block: "hero-section";
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.1);
   filter: saturate(0.9) brightness(0.95);
-  transition: border-radius 1.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-
-  /* Subtle 3D effect */
-  @media (min-width: 1024px) {
-    transform: perspective(1000px) rotateY(-2deg) rotateX(1deg);
-  }
 }
 
 /* Actions */
@@ -448,6 +438,9 @@ $block: "hero-section";
   gap: 0.5rem 1rem;
   justify-content: center;
   margin-bottom: 1rem;
+  list-style: none;
+  padding: 0;
+  margin-left: 0;
 
   @media (min-width: 1024px) {
     justify-content: flex-start;
@@ -456,11 +449,16 @@ $block: "hero-section";
 }
 
 .#{$block}-tag {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-right: 12px;
+
   span {
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--color-text);
-    opacity: 0.9;
+    color: #ffffff;
+    opacity: 1;
   }
 }
 
@@ -506,16 +504,7 @@ $block: "hero-section";
 
 /* Accessibility */
 @media (prefers-reduced-motion: reduce) {
-  .#{$block}-img {
-    transform: none !important;
-    transition: none !important;
-  }
-
   .#{$block}-bg-blur {
-    transition: none !important;
-  }
-
-  .#{$block}:hover .#{$block}-img {
     transition: none !important;
   }
 }
