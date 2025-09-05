@@ -65,20 +65,24 @@ onUnmounted(() => {
   <!-- Scroll down hint when at top -->
   <div v-if="showScrollDown" class="scroll-hint">
     <div class="scroll-hint__content">
-      <span class="scroll-hint__text">
-        {{ $t("ui.scroll_down_first") }}
+      <div class="scroll-hint__line" role="presentation">
+        <span class="scroll-hint__text-before">{{
+          $t("ui.scroll_down_first")
+        }}</span>
         <UIcon
           name="i-lucide-mouse"
           class="scroll-hint__icon"
           aria-hidden="true"
         />
-        {{ $t("ui.scroll_down_second") }}
-      </span>
-      <UIcon
-        name="i-lucide-chevron-down"
-        class="scroll-hint__chevron"
-        aria-hidden="true"
-      />
+        <span class="scroll-hint__text-after">{{
+          $t("ui.scroll_down_second")
+        }}</span>
+        <UIcon
+          name="i-lucide-chevron-down"
+          class="scroll-hint__chevron"
+          aria-hidden="true"
+        />
+      </div>
     </div>
   </div>
 
@@ -195,21 +199,30 @@ $block: "scroll-companion";
   }
 
   &__content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.375rem;
+    display: block;
     color: rgba(255, 255, 255, 0.9);
     text-align: center;
+  }
+
+  // Grid line to keep chevron exactly below the mouse icon
+  &__line {
+    display: grid;
+    grid-template-columns: auto min-content auto;
+    grid-template-rows: auto min-content; // 1: text+icon, 2: chevron
+    align-items: center;
+    justify-items: center;
+    column-gap: 0.25rem;
+    row-gap: 0.375rem;
   }
 
   &__icon {
     font-size: 1.25rem;
     opacity: 0.8;
-    margin: 0 0.25rem;
+    margin: 0; // spacing handled by grid gap
     display: inline-flex;
     align-items: center;
+    grid-column: 2;
+    grid-row: 1;
   }
 
   &__chevron {
@@ -217,15 +230,29 @@ $block: "scroll-companion";
     opacity: 0.6;
     animation: chevronBounce 2s ease-in-out infinite;
     animation-delay: 0.2s;
+    grid-column: 2; // directly under the mouse icon
+    grid-row: 2;
   }
 
-  &__text {
+  &__text-before,
+  &__text-after {
     font-size: 0.875rem;
     font-weight: 400;
     letter-spacing: 0.025em;
     opacity: 0.8;
-    display: inline-flex;
-    align-items: center;
+    display: inline;
+  }
+
+  &__text-before {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: end;
+  }
+
+  &__text-after {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: start;
   }
 }
 
