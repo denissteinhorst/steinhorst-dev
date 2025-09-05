@@ -445,14 +445,15 @@ $block: "navigation-section";
 
   // Scrolled state: opaque and with effects
   &--scrolled {
-    background: rgba(0, 0, 0, 1);
+    background: rgba(0, 0, 0, 0.65);
     box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.15),
       0 0 0 1px rgba(255, 255, 255, 0.05);
+    backdrop-filter: saturate(180%) blur(20px);
 
     // Avoid backdrop-filter for smoother Safari performance
 
     @media (prefers-color-scheme: dark) {
-      background: rgba(0, 0, 0, 1);
+      background: rgba(0, 0, 0, 0.65);
       // Keep simple color change only
     }
 
