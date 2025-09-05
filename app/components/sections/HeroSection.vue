@@ -152,16 +152,32 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
         <!-- Image Column -->
         <div class="hero-section-image">
           <figure class="hero-section-portrait">
-            <img
-              :src="buildImageUrl(data.image) || '/images/hero-image.png'"
-              :alt="
-                data.image?.alternativeText || 'Portrait von Denis Steinhorst'
-              "
-              class="hero-section-img"
-              sizes="(min-width: 1280px) 34rem, (min-width: 1024px) 28rem, 60vw"
-              decoding="async"
-              fetchpriority="high"
-            />
+            <div class="hero-section-img-slots">
+              <div class="hero-section-img-slot hero-section-img-slot--left">
+                <img
+                  src="/images/hero_image.jpeg"
+                  :alt="
+                    data.image?.alternativeText ||
+                    'Portrait von Denis Steinhorst'
+                  "
+                  class="hero-section-img"
+                  sizes="(min-width: 1280px) 34rem, (min-width: 1024px) 28rem, 60vw"
+                  decoding="async"
+                  fetchpriority="high"
+                />
+              </div>
+
+              <div class="hero-section-img-slot hero-section-img-slot--right">
+                <img
+                  src="/images/hero_image.jpeg"
+                  alt=""
+                  class="hero-section-img"
+                  sizes="(min-width: 1280px) 34rem, (min-width: 1024px) 28rem, 60vw"
+                  decoding="async"
+                  aria-hidden="true"
+                />
+              </div>
+            </div>
           </figure>
         </div>
 
@@ -387,15 +403,28 @@ $block: "hero-section";
   justify-content: center;
   align-items: center;
   order: -1;
+  margin-bottom: 5rem;
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    margin-bottom: 3rem;
+  }
+
+  @media (min-width: 768px) and (orientation: portrait) and (max-width: 1023px) {
+    margin-bottom: 3.5rem;
+  }
 
   @media (min-width: 1024px) {
     order: 0;
+    justify-content: end;
+    margin-right: 5px;
+    margin-bottom: 0;
   }
 }
 
 .#{$block}-portrait {
   width: 100%;
   max-width: 20rem;
+  position: relative;
 
   @media (min-width: 768px) {
     max-width: 24rem;
@@ -406,14 +435,71 @@ $block: "hero-section";
   }
 }
 
-.#{$block}-img {
+.#{$block}-img-slots {
+  position: relative;
   width: 100%;
-  height: auto;
-  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-  object-fit: cover;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @media (min-width: 768px) {
+    height: 480px;
+  }
+
+  @media (min-width: 1024px) {
+    height: 530px;
+  }
+}
+
+.#{$block}-img-slot {
+  position: absolute;
+  width: 40%;
+  height: 90%;
+  overflow: hidden;
+  border-radius: calc(var(--radius-default) * 4);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  zoom: 0.3;
+
+  @media (min-width: 1024px) {
+    zoom: 0.385;
+  }
+
+  &--left {
+    left: 10%;
+    top: -20px;
+    transform: rotate(10deg);
+    z-index: 2;
+  }
+
+  &--right {
+    right: 10%;
+    bottom: -15%;
+    transform: rotate(10deg);
+    z-index: 1;
+  }
+}
+
+.#{$block}-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  transform-origin: center;
   filter: saturate(0.9) brightness(0.95);
+  transition: transform 0.3s ease;
+
+  .#{$block}-img-slot--left & {
+    transform: translate(-51%, -39%) rotate(-10deg);
+  }
+
+  .#{$block}-img-slot--right & {
+    transform: translate(-73.5%, -56%) rotate(-10deg);
+  }
 }
 
 /* Actions */
