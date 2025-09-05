@@ -627,7 +627,7 @@ $block: "navigation-section";
     left: 50%;
     transform: translateX(-50%);
     min-width: 200px;
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 0.75rem;
@@ -659,14 +659,14 @@ $block: "navigation-section";
       height: 0;
       border-left: 6px solid transparent;
       border-right: 6px solid transparent;
-      border-bottom: 6px solid rgba(0, 0, 0, 0.75);
+      border-bottom: 6px solid rgba(0, 0, 0, 0.9);
     }
 
     @supports (backdrop-filter: blur(20px)) {
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.85);
 
       &::after {
-        border-bottom-color: rgba(0, 0, 0, 0.65);
+        border-bottom-color: rgba(0, 0, 0, 0.85);
       }
     }
   }
