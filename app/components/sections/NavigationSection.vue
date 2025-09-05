@@ -742,6 +742,10 @@ $block: "navigation-section";
     padding: 0;
     flex: 1 1 auto;
     justify-content: flex-end;
+
+    @media (min-width: 1200px) {
+      gap: 16px;
+    }
   }
 
   &__item {
@@ -761,7 +765,7 @@ $block: "navigation-section";
     will-change: transform, opacity;
 
     .#{$block}--scrolled & {
-      transform: translateX(54px) translateZ(0);
+      transform: translateX(135px) translateZ(0);
 
       @media (max-width: 1200px) {
         transform: translateX(28px) translateZ(0);
