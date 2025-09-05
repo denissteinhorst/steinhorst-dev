@@ -407,13 +407,13 @@ $block: "navigation-section";
   will-change: background-color, box-shadow;
 
   &--scrolled {
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(0, 0, 0, 0.8);
     box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.15),
       0 0 0 1px rgba(255, 255, 255, 0.05);
     backdrop-filter: saturate(180%) blur(20px);
 
     @media (prefers-color-scheme: dark) {
-      background: rgba(0, 0, 0, 0.65);
+      background: rgba(0, 0, 0, 0.8);
     }
 
     .#{$block}__separator {
@@ -742,10 +742,6 @@ $block: "navigation-section";
     padding: 0;
     flex: 1 1 auto;
     justify-content: flex-end;
-
-    @media (min-width: 1200px) {
-      gap: 16px;
-    }
   }
 
   &__item {
@@ -765,7 +761,7 @@ $block: "navigation-section";
     will-change: transform, opacity;
 
     .#{$block}--scrolled & {
-      transform: translateX(135px) translateZ(0);
+      transform: translateX(72px) translateZ(0);
 
       @media (max-width: 1200px) {
         transform: translateX(28px) translateZ(0);
