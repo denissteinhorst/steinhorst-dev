@@ -47,7 +47,7 @@ function updateAmbientBackground(preference: string) {
   <UApp>
     <NuxtRouteAnnouncer />
     <div class="layout-root">
-      <MainNavigation />
+      <NavigationSection />
       <!-- Ambient background (starts after hero/first viewport) -->
       <div
         v-if="showAmbient"

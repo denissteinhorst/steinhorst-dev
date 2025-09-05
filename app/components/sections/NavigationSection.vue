@@ -92,7 +92,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
     const element =
       menuButtonRef.value instanceof HTMLElement
         ? menuButtonRef.value
-        : document.querySelector(".main-navigation__menu-button");
+        : document.querySelector(".navigation-section__menu-button");
     (element as HTMLElement | null)?.focus?.();
   }
 });
@@ -130,12 +130,12 @@ const onBrandClick = (e: MouseEvent) => {
 </script>
 
 <template>
-  <div class="main-navigation" role="navigation">
+  <div class="navigation-section" role="navigation">
     <!-- Skip link (WCAG) -->
     <a
       v-if="showSkipLink"
       href="#hero-heading"
-      class="main-navigation__skip-link"
+      class="navigation-section__skip-link"
       @click.prevent="skipToHero"
       @keydown.space.prevent="skipToHero"
     >
@@ -143,16 +143,16 @@ const onBrandClick = (e: MouseEvent) => {
     </a>
 
     <!-- Gradient separator (bottom) -->
-    <div aria-hidden="true" class="main-navigation__separator"></div>
+    <div aria-hidden="true" class="navigation-section__separator"></div>
 
-    <UContainer class="main-navigation__container">
-      <div class="main-navigation__inner">
-        <div class="main-navigation__brand">
+    <UContainer class="navigation-section__container">
+      <div class="navigation-section__inner">
+        <div class="navigation-section__brand">
           <!-- Brand / Logo -->
           <slot name="brand">
             <NuxtLink
               :to="brandLink"
-              class="main-navigation__brand-link"
+              class="navigation-section__brand-link"
               @click="onBrandClick"
             >
               {{ brandNameParts.main
@@ -164,18 +164,18 @@ const onBrandClick = (e: MouseEvent) => {
         </div>
 
         <!-- Desktop navigation -->
-        <nav aria-label="Primäre Navigation" class="main-navigation__nav">
-          <ul class="main-navigation__list">
+        <nav aria-label="Primäre Navigation" class="navigation-section__nav">
+          <ul class="navigation-section__list">
             <li
               v-for="link in mainLinks"
               :key="link.link"
-              class="main-navigation__item"
+              class="navigation-section__item"
             >
               <NuxtLink
                 :to="link.link"
                 :aria-label="link.title"
                 :aria-current="isActive(link.link) ? 'page' : undefined"
-                class="main-navigation__link"
+                class="navigation-section__link"
                 :data-active="isActive(link.link) ? 'true' : 'false'"
                 @keydown.space.prevent="router.push(link.link)"
               >
@@ -183,19 +183,19 @@ const onBrandClick = (e: MouseEvent) => {
               </NuxtLink>
             </li>
 
-            <li class="main-navigation__extra">
+            <li class="navigation-section__extra">
               <AiSummary :title="specialName" :target="specialLink" />
             </li>
 
-            <li class="main-navigation__extra">
+            <li class="navigation-section__extra">
               <LanguageSelector />
             </li>
           </ul>
         </nav>
 
         <!-- Mobile trigger and panel -->
-        <div class="main-navigation__mobile" aria-label="Mobile navigation">
-          <div class="main-navigation__mobile-language">
+        <div class="navigation-section__mobile" aria-label="Mobile navigation">
+          <div class="navigation-section__mobile-language">
             <LanguageSelector />
           </div>
 
@@ -206,10 +206,10 @@ const onBrandClick = (e: MouseEvent) => {
             aria-label="Menü öffnen"
             :aria-expanded="isMobileMenuOpen.toString()"
             aria-controls="mobile-primary-navigation"
-            class="main-navigation__menu-button"
+            class="navigation-section__menu-button"
             @click="isMobileMenuOpen = true"
           >
-            <UIcon name="i-lucide-menu" class="main-navigation__menu-icon" />
+            <UIcon name="i-lucide-menu" class="navigation-section__menu-icon" />
             <span class="visually-hidden">Menü öffnen</span>
           </UButton>
 
@@ -218,28 +218,28 @@ const onBrandClick = (e: MouseEvent) => {
             v-model:open="isMobileMenuOpen"
             :title="brandName || 'Navigation'"
             description="Navigation"
-            class="main-navigation__slideover"
+            class="navigation-section__slideover"
             @close="closeMobileMenu"
             @update:open="updateMobileMenu"
             @update:model-value="updateMobileMenu"
           >
             <template #body>
-              <div class="main-navigation__mobile-wrapper">
+              <div class="navigation-section__mobile-wrapper">
                 <nav
                   aria-label="Mobile Navigation"
-                  class="main-navigation__mobile-nav"
+                  class="navigation-section__mobile-nav"
                 >
-                  <ul class="main-navigation__mobile-list">
+                  <ul class="navigation-section__mobile-list">
                     <li
                       v-for="link in mainLinks"
                       :key="link.link"
-                      class="main-navigation__mobile-item"
+                      class="navigation-section__mobile-item"
                     >
                       <NuxtLink
                         :to="link.link"
                         :aria-label="link.title"
                         :aria-current="isActive(link.link) ? 'page' : undefined"
-                        class="main-navigation__mobile-link"
+                        class="navigation-section__mobile-link"
                         :data-active="isActive(link.link) ? 'true' : 'false'"
                         @click="isMobileMenuOpen = false"
                         @keydown.space.prevent="
@@ -251,11 +251,11 @@ const onBrandClick = (e: MouseEvent) => {
                     </li>
 
                     <!-- Mobile: Kontakt -->
-                    <li class="main-navigation__mobile-item">
+                    <li class="navigation-section__mobile-item">
                       <NuxtLink
                         to="/#contact"
                         aria-label="Kontakt"
-                        class="main-navigation__mobile-link"
+                        class="navigation-section__mobile-link"
                         @click="isMobileMenuOpen = false"
                         @keydown.space.prevent="
                           (isMobileMenuOpen = false), router.push('/#contact')
@@ -266,7 +266,7 @@ const onBrandClick = (e: MouseEvent) => {
                     </li>
 
                     <!-- Mobile: Extra slot (e.g., AI Summary) -->
-                    <li class="main-navigation__mobile-extra">
+                    <li class="navigation-section__mobile-extra">
                       <AiSummary :title="specialName" :target="specialLink" />
                     </li>
                   </ul>
@@ -278,7 +278,7 @@ const onBrandClick = (e: MouseEvent) => {
       </div>
     </UContainer>
 
-    <div v-if="pending || error" class="main-navigation__fallback">
+    <div v-if="pending || error" class="navigation-section__fallback">
       <span v-if="pending">Navigation wird geladen…</span>
       <span v-else>Navigation konnte nicht geladen werden.</span>
     </div>
@@ -286,7 +286,7 @@ const onBrandClick = (e: MouseEvent) => {
 </template>
 
 <style scoped lang="scss">
-$block: "main-navigation";
+$block: "navigation-section";
 
 .#{$block} {
   position: sticky;

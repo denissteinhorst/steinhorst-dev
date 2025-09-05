@@ -63,7 +63,7 @@ $block: "language-selector";
   }
 
   // Adjust spacing for desktop navigation context
-  .main-navigation__extra & :deep(.iconify) {
+  .navigation-section__extra & :deep(.iconify) {
     margin-left: 12px;
   }
 }
