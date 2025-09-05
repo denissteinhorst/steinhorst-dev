@@ -308,6 +308,10 @@ $block: "hero-section";
 .#{$block}-container {
   position: relative;
   z-index: 10;
+
+  @media (min-width: 1200px) {
+    margin-top: -5%;
+  }
 }
 
 /* Grid Layout - Responsive */
