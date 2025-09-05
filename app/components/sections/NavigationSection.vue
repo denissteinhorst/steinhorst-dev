@@ -519,6 +519,7 @@ $block: "navigation-section";
   &__brand {
     display: flex;
     align-items: center;
+    flex: 0 0 auto; // don't let brand shrink
   }
 
   &__brand-link {
@@ -530,8 +531,10 @@ $block: "navigation-section";
     border-radius: 0.375rem;
     padding: 0.25rem 0.5rem;
     margin: -0.25rem -0.5rem;
+    white-space: nowrap; // prevent wrapping of brand name
     // Optimize transition for iOS Safari
-    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      font-size 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     // Force hardware acceleration
     transform: translateZ(0);
 
@@ -551,6 +554,15 @@ $block: "navigation-section";
       font-size: 1.15rem;
     }
 
+    // Smaller brand in scrolled state
+    .#{$block}--scrolled & {
+      font-size: 1.05rem;
+
+      @media (min-width: 768px) {
+        font-size: 1.075rem;
+      }
+    }
+
     span {
       &.font-bold {
         font-weight: 700;
@@ -566,6 +578,8 @@ $block: "navigation-section";
   &__nav {
     margin-left: auto;
     display: none;
+    flex: 1 1 auto; // allow nav area to shrink
+    min-width: 0; // allow content measurement to avoid overflow pushing brand
   }
 
   &__desktop-burger {
@@ -589,7 +603,7 @@ $block: "navigation-section";
 
     // When scrolled, slide the burger menu out to the left and collapse
     .#{$block}--scrolled & {
-      transform: translateX(-100px) translateZ(0);
+      transform: translateX(-36px) translateZ(0);
       opacity: 0;
       pointer-events: none;
       width: 0; // snap width without transitioning it (prevents layout jank on Safari)
@@ -778,9 +792,11 @@ $block: "navigation-section";
     list-style: none;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 2px;
     margin: 0;
     padding: 0;
+    flex: 1 1 auto;
+    justify-content: flex-end; // keep actions to the far right
   }
 
   &__item {
@@ -802,6 +818,11 @@ $block: "navigation-section";
       opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     // Hint to browser about what will change
     will-change: transform, opacity;
+
+    // When scrolled, move nav items 64px to the left to compensate for burger menu space
+    .#{$block}--scrolled & {
+      transform: translateX(54px) translateZ(0);
+    }
 
     // When not scrolled (collapsed state), hide nav items to the right
     .#{$block}:not(.#{$block}--scrolled) & {
@@ -865,7 +886,7 @@ $block: "navigation-section";
   &__action-item {
     display: flex;
     align-items: center;
-    padding-inline: 10px; // equal inner spacing on both sides
+    padding-inline: 6px; // reduced by 4px from 10px
     height: 100%;
     white-space: nowrap; // prevent wrapping/line breaks
 
@@ -877,10 +898,29 @@ $block: "navigation-section";
 
   // Slightly increase spacing right of the first separator and left of the last separator
   &__actions > &__action-item:first-child {
-    padding-right: 14px;
+    padding-right: 10px; // reduced by 4px from 14px
   }
   &__actions > &__action-item:last-child {
-    padding-left: 14px;
+    padding-left: 10px; // reduced by 4px from 14px
+  }
+
+  /* Tablet landscape tweaks: compress paddings to avoid overflow without wrapping */
+  @media (min-width: 1024px) and (max-width: 1200px) {
+    &__link {
+      padding: 0.5rem 0.625rem;
+    }
+    &__desktop-burger-button {
+      padding: 0.5rem 0.625rem;
+    }
+    &__action-item {
+      padding-inline: 8px;
+    }
+    &__actions > &__action-item:first-child {
+      padding-right: 12px;
+    }
+    &__actions > &__action-item:last-child {
+      padding-left: 12px;
+    }
   }
 
   /* Mobile */
