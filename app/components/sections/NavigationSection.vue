@@ -623,11 +623,14 @@ $block: "navigation-section";
     color: rgba(248, 250, 252, 0.9);
     cursor: pointer;
     border-radius: 0.375rem;
-    // Optimize transition for iOS Safari
     transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-    // Force hardware acceleration
     transform: translateZ(0);
+
+    // table/tablet landscape and smaller: increase hit area
+    @media (max-width: 1200px) {
+      margin-right: 4px;
+    }
 
     &:hover {
       color: #fff;
