@@ -1,6 +1,22 @@
 <script setup lang="ts">
 const { cmsRequest, buildImageUrl, currentLocaleString } = useStrapi();
 
+// Preload hero background image for Safari optimization
+const preloadBgImage = () => {
+  if (import.meta.client) {
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.href = "/images/hero_image.jpeg";
+    link.as = "image";
+    link.crossOrigin = "anonymous";
+    document.head.appendChild(link);
+  }
+};
+
+onMounted(() => {
+  preloadBgImage();
+});
+
 const { data, pending, error } = await useLazyAsyncData<HeroSectionResponse>(
   () => `hero-section-${currentLocaleString.value}`,
   () =>
@@ -44,7 +60,11 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
     </div>
 
     <UContainer class="hero-section__container">
-      <div class="hero-section__background-blur" aria-hidden="true"></div>
+      <div
+        class="hero-section__background-blur"
+        :class="{ 'hero-section__background-blur--loaded': !pending }"
+        aria-hidden="true"
+      ></div>
       <div class="hero-section__inner">
         <div class="hero-section__grid">
           <!-- Left: complete content area -->
@@ -279,37 +299,55 @@ $block: "hero-section";
 
   &__background-blur {
     position: absolute;
-    left: -220px;
-    top: -220px;
+    inset: -250px;
     background-image: url("/images/hero_image.jpeg");
     background-size: cover;
     background-position: center;
-    filter: blur(50px) brightness(0.45) contrast(1.1) saturate(0.5);
-    min-height: 100vh;
-    min-width: 100vw;
+    background-repeat: no-repeat;
     pointer-events: none;
     z-index: -1;
-  }
+    opacity: 0;
+    transition: opacity 0.8s ease-out;
 
-  &__bg-glow {
-    position: absolute;
-    left: 50%;
-    top: -40vh;
-    transform: translateX(-50%);
-    width: 100%;
-    max-width: 160vw;
-    height: 120vh;
-    pointer-events: none;
-    z-index: 5;
-    background: radial-gradient(
-      circle at center,
-      rgba(255, 255, 255, 0.192) 0%,
-      rgba(56, 52, 139, 0.058) 40%,
-      transparent 80%
-    );
-    filter: blur(64px) brightness(1.2) saturate(1.1);
-    opacity: 0.7;
-    border-radius: 50%;
+    /* Safari-optimized blur with fallbacks */
+    filter: blur(50px) brightness(0.45) contrast(1.1) saturate(0.5);
+    -webkit-filter: blur(50px) brightness(0.45) contrast(1.1) saturate(0.5);
+
+    /* Ensure full coverage with transform scale as backup */
+    transform: scale(1.2);
+    -webkit-transform: scale(1.2);
+
+    /* Performance optimizations for Safari */
+    will-change: transform, filter;
+    transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+
+    /* Preload hint for Safari */
+    content-visibility: auto;
+
+    /* Safari-specific fixes for positioning */
+    @supports (-webkit-backdrop-filter: blur(1px)) {
+      /* Ensure proper coverage on Safari */
+      left: -300px;
+      right: -300px;
+      top: -300px;
+      bottom: -300px;
+      width: calc(100vw + 600px);
+      height: calc(100vh + 600px);
+      inset: unset;
+    }
+
+    /* Fallback for older Safari versions */
+    @media screen and (-webkit-min-device-pixel-ratio: 0) {
+      transform: scale(1.5);
+      -webkit-transform: scale(1.5);
+    }
+
+    &--loaded {
+      opacity: 1;
+    }
   }
 
   &__bg-layers {
@@ -317,76 +355,6 @@ $block: "hero-section";
     inset: 0;
     z-index: 10;
     pointer-events: none;
-  }
-
-  &__radial {
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      circle at center,
-      rgba(158, 117, 224, 0.12),
-      transparent 70%
-    );
-    -webkit-mask-image: radial-gradient(
-      circle at center,
-      black,
-      transparent 70%
-    );
-    mask-image: radial-gradient(circle at center, black, transparent 70%);
-  }
-
-  &__masked-gradient {
-    position: absolute;
-    inset: 0;
-    z-index: 9;
-    pointer-events: none;
-
-    background: linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--color-secondary) 20%, transparent) 0%,
-      var(--color-background) 50%,
-      var(--color-background) 100%
-    );
-
-    -webkit-mask-image: radial-gradient(
-      circle at center,
-      black,
-      transparent 70%
-    );
-    mask-image: radial-gradient(circle at center, black, transparent 70%);
-  }
-
-  &__aura-top {
-    position: absolute;
-    left: 50%;
-    top: -30vh;
-    transform: translate(-50%, -150px);
-    height: 120vh;
-    width: 100%;
-    max-width: 120vw;
-    border-radius: 50%;
-    background: color-mix(in srgb, #212436 100%, transparent);
-    filter: blur(48px);
-    opacity: 0.5;
-    z-index: 11;
-  }
-
-  &__bottom-fade {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 16rem;
-    pointer-events: none;
-    background: linear-gradient(
-      to top,
-      #1e2026 0%,
-      rgba(30, 32, 38, 0.95) 18%,
-      rgba(30, 32, 38, 0.75) 40%,
-      rgba(30, 32, 38, 0.45) 65%,
-      transparent 100%
-    );
-    z-index: 12;
   }
 
   &__container {
