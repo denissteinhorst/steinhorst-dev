@@ -7,7 +7,15 @@
   },
   "ui": {
     "opens_in_new_tab": "öffnet in neuem Tab",
-    "contact_me": "Kontakt aufnehmen"
+    "contact_me": "Kontakt aufnehmen",
+    "scroll_down": "runter scrollen",
+    "scroll_down_first": "runter",
+    "scroll_down_second": "scrollen",
+    "scroll_to_top": "Zum Seitenanfang scrollen",
+    "scroll_to_contact": "Direkt zum Kontaktbereich scrollen",
+    "ai_summary": "KI Zusammenfassung anzeigen",
+    "switch_to_dark_mode": "In den Dunkel-Modus wechseln",
+    "switch_to_light_mode": "In den Hell-Modus wechseln"
   },
   "nuxtSiteConfig": {
     "name": "Denis Steinhorst – Fullstack Developer",

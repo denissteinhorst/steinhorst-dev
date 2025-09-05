@@ -7,7 +7,15 @@
   },
   "ui": {
     "opens_in_new_tab": "opens in new tab",
-    "contact_me": "Get in touch"
+    "contact_me": "Get in touch",
+    "scroll_down": "Scroll down",
+    "scroll_down_first": "Scroll",
+    "scroll_down_second": "down",
+    "scroll_to_top": "Scroll to top",
+    "scroll_to_contact": "Go directly to contact section",
+    "ai_summary": "Show AI summary",
+    "switch_to_dark_mode": "Switch to dark mode",
+    "switch_to_light_mode": "Switch to light mode"
   },
   "nuxtSiteConfig": {
     "name": "Denis Steinhorst – Fullstack Developer",

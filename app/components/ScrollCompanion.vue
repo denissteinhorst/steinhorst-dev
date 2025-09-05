@@ -1,9 +1,12 @@
 <script setup lang="ts">
+const { $t } = useI18n();
+
 const isActive = ref(false);
 const isStarting = ref(false);
 const isBottom = ref(false);
 const isContactInView = ref(false);
 const showContactIcon = ref(true);
+const showScrollDown = ref(true);
 
 let contactObserver: IntersectionObserver | null = null;
 let ticking = false;
@@ -17,6 +20,7 @@ const updateScrollState = () => {
     requestAnimationFrame(() => {
       const scrollY = window.scrollY || window.pageYOffset;
       const windowHeight = window.innerHeight;
+      showScrollDown.value = scrollY < windowHeight / 8;
       isStarting.value = scrollY > windowHeight / 4;
       isActive.value = scrollY > windowHeight / 4.2;
       isBottom.value = false;
@@ -58,6 +62,27 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <!-- Scroll down hint when at top -->
+  <div v-if="showScrollDown" class="scroll-hint">
+    <div class="scroll-hint__content">
+      <span class="scroll-hint__text">
+        {{ $t("ui.scroll_down_first") }}
+        <UIcon
+          name="i-lucide-mouse"
+          class="scroll-hint__icon"
+          aria-hidden="true"
+        />
+        {{ $t("ui.scroll_down_second") }}
+      </span>
+      <UIcon
+        name="i-lucide-chevron-down"
+        class="scroll-hint__chevron"
+        aria-hidden="true"
+      />
+    </div>
+  </div>
+
+  <!-- Main scroll companion -->
   <div
     v-if="isStarting"
     ref="companion"
@@ -83,14 +108,14 @@ onUnmounted(() => {
         <!-- 1) Arrow up -->
         <div class="scroll-companion__section">
           <UTooltip
-            :text="'Zum Seitenanfang scrollen'"
+            :text="$t('ui.scroll_to_top') as string"
             :delay-duration="0"
             :content="{ side: 'top', sideOffset: 12 }"
           >
             <UIcon
               name="i-lucide-arrow-up-circle"
               class="scroll-companion__icon scroll-companion__icon--clickable"
-              aria-label="Zum Seitenanfang scrollen"
+              :aria-label="$t('ui.scroll_to_top') as string"
               @click="scrollToTop"
             />
           </UTooltip>
@@ -112,13 +137,13 @@ onUnmounted(() => {
         <div class="scroll-companion__section">
           <template v-if="showContactIcon">
             <UTooltip
-              :text="'Direkt zum Kontaktbereich scrollen'"
+              :text="$t('ui.scroll_to_contact') as string"
               :delay-duration="0"
               :content="{ side: 'top', sideOffset: 8 }"
             >
               <NuxtLink
                 to="#contact"
-                aria-label="Direkt zum Kontaktbereich scrollen"
+                :aria-label="$t('ui.scroll_to_contact') as string"
                 class="scroll-companion__contact-link"
               >
                 <UIcon
@@ -130,7 +155,7 @@ onUnmounted(() => {
           </template>
           <template v-else>
             <UTooltip
-              :text="'KI Zusammenfassung anzeigen'"
+              :text="$t('ui.ai_summary') as string"
               :delay-duration="0"
               :content="{ side: 'top', sideOffset: 5 }"
             >
@@ -138,7 +163,7 @@ onUnmounted(() => {
                 <AiSummary
                   :icon-only="true"
                   class="scroll-companion__ai-summary"
-                  title="KI Zusammenfassung"
+                  :title="$t('ui.ai_summary') as string"
                   target="companion"
                 />
               </span>
@@ -152,6 +177,57 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 $block: "scroll-companion";
+
+// Scroll down hint styles
+.scroll-hint {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9000;
+  pointer-events: none;
+  opacity: 0.8;
+  display: none; // Hidden by default on mobile
+
+  // Only show on desktop (1024px and above)
+  @media (min-width: 1024px) {
+    display: block;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+  }
+
+  &__icon {
+    font-size: 1.25rem;
+    opacity: 0.8;
+    margin: 0 0.25rem;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__chevron {
+    font-size: 1rem;
+    opacity: 0.6;
+    animation: chevronBounce 2s ease-in-out infinite;
+    animation-delay: 0.2s;
+  }
+
+  &__text {
+    font-size: 0.875rem;
+    font-weight: 400;
+    letter-spacing: 0.025em;
+    opacity: 0.8;
+    display: inline-flex;
+    align-items: center;
+  }
+}
 
 .#{$block} {
   position: fixed;
@@ -427,6 +503,41 @@ $block: "scroll-companion";
   }
   100% {
     opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes chevronBounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
+  }
+  40% {
+    transform: translateY(2px);
+    opacity: 0.8;
+  }
+  60% {
+    transform: translateY(1px);
+    opacity: 0.7;
   }
 }
 </style>
