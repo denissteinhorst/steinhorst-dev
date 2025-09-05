@@ -19,8 +19,11 @@ export default defineNuxtConfig({
     preference: 'light',
     storageKey: 'nuxt-color-mode'
   },
+  components: [
+    { path: '~/components/sections' },
+    '~/components'
+  ],
   runtimeConfig: {
-    // Server-only secrets (never exposed to client)
     api_token: '',
     // Public values (available on client). These can be overridden at runtime via
     // env vars NUXT_PUBLIC_API_BASE and NUXT_PUBLIC_API_URL.
