@@ -822,6 +822,11 @@ $block: "navigation-section";
     // When scrolled, move nav items 64px to the left to compensate for burger menu space
     .#{$block}--scrolled & {
       transform: translateX(54px) translateZ(0);
+
+      // tablet landscape and smaller: only 36px to the left
+      @media (max-width: 1200px) {
+        transform: translateX(28px) translateZ(0);
+      }
     }
 
     // When not scrolled (collapsed state), hide nav items to the right
@@ -886,7 +891,7 @@ $block: "navigation-section";
   &__action-item {
     display: flex;
     align-items: center;
-    padding-inline: 6px; // reduced by 4px from 10px
+    padding-inline: 2px; // reduced by 4px from 6px
     height: 100%;
     white-space: nowrap; // prevent wrapping/line breaks
 
@@ -908,18 +913,37 @@ $block: "navigation-section";
   @media (min-width: 1024px) and (max-width: 1200px) {
     &__link {
       padding: 0.5rem 0.625rem;
+      font-size: 0.8125rem; // reduced by 1px from 0.875rem (14px to 13px)
     }
     &__desktop-burger-button {
       padding: 0.5rem 0.625rem;
     }
     &__action-item {
-      padding-inline: 8px;
+      padding-inline: 4px; // reduced by 4px from 8px
     }
     &__actions > &__action-item:first-child {
-      padding-right: 12px;
+      padding-right: 8px; // reduced by 4px from 12px
     }
     &__actions > &__action-item:last-child {
-      padding-left: 12px;
+      padding-left: 8px; // reduced by 4px from 12px
+    }
+
+    // Reduce font sizes for AiSummary and LanguageSelector components
+    &__action-item :deep() {
+      font-size: 0.8125rem; // reduce font size for nested components
+
+      // Target button text and icons specifically
+      button,
+      .ui-button {
+        font-size: 0.8125rem !important;
+      }
+
+      // Target icons in the components
+      .ui-icon,
+      svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
     }
   }
 
