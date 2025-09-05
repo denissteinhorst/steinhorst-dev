@@ -630,7 +630,7 @@ $block: "navigation-section";
     background: rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 0.75rem;
+    border-radius: var(--radius-default);
     padding: 0.75rem;
     box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.5),
       0 10px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);

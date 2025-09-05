@@ -138,8 +138,8 @@ $theme-dark: (
   --font-size-6xl: #{fs("6xl")};
 
   // radii & shadows
-  --radius-default: 12px;
-  --radius-small: 6px;
+  --radius-default: 6px;
+  --radius-small: 3px;
   --shadow-default: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
     rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px,
     rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
