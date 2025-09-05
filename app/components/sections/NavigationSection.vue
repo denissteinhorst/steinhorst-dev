@@ -64,7 +64,9 @@ const { data, pending, error } = await useLazyAsyncData<NavigationResponse>(
 );
 
 const isMobileMenuOpen = ref(false);
+const isDesktopDropdownOpen = ref(false);
 const menuButtonRef = ref<HTMLElement | null>(null);
+const desktopDropdownRef = ref<HTMLElement | null>(null);
 const showSkipLink = ref(true);
 
 const brandName = computed(() => data.value?.brandName ?? "");
@@ -101,6 +103,48 @@ const updateMobileMenu = (isOpen: boolean): boolean =>
   (isMobileMenuOpen.value = isOpen);
 
 const closeMobileMenu = (): boolean => (isMobileMenuOpen.value = false);
+
+// Handle desktop dropdown hover interactions
+let dropdownTimeout: NodeJS.Timeout | null = null;
+
+const handleDesktopDropdownEnter = () => {
+  if (!isScrolled.value) {
+    if (dropdownTimeout) {
+      clearTimeout(dropdownTimeout);
+      dropdownTimeout = null;
+    }
+    isDesktopDropdownOpen.value = true;
+  }
+};
+
+const handleDesktopDropdownLeave = () => {
+  dropdownTimeout = setTimeout(() => {
+    isDesktopDropdownOpen.value = false;
+  }, 150); // Small delay to allow cursor movement
+};
+
+// Close dropdown when clicking outside
+const handleClickOutside = (event: Event) => {
+  if (
+    desktopDropdownRef.value &&
+    !desktopDropdownRef.value.contains(event.target as Node)
+  ) {
+    isDesktopDropdownOpen.value = false;
+  }
+};
+
+onMounted(() => {
+  if (import.meta.client) {
+    document.addEventListener("click", handleClickOutside);
+
+    onUnmounted(() => {
+      document.removeEventListener("click", handleClickOutside);
+      if (dropdownTimeout) {
+        clearTimeout(dropdownTimeout);
+      }
+    });
+  }
+});
 
 watch(isMobileMenuOpen, (isOpen: boolean): void => {
   if (!isOpen) {
@@ -185,10 +229,66 @@ const onBrandClick = (e: MouseEvent) => {
         <!-- Desktop navigation -->
         <nav aria-label="Primäre Navigation" class="navigation-section__nav">
           <ul class="navigation-section__list">
+            <!-- Burger menu for desktop - always present for proper positioning -->
+            <li
+              class="navigation-section__item navigation-section__burger-item"
+            >
+              <div
+                ref="desktopDropdownRef"
+                class="navigation-section__desktop-burger"
+                @mouseenter="handleDesktopDropdownEnter"
+                @mouseleave="handleDesktopDropdownLeave"
+              >
+                <button
+                  class="navigation-section__desktop-burger-button"
+                  :aria-expanded="isDesktopDropdownOpen"
+                  aria-label="Navigation anzeigen"
+                >
+                  <UIcon
+                    name="i-lucide-menu"
+                    class="navigation-section__burger-icon"
+                    :class="{
+                      'navigation-section__burger-icon--hovering':
+                        isDesktopDropdownOpen,
+                    }"
+                  />
+                  <UIcon
+                    name="i-lucide-chevron-down"
+                    class="navigation-section__chevron-icon"
+                    :class="{
+                      'navigation-section__chevron-icon--hovering':
+                        isDesktopDropdownOpen,
+                    }"
+                  />
+                </button>
+
+                <div
+                  v-if="isDesktopDropdownOpen && !isScrolled"
+                  class="navigation-section__desktop-dropdown"
+                  role="menu"
+                >
+                  <NuxtLink
+                    v-for="link in mainLinks"
+                    :key="link.link"
+                    :to="link.link"
+                    :aria-label="link.title"
+                    :aria-current="isActive(link.link) ? 'page' : undefined"
+                    class="navigation-section__dropdown-link"
+                    :data-active="isActive(link.link) ? 'true' : 'false'"
+                    role="menuitem"
+                    @click="isDesktopDropdownOpen = false"
+                  >
+                    {{ link.title }}
+                  </NuxtLink>
+                </div>
+              </div>
+            </li>
+
+            <!-- Regular nav items - always present for animation -->
             <li
               v-for="link in mainLinks"
               :key="link.link"
-              class="navigation-section__item"
+              class="navigation-section__item navigation-section__nav-item"
             >
               <NuxtLink
                 :to="link.link"
@@ -202,12 +302,17 @@ const onBrandClick = (e: MouseEvent) => {
               </NuxtLink>
             </li>
 
+            <!-- Always present extras - just styled differently -->
             <li class="navigation-section__extra">
-              <AiSummary :title="specialName" :target="specialLink" />
+              <AiSummary
+                key="desktop-ai-summary"
+                :title="specialName"
+                :target="specialLink"
+              />
             </li>
 
             <li class="navigation-section__extra">
-              <LanguageSelector />
+              <LanguageSelector key="desktop-language-selector" />
             </li>
           </ul>
         </nav>
@@ -448,6 +553,194 @@ $block: "navigation-section";
     display: none;
   }
 
+  &__desktop-burger {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  &__burger-item {
+    display: flex;
+    align-items: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(0);
+    opacity: 1;
+    width: auto;
+    overflow: visible;
+
+    // When scrolled, slide the burger menu out to the left and collapse
+    .#{$block}--scrolled & {
+      transform: translateX(-100px);
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+  }
+  &__desktop-burger-button {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.875rem;
+    background: transparent;
+    border: none;
+    color: rgba(248, 250, 252, 0.9);
+    cursor: pointer;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      color: #fff;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary, #a78bfa);
+      outline-offset: 2px;
+    }
+  }
+
+  &__burger-icon,
+  &__chevron-icon {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &__burger-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+
+    &--hovering {
+      opacity: 0;
+      transform: rotate(90deg) scale(0.8);
+    }
+  }
+
+  &__chevron-icon {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.8);
+
+    &--hovering {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+  }
+
+  &__desktop-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.75rem;
+    padding: 0.75rem;
+    box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.5),
+      0 10px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    z-index: 60;
+    animation: dropdown-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    // Create a hover bridge to prevent closing when moving cursor to dropdown
+    &::before {
+      content: "";
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 12px;
+      background: transparent;
+      pointer-events: auto;
+    }
+
+    // Subtle arrow pointing up
+    &::after {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid rgba(0, 0, 0, 0.75);
+    }
+
+    @supports (backdrop-filter: blur(20px)) {
+      background: rgba(0, 0, 0, 0.65);
+
+      &::after {
+        border-bottom-color: rgba(0, 0, 0, 0.65);
+      }
+    }
+  }
+
+  &__dropdown-link {
+    display: block;
+    padding: 0.875rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    color: rgba(248, 250, 252, 0.95);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    position: relative;
+
+    &:not(:last-child) {
+      margin-bottom: 2px;
+    }
+
+    &:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(2px);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary, #a78bfa);
+      outline-offset: 2px;
+    }
+
+    &[data-active="true"] {
+      color: var(--color-primary, #a78bfa);
+      font-weight: 700;
+      background: rgba(167, 139, 250, 0.15);
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        background: var(--color-primary, #a78bfa);
+        border-radius: 2px;
+      }
+    }
+  }
+
+  @keyframes dropdown-appear {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-12px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+  }
+
   &__list {
     list-style: none;
     display: flex;
@@ -460,8 +753,35 @@ $block: "navigation-section";
   &__item {
     display: flex;
     align-items: center;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  // Animation for regular navigation items
+  &__nav-item {
+    transform: translateX(0);
+    opacity: 1;
+    width: auto;
+    overflow: visible;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+    // When not scrolled (collapsed state), hide nav items to the right
+    .#{$block}:not(.#{$block}--scrolled) & {
+      transform: translateX(100px);
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    // Stagger animation for multiple items
+    @for $i from 1 through 8 {
+      &:nth-child(#{$i + 1}) {
+        transition-delay: #{$i * 0.05}s;
+      }
+    }
+  }
   &__link {
     display: inline-block;
     padding: 0.5rem 0.875rem;
