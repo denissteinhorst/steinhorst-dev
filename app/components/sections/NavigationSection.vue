@@ -5,35 +5,27 @@ const route = useRoute();
 const router = useRouter();
 const { cmsRequest, currentLocaleString } = useStrapi();
 
-// Track scroll position for navigation transparency (VueUse ensures smooth updates cross-browser)
 const { y } = useWindowScroll();
-// Low threshold so the transition begins immediately across browsers
 const isScrolled = computed(() => y.value > 2);
-
-// Track actual browser hash for active state detection
 const currentHash = ref("");
 
-// Update hash when location changes (including replaceState from useScrollHashes)
 const updateCurrentHash = () => {
   if (import.meta.client) {
     currentHash.value = window.location.hash;
   }
 };
 
-// No manual scroll handlers needed; useWindowScroll handles updates efficiently.
-
-// Listen for hash changes and scroll events
 onMounted(() => {
   if (import.meta.client) {
     updateCurrentHash();
     window.addEventListener("hashchange", updateCurrentHash, { passive: true });
-    // Ensure we catch history.replaceState updates (used by useScrollHashes)
+
     const originalReplaceState = window.history.replaceState.bind(
       window.history
     ) as (data: unknown, title: string, url?: string | URL | null) => void;
     const handleReplace = () => updateCurrentHash();
+
     try {
-      // Patch replaceState so we also update the reactive hash when other code updates it
       window.history.replaceState = ((
         data: unknown,
         title: string,
@@ -43,15 +35,15 @@ onMounted(() => {
         handleReplace();
       }) as History["replaceState"];
     } catch {
-      // no-op: if patching fails, active hash won't update via replaceState
+      // Fallback if patching fails
     }
+
     onUnmounted(() => {
       window.removeEventListener("hashchange", updateCurrentHash);
-      // best-effort: restore original replaceState
       try {
         window.history.replaceState = originalReplaceState;
       } catch {
-        /* ignore */
+        // Ignore restoration errors
       }
     });
   }
@@ -77,10 +69,8 @@ const showSkipLink = ref(true);
 
 const brandName = computed(() => data.value?.brandName ?? "");
 const brandLink = computed(() => data.value?.brandLink ?? "/");
-
 const specialName = computed(() => data.value?.specialButton ?? "");
 const specialLink = computed(() => data.value?.specialLink ?? "/");
-
 const mainLinks = computed<NavigationElement[]>(
   () => data.value?.navigationElements ?? []
 );
@@ -107,10 +97,8 @@ const skipToHero = () => {
 
 const updateMobileMenu = (isOpen: boolean): boolean =>
   (isMobileMenuOpen.value = isOpen);
-
 const closeMobileMenu = (): boolean => (isMobileMenuOpen.value = false);
 
-// Handle desktop dropdown hover interactions
 let dropdownTimeout: NodeJS.Timeout | null = null;
 
 const handleDesktopDropdownEnter = () => {
@@ -126,10 +114,9 @@ const handleDesktopDropdownEnter = () => {
 const handleDesktopDropdownLeave = () => {
   dropdownTimeout = setTimeout(() => {
     isDesktopDropdownOpen.value = false;
-  }, 150); // Small delay to allow cursor movement
+  }, 150);
 };
 
-// Close dropdown when clicking outside
 const handleClickOutside = (event: Event) => {
   if (
     desktopDropdownRef.value &&
@@ -162,21 +149,18 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
   }
 });
 
-// Handle brand click: if already on home route, just scroll to top/hero and clear hash (no navigation)
 const onBrandClick = (e: MouseEvent) => {
   const targetPath = brandLink.value || "/";
   if (route.path === targetPath) {
     e.preventDefault();
-    // Clear hash without causing scroll jump
     if (import.meta.client) {
       const base = `${window.location.pathname}${window.location.search}`;
       try {
         window.history.replaceState(window.history.state, "", base);
       } catch {
-        /* noop: best-effort to clear hash without navigation */
+        // Fallback if replaceState fails
       }
     }
-    // Smooth scroll to hero heading if present, else top
     const el =
       document.getElementById("hero-heading") ||
       document.getElementById("hero");
@@ -188,7 +172,6 @@ const onBrandClick = (e: MouseEvent) => {
     }
     return;
   }
-  // Navigate normally if not on home
   e.preventDefault();
   router.push(targetPath);
 };
@@ -200,7 +183,6 @@ const onBrandClick = (e: MouseEvent) => {
     :class="{ 'navigation-section--scrolled': isScrolled }"
     role="navigation"
   >
-    <!-- Skip link (WCAG) -->
     <a
       v-if="showSkipLink"
       href="#hero-heading"
@@ -211,13 +193,11 @@ const onBrandClick = (e: MouseEvent) => {
       Zum Inhalt springen
     </a>
 
-    <!-- Gradient separator (bottom) -->
     <div aria-hidden="true" class="navigation-section__separator"></div>
 
     <UContainer class="navigation-section__container">
       <div class="navigation-section__inner">
         <div class="navigation-section__brand">
-          <!-- Brand / Logo -->
           <slot name="brand">
             <NuxtLink
               :to="brandLink"
@@ -232,12 +212,8 @@ const onBrandClick = (e: MouseEvent) => {
           </slot>
         </div>
 
-        <!-- Desktop navigation -->
         <nav aria-label="Primäre Navigation" class="navigation-section__nav">
           <ul class="navigation-section__list">
-            <!-- Actions (burger + AI summary + language) grouped for consistent spacing and separators -->
-
-            <!-- Regular nav items - always present for animation -->
             <li
               v-for="link in mainLinks"
               :key="link.link"
@@ -255,9 +231,7 @@ const onBrandClick = (e: MouseEvent) => {
               </NuxtLink>
             </li>
 
-            <!-- Grouped actions at the far right -->
             <li class="navigation-section__actions">
-              <!-- Burger menu for desktop -->
               <div
                 class="navigation-section__action-item navigation-section__burger-item"
               >
@@ -312,7 +286,6 @@ const onBrandClick = (e: MouseEvent) => {
                 </div>
               </div>
 
-              <!-- AI Summary -->
               <div class="navigation-section__action-item">
                 <AiSummary
                   key="desktop-ai-summary"
@@ -321,7 +294,6 @@ const onBrandClick = (e: MouseEvent) => {
                 />
               </div>
 
-              <!-- Language selector -->
               <div class="navigation-section__action-item">
                 <LanguageSelector key="desktop-language-selector" />
               </div>
@@ -329,7 +301,6 @@ const onBrandClick = (e: MouseEvent) => {
           </ul>
         </nav>
 
-        <!-- Mobile trigger and panel -->
         <div class="navigation-section__mobile" aria-label="Mobile navigation">
           <div class="navigation-section__mobile-language">
             <LanguageSelector />
@@ -386,7 +357,6 @@ const onBrandClick = (e: MouseEvent) => {
                       </NuxtLink>
                     </li>
 
-                    <!-- Mobile: Kontakt -->
                     <li class="navigation-section__mobile-item">
                       <NuxtLink
                         to="#contact"
@@ -401,7 +371,6 @@ const onBrandClick = (e: MouseEvent) => {
                       </NuxtLink>
                     </li>
 
-                    <!-- Mobile: Extra slot (e.g., AI Summary) -->
                     <li class="navigation-section__mobile-extra">
                       <AiSummary :title="specialName" :target="specialLink" />
                     </li>
@@ -429,32 +398,22 @@ $block: "navigation-section";
   top: 0;
   z-index: 50;
   color: #fff;
-
-  // Default state: transparent and minimal
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
-  // Optimize transitions for iOS Safari - separate backdrop-filter for better performance
   transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  // Force hardware acceleration for smoother animations
   transform: translateZ(0);
   will-change: background-color, box-shadow;
 
-  // Keep transitions lightweight
-
-  // Scrolled state: opaque and with effects
   &--scrolled {
     background: rgba(0, 0, 0, 0.65);
     box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.15),
       0 0 0 1px rgba(255, 255, 255, 0.05);
     backdrop-filter: saturate(180%) blur(20px);
 
-    // Avoid backdrop-filter for smoother Safari performance
-
     @media (prefers-color-scheme: dark) {
       background: rgba(0, 0, 0, 0.65);
-      // Keep simple color change only
     }
 
     .#{$block}__separator {
@@ -476,9 +435,7 @@ $block: "navigation-section";
     );
     filter: drop-shadow(0 0 6px var(--color-secondary, #90a1b9));
     opacity: 0;
-    // Faster transition for separator on iOS Safari
     transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    // Force hardware acceleration
     transform: translateZ(0);
     will-change: opacity;
   }
@@ -492,7 +449,6 @@ $block: "navigation-section";
     align-items: center;
     gap: 16px;
     height: 72px;
-    // Fixed height for smoother cross-browser behavior (no height transition)
     transform: translateZ(0);
   }
 
@@ -520,7 +476,7 @@ $block: "navigation-section";
   &__brand {
     display: flex;
     align-items: center;
-    flex: 0 0 auto; // don't let brand shrink
+    flex: 0 0 auto;
   }
 
   &__brand-link {
@@ -532,14 +488,10 @@ $block: "navigation-section";
     border-radius: 0.375rem;
     padding: 0.25rem 0.5rem;
     margin: -0.25rem -0.5rem;
-    white-space: nowrap; // prevent wrapping of brand name
-    // Optimize transition for iOS Safari
+    white-space: nowrap;
     transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
       font-size 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    // Force hardware acceleration
     transform: translateZ(0);
-
-    // Better visibility on transparent background
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 
     &:focus-visible {
@@ -555,7 +507,6 @@ $block: "navigation-section";
       font-size: 1.15rem;
     }
 
-    // Smaller brand in scrolled state
     .#{$block}--scrolled & {
       font-size: 1.05rem;
 
@@ -575,12 +526,11 @@ $block: "navigation-section";
     }
   }
 
-  /* Desktop nav */
   &__nav {
     margin-left: auto;
     display: none;
-    flex: 1 1 auto; // allow nav area to shrink
-    min-width: 0; // allow content measurement to avoid overflow pushing brand
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   &__desktop-burger {
@@ -592,27 +542,25 @@ $block: "navigation-section";
   &__burger-item {
     display: flex;
     align-items: center;
-    // Optimize transition for iOS Safari with specific properties
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    transform: translateX(0) translateZ(0); // Add translateZ for hardware acceleration
+    transform: translateX(0) translateZ(0);
     opacity: 1;
     width: auto;
     overflow: visible;
-    // Hint to browser about what will change
     will-change: transform, opacity;
 
-    // When scrolled, slide the burger menu out to the left and collapse
     .#{$block}--scrolled & {
       transform: translateX(-36px) translateZ(0);
       opacity: 0;
       pointer-events: none;
-      width: 0; // snap width without transitioning it (prevents layout jank on Safari)
+      width: 0;
       overflow: hidden;
       margin: 0;
       padding: 0;
     }
   }
+
   &__desktop-burger-button {
     position: relative;
     display: flex;
@@ -628,7 +576,6 @@ $block: "navigation-section";
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
     transform: translateZ(0);
 
-    // table/tablet landscape and smaller: increase hit area
     @media (max-width: 1200px) {
       margin-right: 4px;
     }
@@ -648,10 +595,8 @@ $block: "navigation-section";
     width: 20px;
     height: 20px;
     position: absolute;
-    // Optimize icon transitions for iOS Safari
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
       transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    // Force hardware acceleration
     backface-visibility: hidden;
     will-change: opacity, transform;
   }
@@ -692,7 +637,6 @@ $block: "navigation-section";
     z-index: 60;
     animation: dropdown-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-    // Create a hover bridge to prevent closing when moving cursor to dropdown
     &::before {
       content: "";
       position: absolute;
@@ -705,7 +649,6 @@ $block: "navigation-section";
       pointer-events: auto;
     }
 
-    // Subtle arrow pointing up
     &::after {
       content: "";
       position: absolute;
@@ -737,13 +680,11 @@ $block: "navigation-section";
     color: rgba(248, 250, 252, 0.95);
     text-decoration: none;
     border-radius: 0.5rem;
-    // Optimize transitions for iOS Safari
     transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
       background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
       transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
     position: relative;
-    // Force hardware acceleration
     backface-visibility: hidden;
     will-change: color, background-color, transform;
 
@@ -800,57 +741,50 @@ $block: "navigation-section";
     margin: 0;
     padding: 0;
     flex: 1 1 auto;
-    justify-content: flex-end; // keep actions to the far right
+    justify-content: flex-end;
   }
 
   &__item {
     display: flex;
     align-items: center;
-    // Optimize transition for iOS Safari
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  // Animation for regular navigation items
   &__nav-item {
-    transform: translateX(0) translateZ(0); // Add translateZ for hardware acceleration
+    transform: translateX(0) translateZ(0);
     opacity: 1;
     width: auto;
     overflow: visible;
-    // Optimize for iOS Safari with specific properties
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    // Hint to browser about what will change
     will-change: transform, opacity;
 
-    // When scrolled, move nav items 64px to the left to compensate for burger menu space
     .#{$block}--scrolled & {
       transform: translateX(54px) translateZ(0);
 
-      // tablet landscape and smaller: only 36px to the left
       @media (max-width: 1200px) {
         transform: translateX(28px) translateZ(0);
       }
     }
 
-    // When not scrolled (collapsed state), hide nav items to the right
     .#{$block}:not(.#{$block}--scrolled) & {
       transform: translateX(100px) translateZ(0);
       opacity: 0;
       pointer-events: none;
-      width: 0; // snap width; no width transition
+      width: 0;
       overflow: hidden;
       margin: 0;
       padding: 0;
     }
 
-    // Stagger animation for multiple items
     @for $i from 1 through 8 {
       &:nth-child(#{$i + 1}) {
         transition-delay: #{$i * 0.05}s;
       }
     }
   }
+
   &__link {
     display: inline-block;
     padding: 0.5rem 0.875rem;
@@ -859,12 +793,8 @@ $block: "navigation-section";
     letter-spacing: 0.025em;
     color: rgba(248, 250, 252, 0.9);
     text-decoration: none;
-    // Optimize transition for iOS Safari
     transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    // Force hardware acceleration
     transform: translateZ(0);
-
-    // Better visibility on transparent background
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 
     &:hover {
@@ -882,67 +812,60 @@ $block: "navigation-section";
     }
   }
 
-  /* Right-aligned actions container */
   &__actions {
     margin-left: auto;
     display: flex;
     align-items: center;
-    gap: 0; // separators provide visual spacing; inner items handle padding
+    gap: 0;
     list-style: none;
-    flex: 0 0 auto; // avoid shrinking that could distort spacing
+    flex: 0 0 auto;
   }
 
   &__action-item {
     display: flex;
     align-items: center;
-    padding-inline: 2px; // reduced by 4px from 6px
+    padding-inline: 2px;
     height: 100%;
-    white-space: nowrap; // prevent wrapping/line breaks
+    white-space: nowrap;
 
-    // vertical separator between items (only between, not around the group)
     & + & {
       border-left: 1px solid rgba(148, 163, 184, 0.4);
     }
   }
 
-  // Slightly increase spacing right of the first separator and left of the last separator
   &__actions > &__action-item:first-child {
-    padding-right: 10px; // reduced by 4px from 14px
+    padding-right: 10px;
   }
   &__actions > &__action-item:last-child {
-    padding-left: 10px; // reduced by 4px from 14px
+    padding-left: 10px;
   }
 
-  /* Tablet landscape tweaks: compress paddings to avoid overflow without wrapping */
   @media (min-width: 1024px) and (max-width: 1200px) {
     &__link {
       padding: 0.5rem 0.625rem;
-      font-size: 0.8125rem; // reduced by 1px from 0.875rem (14px to 13px)
+      font-size: 0.8125rem;
     }
     &__desktop-burger-button {
       padding: 0.5rem 0.625rem;
     }
     &__action-item {
-      padding-inline: 4px; // reduced by 4px from 8px
+      padding-inline: 4px;
     }
     &__actions > &__action-item:first-child {
-      padding-right: 8px; // reduced by 4px from 12px
+      padding-right: 8px;
     }
     &__actions > &__action-item:last-child {
-      padding-left: 8px; // reduced by 4px from 12px
+      padding-left: 8px;
     }
 
-    // Reduce font sizes for AiSummary and LanguageSelector components
     &__action-item :deep() {
-      font-size: 0.8125rem; // reduce font size for nested components
+      font-size: 0.8125rem;
 
-      // Target button text and icons specifically
       button,
       .ui-button {
         font-size: 0.8125rem !important;
       }
 
-      // Target icons in the components
       .ui-icon,
       svg {
         width: 16px !important;
@@ -951,7 +874,6 @@ $block: "navigation-section";
     }
   }
 
-  /* Mobile */
   &__mobile {
     margin-left: auto;
     display: flex;
@@ -966,9 +888,7 @@ $block: "navigation-section";
 
   &__menu-button {
     border: 0;
-    // Optimize transition for iOS Safari
     transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    // Force hardware acceleration
     transform: translateZ(0);
 
     &:hover {
@@ -1074,9 +994,6 @@ $block: "navigation-section";
     }
   }
 
-  // Keep CSS simple; avoid device-specific overrides that may cause inconsistencies
-
-  // Reduce animations on devices with limited resources
   @media (prefers-reduced-motion: reduce) {
     &,
     &__inner,
