@@ -1,21 +1,8 @@
 <script setup lang="ts">
 const { cmsRequest, currentLocaleString } = useStrapi();
 
-// Preload hero background image for Safari optimization
-const preloadBgImage = () => {
-  if (import.meta.client) {
-    const link = document.createElement("link");
-    link.rel = "preload";
-    link.href = "/images/hero_image.jpeg";
-    link.as = "image";
-    link.crossOrigin = "anonymous";
-    document.head.appendChild(link);
-  }
-};
-
-onMounted(() => {
-  preloadBgImage();
-});
+// Note: Removed manual preloading as it's redundant with fetchpriority="high"
+// Modern browsers handle image prioritization well with proper HTML attributes
 
 const { data, pending, error } = await useLazyAsyncData<HeroSectionResponse>(
   () => `hero-section-${currentLocaleString.value}`,
@@ -155,7 +142,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
             <div class="hero-section-img-slots">
               <div class="hero-section-img-slot hero-section-img-slot--left">
                 <img
-                  src="/images/hero_image.jpeg"
+                  src="/images/hero_image.webp"
                   :alt="
                     data.image?.alternativeText ||
                     'Portrait von Denis Steinhorst'
@@ -169,7 +156,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
 
               <div class="hero-section-img-slot hero-section-img-slot--right">
                 <img
-                  src="/images/hero_image.jpeg"
+                  src="/images/hero_image.webp"
                   alt=""
                   class="hero-section-img"
                   sizes="(min-width: 1280px) 34rem, (min-width: 1024px) 28rem, 60vw"
@@ -299,7 +286,7 @@ $block: "hero-section";
   &-blur {
     position: absolute;
     inset: -20%;
-    background-image: url("/images/hero_image.jpeg");
+    background-image: url("/images/hero_image.webp");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
