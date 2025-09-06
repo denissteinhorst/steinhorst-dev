@@ -257,6 +257,7 @@ $block: "hero-section";
   --color-text: #d1d5db;
   --color-bg: #1d2129;
   --color-surface: #232833;
+  --color-primary: #9861ff; /* Fallback for emphasis text */
 
   color: var(--color-text);
   background: var(--color-bg);
@@ -367,7 +368,13 @@ $block: "hero-section";
   }
 
   &-emphasis {
-    color: var(--color-primary);
+    color: var(--color-primary, #9861ff);
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    font-family: inherit;
+    text-shadow: inherit;
   }
 }
 
