@@ -51,7 +51,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
           </div>
 
           <h1 id="hero-heading" tabindex="-1" class="hero-section-title">
-            <span v-if="data.titleBefore">{{ data.titleBefore }} </span>
+            <span v-if="data.titleBefore">{{ data.titleBefore }} </span><br />
             <span v-if="data.emphasis" class="hero-section-title-emphasis">{{
               data.emphasis
             }}</span>
