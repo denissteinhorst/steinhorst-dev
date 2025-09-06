@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { cmsRequest, buildImageUrl, currentLocaleString } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi();
 
 // Preload hero background image for Safari optimization
 const preloadBgImage = () => {
@@ -307,6 +307,7 @@ $block: "hero-section";
     transition: opacity 0.8s ease-out;
     filter: blur(50px) brightness(0.4) saturate(0.6);
     transform: scale(1.1);
+    z-index: -1;
 
     &.loaded {
       opacity: 1;
