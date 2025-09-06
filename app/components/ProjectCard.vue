@@ -26,8 +26,10 @@ const extractTextFromRichText = (block: RichTextBlock): string => {
     <div class="project-card__body">
       <div class="project-card__header">
         <div class="project-card__image-container">
-          <img
+          <NuxtImg
             v-if="data.logo && buildImageUrl(data.logo)"
+            format="webp"
+            quality="80"
             :src="buildImageUrl(data.logo)!"
             :alt="
               data.logo.alternativeText || `${data.title} – ${data.company}`

@@ -23,8 +23,10 @@ const logoUrl = computed<string | undefined>(() => {
             backgroundColor: data.bgColor ? `#${data.bgColor}` : undefined,
           }"
         >
-          <img
+          <NuxtImg
             v-if="data.logo"
+            format="webp"
+            quality="80"
             :src="logoUrl"
             :alt="'Zertifikat Logo von ' + data.title"
             class="certificate-card__logo-image"
