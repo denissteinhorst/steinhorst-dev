@@ -20,6 +20,35 @@ const { data, pending, error } = await useLazyAsyncData<HeroSectionResponse>(
 );
 
 const text = computed<RichTextNodes>(() => data.value?.text ?? []);
+
+// Scroll-based blur effect
+const heroSectionRef = ref<HTMLElement>();
+const scrollBlur = ref(0);
+
+const { y: scrollY } = useWindowScroll();
+
+// Calculate blur based on scroll position
+watch(
+  scrollY,
+  (newScrollY) => {
+    if (!heroSectionRef.value) return;
+
+    const heroHeight = heroSectionRef.value.offsetHeight;
+    const scrollProgress = newScrollY / heroHeight;
+
+    // Start blur only after first 33% of hero height
+    const blurStartPoint = 0.33;
+    const adjustedProgress = Math.max(
+      0,
+      (scrollProgress - blurStartPoint) / (1 - blurStartPoint)
+    );
+    const clampedProgress = Math.min(adjustedProgress, 1);
+
+    // Apply blur from 0 to 8px based on adjusted scroll progress
+    scrollBlur.value = clampedProgress * 8;
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
@@ -32,18 +61,23 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
   <section
     v-else-if="data"
     :id="data.jumpmark"
+    ref="heroSectionRef"
     class="hero-section"
     aria-labelledby="hero-heading"
   >
     <!-- Background Elements -->
     <div class="hero-section-bg" aria-hidden="true">
       <div class="hero-section-bg-blur" :class="{ loaded: !pending }"></div>
+      <div class="hero-section-bg-noise"></div>
       <div class="hero-section-bg-overlay"></div>
     </div>
 
     <UContainer class="hero-section-container">
       <div class="hero-section-bg-blur"></div>
-      <div class="hero-section-grid">
+      <div
+        class="hero-section-grid"
+        :style="{ filter: `blur(${scrollBlur}px)` }"
+      >
         <!-- Content Column -->
         <div class="hero-section-content">
           <div class="hero-section-badge">
@@ -260,7 +294,7 @@ $block: "hero-section";
   --color-primary: #9861ff; /* Fallback for emphasis text */
 
   color: var(--color-text);
-  background: var(--color-bg);
+  background: black;
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -296,10 +330,41 @@ $block: "hero-section";
     filter: blur(50px) brightness(0.4) saturate(0.6);
     transform: scale(1.1);
     z-index: -1;
+    animation: subtle-float 6s ease-in-out infinite;
 
     &.loaded {
       opacity: 1;
     }
+  }
+
+  &-noise {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+        circle at 20% 30%,
+        rgba(255, 255, 255, 0.015) 1px,
+        transparent 1px
+      ),
+      radial-gradient(
+        circle at 80% 70%,
+        rgba(255, 255, 255, 0.01) 1px,
+        transparent 1px
+      ),
+      radial-gradient(
+        circle at 40% 80%,
+        rgba(255, 255, 255, 0.008) 1px,
+        transparent 1px
+      ),
+      radial-gradient(
+        circle at 60% 20%,
+        rgba(255, 255, 255, 0.012) 1px,
+        transparent 1px
+      );
+    background-size: 3px 3px, 5px 5px, 2px 2px, 4px 4px;
+    background-position: 0 0, 1px 2px, 3px 1px, 2px 3px;
+    opacity: 1;
+    z-index: 2;
+    mix-blend-mode: overlay;
   }
 
   &-overlay {
@@ -458,7 +523,7 @@ $block: "hero-section";
   zoom: 0.3;
 
   @media (min-width: 1024px) {
-    zoom: 0.385;
+    zoom: 0.39;
   }
 
   &--left {
@@ -470,7 +535,7 @@ $block: "hero-section";
 
   &--right {
     right: 10%;
-    bottom: -15%;
+    bottom: -15.5%;
     transform: rotate(10deg);
     z-index: 1;
   }
@@ -591,6 +656,28 @@ $block: "hero-section";
 @media (prefers-reduced-motion: reduce) {
   .#{$block}-bg-blur {
     transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Subtle background animation */
+@keyframes subtle-float {
+  0%,
+  100% {
+    transform: scale(1.1) translateY(0px) translateX(0px);
+    filter: blur(50px) brightness(0.4) saturate(0.6);
+  }
+  25% {
+    transform: scale(1.12) translateY(-3px) translateX(1px);
+    filter: blur(51px) brightness(0.42) saturate(0.65);
+  }
+  50% {
+    transform: scale(1.13) translateY(-1px) translateX(-1px);
+    filter: blur(52px) brightness(0.44) saturate(0.7);
+  }
+  75% {
+    transform: scale(1.12) translateY(-4px) translateX(1px);
+    filter: blur(51px) brightness(0.41) saturate(0.65);
   }
 }
 </style>
