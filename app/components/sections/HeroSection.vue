@@ -20,35 +20,6 @@ const { data, pending, error } = await useLazyAsyncData<HeroSectionResponse>(
 );
 
 const text = computed<RichTextNodes>(() => data.value?.text ?? []);
-
-// Scroll-based blur effect
-const heroSectionRef = ref<HTMLElement>();
-const scrollBlur = ref(0);
-
-const { y: scrollY } = useWindowScroll();
-
-// Calculate blur based on scroll position
-watch(
-  scrollY,
-  (newScrollY) => {
-    if (!heroSectionRef.value) return;
-
-    const heroHeight = heroSectionRef.value.offsetHeight;
-    const scrollProgress = newScrollY / heroHeight;
-
-    // Start blur only after first 33% of hero height
-    const blurStartPoint = 0.33;
-    const adjustedProgress = Math.max(
-      0,
-      (scrollProgress - blurStartPoint) / (1 - blurStartPoint)
-    );
-    const clampedProgress = Math.min(adjustedProgress, 1);
-
-    // Apply blur from 0 to 8px based on adjusted scroll progress
-    scrollBlur.value = clampedProgress * 8;
-  },
-  { immediate: true }
-);
 </script>
 
 <template>
@@ -61,7 +32,6 @@ watch(
   <section
     v-else-if="data"
     :id="data.jumpmark"
-    ref="heroSectionRef"
     class="hero-section"
     aria-labelledby="hero-heading"
   >
@@ -74,10 +44,7 @@ watch(
 
     <UContainer class="hero-section-container">
       <div class="hero-section-bg-blur"></div>
-      <div
-        class="hero-section-grid"
-        :style="{ filter: `blur(${scrollBlur}px)` }"
-      >
+      <div class="hero-section-grid">
         <!-- Content Column -->
         <div class="hero-section-content">
           <div class="hero-section-badge">
