@@ -112,7 +112,7 @@ export default defineNuxtConfig({
         { rel: 'canonical', href: 'https://www.steinhorst.dev' },
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
       ],
-      script: [
+      script: process.env.NODE_ENV === 'production' ? [
         {
           id: 'usercentrics-cmp',
           src: 'https://web.cmp.usercentrics.eu/ui/loader.js',
@@ -133,7 +133,7 @@ export default defineNuxtConfig({
             })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
           `
         }
-      ],
+      ] : [],
     },
   }
 })
