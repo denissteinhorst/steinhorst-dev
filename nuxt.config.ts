@@ -13,17 +13,11 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     'nuxt-strapi-blocks-renderer',
     '@nuxtjs/mdc',
-    'nuxt-i18n-micro',
-    'nuxt-module-hotjar'
+    'nuxt-i18n-micro'
   ],
   colorMode: {
     preference: 'light',
     storageKey: 'nuxt-color-mode'
-  },
-  hotjar: {
-    hotjarId: 6513298,
-    scriptVersion: 6,
-    debug: true
   },
   components: [
     { path: '~/components/sections' },
@@ -118,7 +112,28 @@ export default defineNuxtConfig({
         { rel: 'canonical', href: 'https://www.steinhorst.dev' },
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
       ],
-      script: [],
+      script: [
+        {
+          id: 'usercentrics-cmp',
+          src: 'https://web.cmp.usercentrics.eu/ui/loader.js',
+          'data-settings-id': 'h94zxBp1utgWJs',
+          async: true
+        },
+        {
+          type: 'text/plain',
+          'data-usercentrics': 'Hotjar',
+          innerHTML: `
+            (function(h,o,t,j,a,r){
+              h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+              h._hjSettings={hjid:6513298,hjsv:6};
+              a=o.getElementsByTagName('head')[0];
+              r=o.createElement('script');r.async=1;
+              r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+              a.appendChild(r);
+            })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+          `
+        }
+      ],
     },
   }
 })
