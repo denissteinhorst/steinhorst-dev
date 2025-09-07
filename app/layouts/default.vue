@@ -41,6 +41,12 @@ function updateAmbientBackground(preference: string) {
     ambientBackground.value?.classList.remove("ambient-background-light");
   }
 }
+
+const { initialize } = useHotjar();
+
+onMounted(() => {
+  initialize();
+});
 </script>
 
 <template>

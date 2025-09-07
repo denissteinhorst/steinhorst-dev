@@ -14,10 +14,16 @@ export default defineNuxtConfig({
     'nuxt-strapi-blocks-renderer',
     '@nuxtjs/mdc',
     'nuxt-i18n-micro',
+    'nuxt-module-hotjar'
   ],
   colorMode: {
     preference: 'light',
     storageKey: 'nuxt-color-mode'
+  },
+  hotjar: {
+    hotjarId: 6513298,
+    scriptVersion: 6,
+    debug: true
   },
   components: [
     { path: '~/components/sections' },
