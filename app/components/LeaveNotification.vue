@@ -38,6 +38,8 @@ const qrCodeUrl = computed<string | undefined>(() => {
 const isOpen = ref(false);
 const lastMouseY = ref<number | null>(null);
 const suppressedUntil = ref<number>(0);
+const hasScrolledHalfway = ref(false);
+const showIndicator = ref(true);
 
 // Minimal, readable constants (do not expose as props)
 const ACTIVATION_THRESHOLD_IN_PIXELS = 60; // Top band height triggering the modal
@@ -73,6 +75,7 @@ const suppressForToday = (): void => {
 const shouldOpenOnMove = (mouseY: number, deltaY: number): boolean => {
   const topOffset = Math.max(0, props.blindTopOffsetPx ?? 0);
   if (Date.now() < suppressedUntil.value) return false;
+  if (!hasScrolledHalfway.value) return false; // Only show after scrolling halfway
   if (mouseY > ACTIVATION_THRESHOLD_IN_PIXELS) return false;
   if (mouseY < topOffset) return false;
   if (deltaY >= -MINIMUM_UPWARD_DELTA_IN_PIXELS) return false;
@@ -88,6 +91,27 @@ const handleMouseMove = (event: MouseEvent): void => {
   }
 };
 
+const handleScroll = (): void => {
+  if (hasScrolledHalfway.value) return; // Already tracked, no need to continue
+
+  const scrollTop = window.scrollY || document.documentElement.scrollTop;
+  const documentHeight =
+    document.documentElement.scrollHeight -
+    document.documentElement.clientHeight;
+  const scrollPercentage = scrollTop / documentHeight;
+
+  if (scrollPercentage >= 0.5) {
+    hasScrolledHalfway.value = true;
+    // Remove scroll listener once halfway point is reached for performance
+    window.removeEventListener("scroll", handleScroll);
+
+    // Auto-hide indicator after 3 seconds when ready
+    setTimeout(() => {
+      showIndicator.value = false;
+    }, 3000);
+  }
+};
+
 onMounted(() => {
   suppressedUntil.value = readSuppressedUntil();
   checkIfDesktop();
@@ -95,12 +119,14 @@ onMounted(() => {
   // Only enable leave notification on desktop devices
   if (isDesktop.value) {
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("scroll", handleScroll, { passive: true });
   }
 });
 
 onBeforeUnmount(() => {
   if (isDesktop.value) {
     window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("scroll", handleScroll);
   }
 });
 
@@ -121,34 +147,15 @@ watch(isOpen, (newValue: boolean, oldValue: boolean): void => {
 
   <div v-else-if="data" class="leave-notification">
     <ClientOnly>
-      <UModal v-if="isOpen" v-model:open="isOpen">
-        <template #header>
-          <div class="leave-notification__header">
-            <div
-              role="heading"
-              aria-level="2"
-              class="leave-notification__title"
-            >
-              {{ data.title || "Kontakt aufnehmen" }}
-            </div>
-            <UButton
-              aria-label="Schließen"
-              icon="i-lucide-x"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-              class="leave-notification__close-button"
-              style="cursor: pointer"
-              @click="isOpen = false"
-            />
-          </div>
-        </template>
+      <UModal
+        v-if="isOpen"
+        v-model:open="isOpen"
+        :title="data.title || 'Kontakt aufnehmen'"
+        :description="data.text || 'Nehmen Sie direkt Kontakt auf'"
+        class="leave-modal-custom"
+      >
         <template #body>
           <div class="leave-notification__body">
-            <p class="leave-notification__intro-text">
-              {{ data.text || "" }}
-            </p>
-
             <section
               class="leave-notification__qr-section"
               aria-labelledby="leave-notification-qr-title"
@@ -254,28 +261,6 @@ watch(isOpen, (newValue: boolean, oldValue: boolean): void => {
 $block: "leave-notification";
 
 .#{$block} {
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    width: 100%;
-  }
-
-  &__title {
-    font-size: 1.25rem;
-    line-height: 1.4;
-    margin: 0;
-  }
-
-  &__close-button {
-    margin-left: auto; // ensure right alignment even if header styles change
-    cursor: pointer !important;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
   &__body {
     display: flex;
     flex-direction: column;
@@ -385,5 +370,15 @@ $block: "leave-notification";
     opacity: 0.8;
     margin-top: 0.5rem;
   }
+}
+
+// Global fallback for any modal title
+:global(.leave-modal-custom h2),
+:global(.leave-modal-custom [id*="dialog-title"]) {
+  font-size: 1.5rem !important;
+}
+
+:global(.leave-modal-custom button) {
+  cursor: pointer !important;
 }
 </style>
