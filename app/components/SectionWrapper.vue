@@ -186,6 +186,18 @@ onMounted(() => {
 $block: "section-wrapper";
 
 .#{$block} {
+  padding-top: var(--spacing-3xl);
+  padding-bottom: var(--spacing-3xl);
+
+  @media (min-width: 640px) {
+    padding-top: var(--spacing-4xl);
+    padding-bottom: var(--spacing-4xl);
+  }
+  @media (min-width: 1024px) {
+    padding-top: var(--spacing-5xl);
+    padding-bottom: var(--spacing-5xl);
+  }
+
   &__wrapper {
     position: relative;
     overflow: hidden;
@@ -222,18 +234,6 @@ $block: "section-wrapper";
         bottom: 0;
       }
     }
-  }
-
-  padding-top: var(--spacing-3xl);
-  padding-bottom: var(--spacing-3xl);
-
-  @media (min-width: 640px) {
-    padding-top: var(--spacing-4xl);
-    padding-bottom: var(--spacing-4xl);
-  }
-  @media (min-width: 1024px) {
-    padding-top: var(--spacing-5xl);
-    padding-bottom: var(--spacing-5xl);
   }
 
   .section-header {
