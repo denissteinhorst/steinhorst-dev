@@ -3,6 +3,14 @@ const { cmsRequest, currentLocaleString } = useStrapi();
 const { $t } = useI18n();
 const { generatePdfFromMarkdown } = usePdfEasy();
 
+// Detect touch device capability for popover behavior
+const isTouchDevice = computed(() => {
+  if (typeof window === "undefined") return false;
+  return "ontouchstart" in window || navigator.maxTouchPoints > 0;
+});
+
+const popoverMode = computed(() => (isTouchDevice.value ? "click" : "hover"));
+
 const WORDS_PER_SECOND = 32;
 const WORDS_PER_SECOND_FINAL = 9000;
 
@@ -329,9 +337,9 @@ onBeforeUnmount(() => {
         <div class="ai-summary__footer">
           <div class="ai-summary__footer-left">
             <UPopover
-              mode="hover"
-              :open-delay="150"
-              :close-delay="100"
+              :mode="popoverMode"
+              :open-delay="popoverMode === 'hover' ? 150 : 0"
+              :close-delay="popoverMode === 'hover' ? 100 : 0"
               :content="{ side: 'top', align: 'start' }"
               :ui="{ content: 'max-w-xs p-3' }"
             >
