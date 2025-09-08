@@ -1,44 +1,48 @@
-// Define a minimal response type for Strapi API
 interface StrapiResponse {
   data?: unknown;
   [key: string]: unknown;
 }
 
+interface QueryParams {
+  endpoint: string;
+  fields?: string | string[];
+  locale?: string;
+  isCollection?: string | boolean;
+  populates?: string | string[];
+}
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const API_URL = config.public.api_url as string;
-  const API_TOKEN = (config.api_token as string) || '';
+  const apiUrl = config.public.api_url as string;
+  const apiToken = config.api_token as string;
 
-  // Get query parameters from request
-  const query = getQuery(event);
-  const endpoint = query.endpoint as string;
-  const fields = query.fields ? (Array.isArray(query.fields) ? query.fields : [query.fields]) : [];
-  const locale = query.locale as string | undefined;
-  const isCollection = query.isCollection === 'true' || query.isCollection === true;
-  const populates = query.populates ? (Array.isArray(query.populates) ? query.populates : [query.populates]) : [];
+  const query = getQuery(event) as QueryParams;
+  const { endpoint, fields: rawFields, locale, isCollection: rawIsCollection, populates: rawPopulates } = query;
+
+  const fields = rawFields ? (Array.isArray(rawFields) ? rawFields : [rawFields]) : [];
+  const isCollection = rawIsCollection === 'true' || rawIsCollection === true;
+  const populates = rawPopulates ? (Array.isArray(rawPopulates) ? rawPopulates : [rawPopulates]) : [];
 
   if (!endpoint) {
     throw createError({
       statusCode: 400,
-      message: 'Missing endpoint parameter'
+      statusMessage: 'Missing endpoint parameter'
     });
   }
 
-  /**
-   * Convert dot notation populate array to Strapi populate query parameters
-   * @param populates - Array of dot notation strings like ['quickFilter', 'skillCards.skillItems']
-   * @returns Object with Strapi populate parameters
-   */
-  const buildPopulateParams = (populates: string[]): Record<string, string> => {
-    const params: Record<string, string> = {};
+  if (!apiUrl) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'API base URL is not configured'
+    });
+  }
 
+  const buildPopulateParams = (populates: string[]): Record<string, string> => {
     if (populates.length === 0) {
-      // Default to populate all first-level relations
-      params['populate'] = '*';
-      return params;
+      return { populate: '*' };
     }
 
-    // Group populates by parent to handle multiple children under same parent
+    const params: Record<string, string> = {};
     const groupedPopulates = new Map<string, string[]>();
     const simplePopulates: string[] = [];
     const complexPopulates: string[] = [];
@@ -49,9 +53,7 @@ export default defineEventHandler(async (event) => {
       if (parts.length === 1) {
         simplePopulates.push(path);
       } else if (parts.length === 2) {
-        const parent = parts[0];
-        const child = parts[1];
-
+        const [parent, child] = parts;
         if (!groupedPopulates.has(parent)) {
           groupedPopulates.set(parent, []);
         }
@@ -61,25 +63,20 @@ export default defineEventHandler(async (event) => {
       }
     });
 
-    // Handle simple relations
     simplePopulates.forEach((path) => {
       params[`populate[${path}]`] = '*';
     });
 
-    // Handle grouped two-level relations
     groupedPopulates.forEach((children, parent) => {
       if (children.length === 1) {
-        // Single child: populate[parent][populate]=child
         params[`populate[${parent}][populate]`] = children[0];
       } else {
-        // Multiple children: populate[parent][populate][child1]=* and populate[parent][populate][child2]=*
         children.forEach((child) => {
           params[`populate[${parent}][populate][${child}]`] = '*';
         });
       }
     });
 
-    // Handle complex (3+ level) relations
     complexPopulates.forEach((path) => {
       const parts = path.split('.');
       let paramKey = `populate[${parts[0]}]`;
@@ -95,70 +92,60 @@ export default defineEventHandler(async (event) => {
     return params;
   };
 
-  if (!API_URL) {
-    throw createError({ statusCode: 500, statusMessage: 'API base URL is not configured' });
-  }
+  const pickFields = (obj: unknown, fields: string[]): unknown => {
+    if (!obj || typeof obj !== 'object' || fields.length === 0) return obj;
 
-  // Construct URL
-  const url = new URL(`${API_URL}/${endpoint}`);
+    const picked: Record<string, unknown> = {};
+    for (const key of fields) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        picked[key] = (obj as Record<string, unknown>)[key];
+      }
+    }
+    return picked;
+  };
 
-  // Add locale parameter if provided
+  const url = new URL(`${apiUrl}/${endpoint}`);
+
   if (locale) {
     url.searchParams.append('locale', locale);
   }
 
-  // Add populate parameters
   const populateParams = buildPopulateParams(populates);
   Object.entries(populateParams).forEach(([key, value]) => {
     url.searchParams.append(key, value);
   });
 
-  // Make the request to Strapi with the token
   try {
     const headers: Record<string, string> = {};
-    if (API_TOKEN) {
-      headers.Authorization = `Bearer ${API_TOKEN}`;
+    if (apiToken) {
+      headers.Authorization = `Bearer ${apiToken}`;
     }
 
-    const response: StrapiResponse = await $fetch(url.toString(), {
+    const response = await $fetch<StrapiResponse>(url.toString(), {
       method: 'GET',
       headers,
-      timeout: 8000 // Same timeout as in original useStrapi
+      timeout: 8000
     });
 
-    // Normalize response payload
     const rawData = response?.data ?? response;
 
-    // Helper to pick only requested fields from an object
-    const pickFields = (obj: unknown): unknown => {
-      if (!obj || typeof obj !== 'object') return obj;
-      if (fields.length === 0) return obj;
-      const picked: Record<string, unknown> = {};
-      for (const key of fields as string[]) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-          picked[key] = (obj as Record<string, unknown>)[key];
-        }
-      }
-      return picked;
-    };
-
-    // Process response based on whether it's a collection or single type
     if (isCollection) {
-      const arr = Array.isArray(rawData) ? rawData : [];
-      // If fields requested, filter each item; otherwise return as-is
-      return fields.length > 0 ? arr.map(item => pickFields(item)) : arr;
-    } else {
-      // Single type: optionally filter top-level fields
-      return fields.length > 0 ? pickFields(rawData) : rawData;
+      const dataArray = Array.isArray(rawData) ? rawData : [];
+      return fields.length > 0
+        ? dataArray.map(item => pickFields(item, fields))
+        : dataArray;
     }
-  } catch (err: unknown) {
-    // Avoid leaking secrets; include minimal info
-    const e = err as { status?: number; response?: { status?: number }; message?: string } | undefined;
-    console.error('Strapi proxy error', {
+
+    return pickFields(rawData, fields);
+  } catch (error: unknown) {
+    const err = error as { status?: number; response?: { status?: number }; message?: string };
+
+    console.error('CMS proxy error', {
       url: url.toString(),
-      status: e?.status || e?.response?.status,
-      message: e?.message,
+      status: err?.status || err?.response?.status,
+      message: err?.message,
     });
+
     throw createError({
       statusCode: 502,
       statusMessage: 'Upstream CMS request failed',

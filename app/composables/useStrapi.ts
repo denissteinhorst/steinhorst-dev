@@ -1,156 +1,104 @@
-/**
- * Strapi API helper functions
- * @returns {object} - Strapi API helper functions
- */
 import type { StrapiImage } from '~/types/types';
 
+interface StrapiResponseData {
+  [key: string]: unknown;
+}
+
+interface CmsQueryParams {
+  endpoint: string;
+  isCollection: boolean;
+  fields?: string[];
+  populates?: string[];
+  locale: string;
+}
+
+/**
+ * Strapi CMS composable with locale-aware API requests and image URL building
+ */
 export const useStrapi = () => {
-
   const { $getLocale } = useI18n();
+  const route = useRoute();
+  const config = useRuntimeConfig();
 
-
-  // It seems, that the $getLocale() doesn't know the locale set in the url on first load
-  // So we check if /en is present in the path and return 'en' if so, otherwise 'de'
-  const getCurrentLocale = (): string => {
+  const currentLocale = computed((): string => {
     const locale = $getLocale();
-    if (locale) {
-      return locale;
-    }
-    const route = useRoute();
-    if (route.path.startsWith('/en')) {
-      return 'en';
-    }
-    return 'de';
-  }
+    if (locale) return locale;
 
+    return route.path.startsWith('/en') ? 'en' : 'de';
+  });
 
-  interface IStrapiResponseData {
-    [key: string]: unknown;
-  }
+  const filterFields = <T>(data: Record<string, unknown>, fields: string[]): T => {
+    if (fields.length === 0) return data as T;
 
-  /**
-   * Retrieve data from Strapi API endpoint via server proxy
-   * @param {string} endpoint - API endpoint to fetch from
-   * @param {string[]} fields - Optional array of fields to include
-   * @param {boolean} isCollection - Whether the endpoint is a collection type (default: false)
-   * @param {string[]} populates - Optional array of relations to populate using dot notation (e.g. ['quickFilter', 'skillCards.skillItems'])
-   * @returns Filtered JSON response from Strapi
-   */
+    return fields.reduce((filtered, field) => {
+      if (data[field] !== undefined) {
+        filtered[field] = data[field];
+      }
+      return filtered;
+    }, {} as Record<string, unknown>) as T;
+  };
+
   const cmsRequest = async <T = unknown>(
     endpoint: string,
     fields: string[] = [],
     isCollection: boolean = false,
     populates: string[] = []
   ): Promise<T> => {
+    if (!endpoint) {
+      throw new Error('Invalid endpoint provided');
+    }
 
+    const queryParams: CmsQueryParams = {
+      endpoint,
+      isCollection,
+      locale: currentLocale.value
+    };
+
+    if (fields.length > 0) queryParams.fields = fields;
+    if (populates.length > 0) queryParams.populates = populates;
 
     try {
-      // Input validation for endpoint parameter
-      if (!endpoint || typeof endpoint !== 'string') {
-        throw new Error('Invalid endpoint provided');
-      }
-
-      // Create query parameters for the proxy
-      const query: Record<string, string | string[] | boolean> = {
-        endpoint,
-        isCollection
-      };
-
-      // Add fields to query if provided
-      if (fields.length > 0) {
-        query.fields = fields;
-      }
-
-      // Add populates to query if provided
-      if (populates.length > 0) {
-        query.populates = populates;
-      }
-
-      query.locale = getCurrentLocale();
-
-      // Fetch data through our server proxy
-      const response: IStrapiResponseData = await $fetch('/api/request', {
+      const response = await $fetch<StrapiResponseData>('/api/request', {
         method: 'GET',
-        query,
+        query: queryParams,
         timeout: 8000
       });
 
-      // Process response based on whether it's a collection or single type
       if (isCollection) {
-        // For collection types, we expect an array of items
-        if (!response || !Array.isArray(response)) {
-          return [] as unknown as T;
-        }
+        if (!Array.isArray(response)) return [] as unknown as T;
 
-        // If fields were specified, filter each item in the collection
-        if (fields.length > 0) {
-          return response.map(item => {
-            const filteredItem: Record<string, unknown> = {};
-            fields.forEach(field => {
-              if (item[field] !== undefined) {
-                filteredItem[field] = item[field];
-              }
-            });
-            return filteredItem;
-          }) as unknown as T;
-        }
-
-        return response as T;
-      } else {
-        // Original single type handling
-        // If fields were specified, filter the response
-        if (fields.length > 0 && response) {
-          const filteredData: Record<string, unknown> = {};
-          fields.forEach(field => {
-            if (response[field] !== undefined) {
-              filteredData[field] = response[field];
-            }
-          });
-          return filteredData as T;
-        }
-
-        return response as T;
+        return (fields.length > 0
+          ? response.map(item => filterFields<Record<string, unknown>>(item as Record<string, unknown>, fields))
+          : response
+        ) as T;
       }
+
+      return filterFields<T>(response as Record<string, unknown>, fields);
     } catch (error) {
-      console.error(`Strapi fetch error for endpoint "${endpoint}":`, error);
+      console.error(`CMS request failed for endpoint "${endpoint}":`, error);
       throw error;
     }
   };
 
-  /**
-   * Build a full image URL from a Strapi image object and desired format key.
-   * Uses runtimeConfig public.api_base (or public.api_url) as the base.
-   * Falls back to the image.url value if formats are missing.
-   */
-  const buildImageUrl = (
-    image?: StrapiImage | null,
-    format: string = 'small'
-  ): string | null => {
+  const buildImageUrl = (image?: StrapiImage | null, format: string = 'small'): string | null => {
     if (!image) return null;
 
-    const runtime = useRuntimeConfig();
-    const base = (runtime.public && (runtime.public.api_base || runtime.public.api_url)) || '';
+    const baseUrl = config.public?.api_base || config.public?.api_url || '';
+    const formats = image.formats as Record<string, { url?: string }> | undefined;
+    const imageUrl = formats?.[format]?.url || image.url;
 
-    // Try formats first (e.g. image.formats.small.url), then fallback to image.url
-    const formats = image.formats as Record<string, { url?: string } | undefined> | undefined;
-    const formatObj = formats ? formats[format] : undefined;
-    const relative = formatObj?.url ?? image.url ?? null;
-    if (!relative) return null;
+    if (!imageUrl) return null;
+    if (/^https?:\/\//.test(imageUrl) || imageUrl.startsWith('//')) return imageUrl;
 
-    // If the URL is already absolute, return it
-    if (/^https?:\/\//i.test(relative) || /^\/\//.test(relative)) {
-      return relative;
-    }
+    const cleanBase = baseUrl.replace(/\/+$/, '');
+    const cleanUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
 
-    // Ensure proper slashes when concatenating
-    const baseTrim = base.replace(/\/+$/g, '');
-    const rel = relative.startsWith('/') ? relative : `/${relative}`;
-    return baseTrim ? `${baseTrim}${rel}` : rel;
+    return cleanBase ? `${cleanBase}${cleanUrl}` : cleanUrl;
   };
 
   return {
     cmsRequest,
     buildImageUrl,
-    currentLocaleString: computed(() => getCurrentLocale()),
+    currentLocaleString: currentLocale
   };
 };
