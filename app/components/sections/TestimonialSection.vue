@@ -3,7 +3,7 @@ const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } =
   await useLazyAsyncData<TestimonialSectionResponse>(
-    () => `testimonials-${currentLocaleString.value}`,
+    `testimonials-${currentLocaleString.value}`,
     () =>
       cmsRequest<TestimonialSectionResponse>(
         "testimonial-section",
@@ -13,28 +13,22 @@ const { data, pending, error } =
       )
   );
 
-const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
-
-// Active testimonial state management
-// Use `page` (1-based) as single source of truth for UPagination
 const page = ref(1);
 const showAlternativeLanguage = ref(false);
 
-// Computed properties for layout
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 const testimonials = computed(() => data.value?.recommendationCards || []);
 
-// Alternate testimonials between left and right columns
 const leftColumnItems = computed(() => {
   const items = testimonials.value;
-  return items.filter((_, index) => index % 2 === 0);
+  return items.filter((_, cardIndex) => cardIndex % 2 === 0);
 });
 
 const rightColumnItems = computed(() => {
   const items = testimonials.value;
-  return items.filter((_, index) => index % 2 === 1);
+  return items.filter((_, cardIndex) => cardIndex % 2 === 1);
 });
 
-// Active index derived from current page (keep UI 0-based internally)
 const activeIndex = computed(() =>
   Math.max(
     0,
@@ -46,13 +40,11 @@ const currentTestimonial = computed(
   () => testimonials.value[activeIndex.value]
 );
 
-// Event handlers for child component communication
-const handleCardClick = (index: number) => {
-  // Cards provide 0-based index; convert to 1-based page
-  const newPage = index + 1;
+const handleCardClick = (cardIndex: number) => {
+  const newPage = cardIndex + 1;
   if (newPage !== page.value) {
     page.value = newPage;
-    showAlternativeLanguage.value = false; // Reset language toggle
+    showAlternativeLanguage.value = false;
   }
 };
 
@@ -61,24 +53,26 @@ const handleLanguageToggle = () => {
 };
 
 onMounted(() => {
-  // Ensure we start on first item if available
   if (testimonials.value.length > 0) page.value = 1;
 });
 
-// Reset language toggle when page changes
 watch(page, () => {
   showAlternativeLanguage.value = false;
 });
 </script>
 
 <template>
-  <section v-if="pending" class="testimonial-section">
-    Loading testimonial-section...
-  </section>
+  <template v-if="pending">
+    <section class="testimonial-section">
+      Loading testimonial-section...
+    </section>
+  </template>
 
-  <section v-else-if="error" class="testimonial-section">
-    Failed to load testimonial-section.
-  </section>
+  <template v-else-if="error">
+    <section class="testimonial-section">
+      Failed to load testimonial-section.
+    </section>
+  </template>
 
   <SectionWrapper
     v-else-if="data"

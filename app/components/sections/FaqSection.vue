@@ -2,7 +2,7 @@
 const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } = await useLazyAsyncData<FaqSectionResponse>(
-  () => `faq-${currentLocaleString.value}`,
+  `faq-${currentLocaleString.value}`,
   () => cmsRequest<FaqSectionResponse>("faq-section", [])
 );
 
@@ -10,13 +10,17 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </script>
 
 <template>
-  <section v-if="pending" class="faq-section faq-section--loading">
-    Loading faq-section...
-  </section>
+  <template v-if="pending">
+    <section class="faq-section faq-section--loading">
+      Loading faq-section...
+    </section>
+  </template>
 
-  <section v-else-if="error" class="faq-section faq-section--error">
-    Failed to load faq-section.
-  </section>
+  <template v-else-if="error">
+    <section class="faq-section faq-section--error">
+      Failed to load faq-section.
+    </section>
+  </template>
 
   <SectionWrapper
     v-else-if="data"
@@ -37,15 +41,15 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
           <UContainer class="faq-section__content">
             <div class="faq-section__accordion-wrapper">
               <div
-                v-for="(item, index) in data.faqItems || []"
-                :key="index"
+                v-for="(faqItem, itemIndex) in data.faqItems || []"
+                :key="itemIndex"
                 data-aos="fade-up"
-                :data-aos-delay="Math.min(index, 5) * 100"
+                :data-aos-delay="Math.min(itemIndex, 5) * 100"
                 class="faq-section__accordion-item-wrapper"
               >
                 <UAccordion
                   type="multiple"
-                  :items="[item]"
+                  :items="[faqItem]"
                   trailing-icon="i-lucide-chevron-down"
                   class="faq-section__accordion"
                   label-key="question"

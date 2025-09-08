@@ -3,7 +3,7 @@ const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } =
   await useLazyAsyncData<PersonalitySectionResponse>(
-    () => `personality-${currentLocaleString.value}`,
+    `personality-${currentLocaleString.value}`,
     () =>
       cmsRequest<PersonalitySectionResponse>(
         "personality-section",
@@ -20,13 +20,17 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </script>
 
 <template>
-  <section v-if="pending" class="personality-section">
-    Loading personality-section...
-  </section>
+  <template v-if="pending">
+    <section class="personality-section">
+      Loading personality-section...
+    </section>
+  </template>
 
-  <section v-else-if="error" class="personality-section">
-    Failed to load personality-section.
-  </section>
+  <template v-else-if="error">
+    <section class="personality-section">
+      Failed to load personality-section.
+    </section>
+  </template>
 
   <SectionWrapper
     v-else-if="data"
@@ -39,27 +43,27 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
     <template #content>
       <div class="personality-section__grid">
         <div
-          v-for="(card, index) in data.personalityCards"
-          :key="index"
+          v-for="(personalityCard, cardIndex) in data.personalityCards"
+          :key="cardIndex"
           data-aos="fade-up"
-          :data-aos-delay="index * 100"
+          :data-aos-delay="cardIndex * 100"
           class="personality-section__card-wrapper"
         >
           <BaseCard :is-in-wrapper="true" class="personality-section__card">
-            <template v-if="card.variant === 'polarChart'">
+            <template v-if="personalityCard.variant === 'polarChart'">
               <PolarChart
-                :title="card.title"
-                :subtitle="card.subtitle"
-                :text="card.text"
-                :tooltips="card.polarChartTooltips || []"
+                :title="personalityCard.title"
+                :subtitle="personalityCard.subtitle"
+                :text="personalityCard.text"
+                :tooltips="personalityCard.polarChartTooltips || []"
               />
             </template>
-            <template v-else-if="card.variant === 'barChart'">
+            <template v-else-if="personalityCard.variant === 'barChart'">
               <BarChart
-                :title="card.title"
-                :subtitle="card.subtitle"
-                :text="card.text"
-                :tooltips="card.barChartTooltips || []"
+                :title="personalityCard.title"
+                :subtitle="personalityCard.subtitle"
+                :text="personalityCard.text"
+                :tooltips="personalityCard.barChartTooltips || []"
               />
             </template>
           </BaseCard>

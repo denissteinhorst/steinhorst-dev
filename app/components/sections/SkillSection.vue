@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { SkillItem } from "~/types/types";
+
 const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } = await useLazyAsyncData<SkillSectionResponse>(
-  () => `skills-${currentLocaleString.value}`,
+  `skills-${currentLocaleString.value}`,
   () =>
     cmsRequest<SkillSectionResponse>(
       "skill-section",
@@ -21,19 +22,18 @@ const handleButtonClick = () => {
   modalOpen.value = true;
 };
 
-// Map skill items to display strings with proper typing
 const toListItems = (items?: SkillItem[]): string[] =>
-  items?.map((i) => i.title || "") ?? [];
+  items?.map((skillItem) => skillItem.title || "") ?? [];
 </script>
 
 <template>
-  <section v-if="pending" class="skill-section">
-    Loading skill-section...
-  </section>
+  <template v-if="pending">
+    <section class="skill-section">Loading skill-section...</section>
+  </template>
 
-  <section v-else-if="error" class="skill-section">
-    Failed to load skill-section.
-  </section>
+  <template v-else-if="error">
+    <section class="skill-section">Failed to load skill-section.</section>
+  </template>
 
   <SectionWrapper
     v-else-if="data"

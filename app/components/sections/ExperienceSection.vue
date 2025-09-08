@@ -3,7 +3,7 @@ const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } =
   await useLazyAsyncData<ExperienceSectionResponse>(
-    () => `experience-${currentLocaleString.value}`,
+    `experience-${currentLocaleString.value}`,
     () =>
       cmsRequest<ExperienceSectionResponse>(
         "experience-section",
@@ -21,18 +21,48 @@ const { data, pending, error } =
       )
   );
 
-// State to manage the number of visible stations (default: 3 for desktop, 2 for mobile)
 const visibleStationsBase = ref(3);
 const isMobile = ref(false);
 
-// Check if device is mobile
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
+const visibleStations = computed(() => visibleStationsBase.value);
+const timelineStatus = computed(() => {
+  const total = data.value?.experienceCards?.length || 0;
+  return `Zeige ${visibleStations.value} von ${total} Stationen`;
+});
+
+const timelineItems = computed(() => {
+  const cards = data.value?.experienceCards ?? [];
+  return cards.map((card, cardIndex) => ({
+    date: "",
+    title: "",
+    description: "",
+    icon: cardIndex === 0 ? "i-lucide-rocket" : "i-lucide-code",
+    card,
+    isFirst: cardIndex === 0,
+    index: cardIndex,
+  }));
+});
+
+const visibleTimelineItems = computed(() => {
+  return timelineItems.value.slice(0, visibleStations.value);
+});
+
 const checkMobile = () => {
   isMobile.value = window.innerWidth < 640;
 };
 
+const toggleStations = () => {
+  const totalCards = data.value?.experienceCards?.length || 0;
+  if (visibleStationsBase.value < totalCards) {
+    visibleStationsBase.value += 1;
+  } else {
+    visibleStationsBase.value = isMobile.value ? 2 : 3;
+  }
+};
+
 onMounted(() => {
   checkMobile();
-  // Initialize the visible items based on device on first mount
   visibleStationsBase.value = isMobile.value ? 2 : 3;
   window.addEventListener("resize", checkMobile);
 });
@@ -41,68 +71,31 @@ onUnmounted(() => {
   window.removeEventListener("resize", checkMobile);
 });
 
-// Computed number of visible stations (device-agnostic; base is initialized per device)
-const visibleStations = computed(() => visibleStationsBase.value);
-
-// Live status string for assistive tech
-const timelineStatus = computed(() => {
-  const total = data.value?.experienceCards?.length || 0;
-  return `Zeige ${visibleStations.value} von ${total} Stationen`;
-});
-
-// Focus last newly revealed station heading when expanding
-watch(visibleStationsBase, (newVal, oldVal) => {
-  if (newVal > oldVal && data.value?.experienceCards) {
+watch(visibleStationsBase, (newValue, oldValue) => {
+  if (newValue > oldValue && data.value?.experienceCards) {
     nextTick(() => {
-      const lastCard = data.value?.experienceCards?.[newVal - 1];
+      const lastCard = data.value?.experienceCards?.[newValue - 1];
       if (lastCard) {
         const lastId = `exp-${lastCard.id}`;
-        const el = document.getElementById(lastId);
-        el?.focus();
+        const element = document.getElementById(lastId);
+        element?.focus();
       }
     });
   }
 });
-
-// Function to toggle the number of visible stations
-const toggleStations = () => {
-  const totalCards = data.value?.experienceCards?.length || 0;
-  if (visibleStationsBase.value < totalCards) {
-    visibleStationsBase.value += 1;
-  } else {
-    // Reset to device-specific initial value
-    visibleStationsBase.value = isMobile.value ? 2 : 3;
-  }
-};
-
-const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
-
-// Map cards to Timeline items so UTimeline renders connected separators
-const timelineItems = computed(() => {
-  const cards = data.value?.experienceCards ?? [];
-  return cards.map((card, idx) => ({
-    date: "",
-    title: "",
-    description: "",
-    icon: idx === 0 ? "i-lucide-rocket" : "i-lucide-code",
-    card,
-    isFirst: idx === 0,
-    index: idx,
-  }));
-});
-
-const visibleTimelineItems = computed(() => {
-  return timelineItems.value.slice(0, visibleStations.value);
-});
 </script>
 
 <template>
-  <small v-if="pending" class="experience-section">
-    Loading experience-section...
-  </small>
-  <small v-else-if="error" class="experience-section">
-    Failed to load experience-section.
-  </small>
+  <template v-if="pending">
+    <section class="experience-section">Loading experience-section...</section>
+  </template>
+
+  <template v-else-if="error">
+    <section class="experience-section">
+      Failed to load experience-section.
+    </section>
+  </template>
+
   <SectionWrapper
     v-else-if="data"
     :jumpmark="data.jumpmark || 'experiences'"

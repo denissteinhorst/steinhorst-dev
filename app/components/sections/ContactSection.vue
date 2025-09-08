@@ -1,9 +1,8 @@
 <script setup lang="ts">
 const { cmsRequest, currentLocaleString } = useStrapi();
 
-// Fetch contact section data from CMS
 const { data, pending, error } = await useLazyAsyncData<ContactSectionResponse>(
-  () => `contact-${currentLocaleString.value}`,
+  `contact-${currentLocaleString.value}`,
   (): Promise<ContactSectionResponse> =>
     cmsRequest<ContactSectionResponse>(
       "contact-section",
@@ -13,18 +12,17 @@ const { data, pending, error } = await useLazyAsyncData<ContactSectionResponse>(
     )
 );
 
-// Header text from CMS
 const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </script>
 
 <template>
-  <section v-if="pending" class="contact-section">
-    Loading contact-section...
-  </section>
+  <template v-if="pending">
+    <section class="contact-section">Loading contact-section...</section>
+  </template>
 
-  <section v-else-if="error" class="contact-section">
-    Failed to load contact-section.
-  </section>
+  <template v-else-if="error">
+    <section class="contact-section">Failed to load contact-section.</section>
+  </template>
 
   <section
     v-else-if="data"
@@ -56,10 +54,10 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
         aria-describedby="contact-instructions contact-note"
       >
         <ContactCard
-          v-for="(card, i) in data.contactCards"
-          :key="card.id || i"
-          :data="card"
-          :aos-delay="i * 100"
+          v-for="(contactCard, cardIndex) in data.contactCards"
+          :key="contactCard.id || cardIndex"
+          :data="contactCard"
+          :aos-delay="cardIndex * 100"
         />
       </ul>
     </UContainer>

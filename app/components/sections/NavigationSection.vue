@@ -4,53 +4,10 @@ import type { NavigationElement, NavigationResponse } from "~/types/types";
 const route = useRoute();
 const router = useRouter();
 const { cmsRequest, currentLocaleString } = useStrapi();
-
 const { y } = useWindowScroll();
-const isScrolled = computed(() => y.value > 2);
-const currentHash = ref("");
-
-const updateCurrentHash = () => {
-  if (import.meta.client) {
-    currentHash.value = window.location.hash;
-  }
-};
-
-onMounted(() => {
-  if (import.meta.client) {
-    updateCurrentHash();
-    window.addEventListener("hashchange", updateCurrentHash, { passive: true });
-
-    const originalReplaceState = window.history.replaceState.bind(
-      window.history
-    ) as (data: unknown, title: string, url?: string | URL | null) => void;
-    const handleReplace = () => updateCurrentHash();
-
-    try {
-      window.history.replaceState = ((
-        data: unknown,
-        title: string,
-        url?: string | URL | null
-      ) => {
-        originalReplaceState(data, title, url);
-        handleReplace();
-      }) as History["replaceState"];
-    } catch {
-      // Fallback if patching fails
-    }
-
-    onUnmounted(() => {
-      window.removeEventListener("hashchange", updateCurrentHash);
-      try {
-        window.history.replaceState = originalReplaceState;
-      } catch {
-        // Ignore restoration errors
-      }
-    });
-  }
-});
 
 const { data, pending, error } = await useLazyAsyncData<NavigationResponse>(
-  () => `nav-${currentLocaleString.value}`,
+  `nav-${currentLocaleString.value}`,
   () =>
     cmsRequest<NavigationResponse>("navigation", [
       "brandName",
@@ -61,12 +18,14 @@ const { data, pending, error } = await useLazyAsyncData<NavigationResponse>(
     ])
 );
 
+const currentHash = ref("");
 const isMobileMenuOpen = ref(false);
 const isDesktopDropdownOpen = ref(false);
 const menuButtonRef = ref<HTMLElement | null>(null);
 const desktopDropdownRef = ref<HTMLElement | null>(null);
 const showSkipLink = ref(true);
 
+const isScrolled = computed(() => y.value > 2);
 const brandName = computed(() => data.value?.brandName ?? "");
 const brandLink = computed(() => data.value?.brandLink ?? "/");
 const specialName = computed(() => data.value?.specialButton ?? "");
@@ -88,16 +47,49 @@ const isActive = (to = ""): boolean => {
   return route.path === path;
 };
 
+const updateCurrentHash = () => {
+  if (import.meta.client) {
+    currentHash.value = window.location.hash;
+  }
+};
+
 const skipToHero = () => {
-  const el = document.getElementById("hero-heading");
-  if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "start" });
-  (el as HTMLElement).focus?.();
+  const heroElement = document.getElementById("hero-heading");
+  if (!heroElement) return;
+  heroElement.scrollIntoView({ behavior: "smooth", block: "start" });
+  (heroElement as HTMLElement).focus?.();
 };
 
 const updateMobileMenu = (isOpen: boolean): boolean =>
   (isMobileMenuOpen.value = isOpen);
 const closeMobileMenu = (): boolean => (isMobileMenuOpen.value = false);
+
+const onBrandClick = (event: MouseEvent) => {
+  const targetPath = brandLink.value || "/";
+  if (route.path === targetPath) {
+    event.preventDefault();
+    if (import.meta.client) {
+      const baseUrl = `${window.location.pathname}${window.location.search}`;
+      try {
+        window.history.replaceState(window.history.state, "", baseUrl);
+      } catch {
+        // Fallback if replaceState fails
+      }
+    }
+    const heroElement =
+      document.getElementById("hero-heading") ||
+      document.getElementById("hero");
+    if (heroElement) {
+      heroElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      (heroElement as HTMLElement).focus?.();
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+    return;
+  }
+  event.preventDefault();
+  router.push(targetPath);
+};
 
 let dropdownTimeout: NodeJS.Timeout | null = null;
 
@@ -128,12 +120,39 @@ const handleClickOutside = (event: Event) => {
 
 onMounted(() => {
   if (import.meta.client) {
+    updateCurrentHash();
+    window.addEventListener("hashchange", updateCurrentHash, { passive: true });
     document.addEventListener("click", handleClickOutside);
 
+    const originalReplaceState = window.history.replaceState.bind(
+      window.history
+    ) as (data: unknown, title: string, url?: string | URL | null) => void;
+
+    const handleReplace = () => updateCurrentHash();
+
+    try {
+      window.history.replaceState = ((
+        data: unknown,
+        title: string,
+        url?: string | URL | null
+      ) => {
+        originalReplaceState(data, title, url);
+        handleReplace();
+      }) as History["replaceState"];
+    } catch {
+      // Fallback if patching fails
+    }
+
     onUnmounted(() => {
+      window.removeEventListener("hashchange", updateCurrentHash);
       document.removeEventListener("click", handleClickOutside);
       if (dropdownTimeout) {
         clearTimeout(dropdownTimeout);
+      }
+      try {
+        window.history.replaceState = originalReplaceState;
+      } catch {
+        // Ignore restoration errors
       }
     });
   }
@@ -141,40 +160,13 @@ onMounted(() => {
 
 watch(isMobileMenuOpen, (isOpen: boolean): void => {
   if (!isOpen) {
-    const element =
+    const menuElement =
       menuButtonRef.value instanceof HTMLElement
         ? menuButtonRef.value
         : document.querySelector(".navigation-section__menu-button");
-    (element as HTMLElement | null)?.focus?.();
+    (menuElement as HTMLElement | null)?.focus?.();
   }
 });
-
-const onBrandClick = (e: MouseEvent) => {
-  const targetPath = brandLink.value || "/";
-  if (route.path === targetPath) {
-    e.preventDefault();
-    if (import.meta.client) {
-      const base = `${window.location.pathname}${window.location.search}`;
-      try {
-        window.history.replaceState(window.history.state, "", base);
-      } catch {
-        // Fallback if replaceState fails
-      }
-    }
-    const el =
-      document.getElementById("hero-heading") ||
-      document.getElementById("hero");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-      (el as HTMLElement).focus?.();
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-    return;
-  }
-  e.preventDefault();
-  router.push(targetPath);
-};
 </script>
 
 <template>

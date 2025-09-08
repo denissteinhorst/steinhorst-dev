@@ -3,7 +3,7 @@ const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } =
   await useLazyAsyncData<CertificateSectionResponse>(
-    () => `certificates-${currentLocaleString.value}`,
+    `certificates-${currentLocaleString.value}`,
     () =>
       cmsRequest<CertificateSectionResponse>(
         "certificate-section",
@@ -17,13 +17,17 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </script>
 
 <template>
-  <section v-if="pending" class="certificate-section">
-    Loading certificate-section...
-  </section>
+  <template v-if="pending">
+    <section class="certificate-section">
+      Loading certificate-section...
+    </section>
+  </template>
 
-  <section v-else-if="error" class="certificate-section">
-    Failed to load certificate-section.
-  </section>
+  <template v-else-if="error">
+    <section class="certificate-section">
+      Failed to load certificate-section.
+    </section>
+  </template>
 
   <SectionWrapper
     v-else-if="data"
@@ -36,13 +40,13 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
       <div class="certificate-section" aria-label="Main">
         <div class="certificate-section__grid">
           <div
-            v-for="(card, index) in data.certificationCards"
-            :key="index"
+            v-for="(certificateCard, cardIndex) in data.certificationCards"
+            :key="cardIndex"
             data-aos="fade-up"
-            :data-aos-delay="Math.min(index, 5) * 100"
+            :data-aos-delay="Math.min(cardIndex, 5) * 100"
             class="certificate-section__card-wrapper"
           >
-            <CertificateCard :data="card" />
+            <CertificateCard :data="certificateCard" />
           </div>
         </div>
       </div>

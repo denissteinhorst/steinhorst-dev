@@ -1,11 +1,8 @@
 <script setup lang="ts">
 const { cmsRequest, currentLocaleString } = useStrapi();
 
-// Note: Removed manual preloading as it's redundant with fetchpriority="high"
-// Modern browsers handle image prioritization well with proper HTML attributes
-
 const { data, pending, error } = await useLazyAsyncData<HeroSectionResponse>(
-  () => `hero-section-${currentLocaleString.value}`,
+  `hero-section-${currentLocaleString.value}`,
   () =>
     cmsRequest<HeroSectionResponse>("hero-section", [
       "titleBefore",
@@ -23,11 +20,13 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
 </script>
 
 <template>
-  <section v-if="pending" class="hero-section">Loading hero-section...</section>
+  <template v-if="pending">
+    <section class="hero-section">Loading hero-section...</section>
+  </template>
 
-  <section v-else-if="error" class="hero-section">
-    Failed to load hero-section.
-  </section>
+  <template v-else-if="error">
+    <section class="hero-section">Failed to load hero-section.</section>
+  </template>
 
   <section
     v-else-if="data"
@@ -67,69 +66,71 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
           <div class="hero-section-actions desktop-only">
             <ul class="hero-section-tags" aria-label="Highlights">
               <li
-                v-for="tag in data.heroTags || []"
-                :key="tag.id"
+                v-for="heroTag in data.heroTags || []"
+                :key="heroTag.id"
                 class="hero-section-tag"
               >
-                <span>{{ tag.text }}</span>
+                <span>{{ heroTag.text }}</span>
               </li>
             </ul>
 
             <div class="hero-section-buttons">
               <template
-                v-for="(link, idx) in data.heroLinks || []"
-                :key="link.id ?? link.text ?? idx"
+                v-for="(heroLink, linkIndex) in data.heroLinks || []"
+                :key="heroLink.id ?? heroLink.text ?? linkIndex"
               >
                 <UButton
-                  v-if="link.type === 'button'"
-                  :href="link.link ?? '#'"
-                  :target="link.target || '_self'"
+                  v-if="heroLink.type === 'button'"
+                  :href="heroLink.link ?? '#'"
+                  :target="heroLink.target || '_self'"
                   size="md"
                   color="secondary"
                   class="hero-section-cta"
                 >
                   <UIcon
-                    v-if="link.icon"
-                    :name="link.icon"
+                    v-if="heroLink.icon"
+                    :name="heroLink.icon"
                     class="hero-section-icon"
                   />
-                  {{ link.text }}
+                  {{ heroLink.text }}
                 </UButton>
 
                 <template v-else>
                   <UTooltip
-                    v-if="link.tooltip"
-                    :text="link.tooltip"
+                    v-if="heroLink.tooltip"
+                    :text="heroLink.tooltip"
                     :delay-duration="0"
                     :content="{ side: 'bottom', sideOffset: 6 }"
                   >
                     <a
-                      :href="link.link ?? '#'"
+                      :href="heroLink.link ?? '#'"
                       target="_blank"
                       rel="noopener noreferrer"
                       class="hero-section-link"
                     >
                       <UIcon
-                        :name="link.icon || 'i-lucide-mail'"
+                        :name="heroLink.icon || 'i-lucide-mail'"
                         class="hero-section-icon"
                       />
                       <span class="hero-section-link-text">{{
-                        link.text
+                        heroLink.text
                       }}</span>
                     </a>
                   </UTooltip>
                   <a
                     v-else
-                    :href="link.link ?? '#'"
+                    :href="heroLink.link ?? '#'"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="hero-section-link"
                   >
                     <UIcon
-                      :name="link.icon || 'i-lucide-mail'"
+                      :name="heroLink.icon || 'i-lucide-mail'"
                       class="hero-section-icon"
                     />
-                    <span class="hero-section-link-text">{{ link.text }}</span>
+                    <span class="hero-section-link-text">{{
+                      heroLink.text
+                    }}</span>
                   </a>
                 </template>
               </template>
@@ -173,67 +174,71 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
         <div class="hero-section-actions mobile-only">
           <ul class="hero-section-tags" aria-label="Highlights">
             <li
-              v-for="tag in data.heroTags || []"
-              :key="tag.id"
+              v-for="heroTag in data.heroTags || []"
+              :key="heroTag.id"
               class="hero-section-tag"
             >
-              <span>{{ tag.text }}</span>
+              <span>{{ heroTag.text }}</span>
             </li>
           </ul>
 
           <div class="hero-section-buttons">
             <template
-              v-for="(link, idx) in data.heroLinks || []"
-              :key="link.id ?? link.text ?? idx"
+              v-for="(heroLink, linkIndex) in data.heroLinks || []"
+              :key="heroLink.id ?? heroLink.text ?? linkIndex"
             >
               <UButton
-                v-if="link.type === 'button'"
-                :href="link.link ?? '#'"
-                :target="link.target || '_self'"
+                v-if="heroLink.type === 'button'"
+                :href="heroLink.link ?? '#'"
+                :target="heroLink.target || '_self'"
                 size="md"
                 color="secondary"
                 class="hero-section-cta"
               >
                 <UIcon
-                  v-if="link.icon"
-                  :name="link.icon"
+                  v-if="heroLink.icon"
+                  :name="heroLink.icon"
                   class="hero-section-icon"
                 />
-                {{ link.text }}
+                {{ heroLink.text }}
               </UButton>
 
               <template v-else>
                 <UTooltip
-                  v-if="link.tooltip"
-                  :text="link.tooltip"
+                  v-if="heroLink.tooltip"
+                  :text="heroLink.tooltip"
                   :delay-duration="0"
                   :content="{ side: 'bottom', sideOffset: 6 }"
                 >
                   <a
-                    :href="link.link ?? '#'"
+                    :href="heroLink.link ?? '#'"
                     target="_blank"
                     rel="noopener noreferrer"
                     class="hero-section-link"
                   >
                     <UIcon
-                      :name="link.icon || 'i-lucide-mail'"
+                      :name="heroLink.icon || 'i-lucide-mail'"
                       class="hero-section-icon"
                     />
-                    <span class="hero-section-link-text">{{ link.text }}</span>
+                    <span class="hero-section-link-text">{{
+                      heroLink.text
+                    }}</span>
                   </a>
                 </UTooltip>
                 <a
                   v-else
-                  :href="link.link ?? '#'"
+                  :href="heroLink.link ?? '#'"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="hero-section-link"
                 >
                   <UIcon
-                    :name="link.icon || 'i-lucide-mail'"
+                    :name="heroLink.icon || 'i-lucide-mail'"
                     class="hero-section-icon"
                   />
-                  <span class="hero-section-link-text">{{ link.text }}</span>
+                  <span class="hero-section-link-text">{{
+                    heroLink.text
+                  }}</span>
                 </a>
               </template>
             </template>

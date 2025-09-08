@@ -2,7 +2,7 @@
 const { cmsRequest, currentLocaleString } = useStrapi();
 
 const { data, pending, error } = await useLazyAsyncData<ProjectSectionResponse>(
-  () => `project-${currentLocaleString.value}`,
+  `project-${currentLocaleString.value}`,
   (): Promise<ProjectSectionResponse> =>
     cmsRequest<ProjectSectionResponse>(
       "project-section",
@@ -19,22 +19,19 @@ const { data, pending, error } = await useLazyAsyncData<ProjectSectionResponse>(
     )
 );
 
-const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
-
-const footerText = computed<RichTextNodes>(() => data.value?.footnote ?? []);
-
-// Filter state
 const showCount = ref<number>(4);
 const selectedTags = ref<string[]>([]);
 const isFiltering = ref<boolean>(false);
 
-// Extract all unique tags from project cards
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
+const footerText = computed<RichTextNodes>(() => data.value?.footnote ?? []);
+
 const allTags = computed<string[]>(() => {
   if (!data.value?.projectCards) return [];
 
   const tags = new Set<string>();
-  data.value.projectCards.forEach((card) => {
-    card.tagList?.forEach((tag) => {
+  data.value.projectCards.forEach((projectCard) => {
+    projectCard.tagList?.forEach((tag) => {
       const tagText = extractTextFromRichText(tag);
       if (tagText) tags.add(tagText);
     });
@@ -43,7 +40,6 @@ const allTags = computed<string[]>(() => {
   return Array.from(tags);
 });
 
-// Helper function to extract text content from RichTextBlock
 const extractTextFromRichText = (block: RichTextBlock): string => {
   if (block.text) {
     return block.text;
@@ -81,13 +77,13 @@ const filteredProjects = computed((): ProjectCard[] => {
 </script>
 
 <template>
-  <section v-if="pending" class="project-section">
-    Loading project-section...
-  </section>
+  <template v-if="pending">
+    <section class="project-section">Loading project-section...</section>
+  </template>
 
-  <section v-else-if="error" class="project-section">
-    Failed to load project-section.
-  </section>
+  <template v-else-if="error">
+    <section class="project-section">Failed to load project-section.</section>
+  </template>
 
   <SectionWrapper
     v-else-if="data"
@@ -126,8 +122,6 @@ const filteredProjects = computed((): ProjectCard[] => {
             !isFiltering &&
             showCount >= (data.projectCards?.length || 0)
           "
-          data-aos="fade-up"
-          :data-aos-delay="Math.min(filteredProjects.length, 5) * 100"
           class="project-section__card-wrapper"
         >
           <ProjectCardLast :data="data.lastProjectCard" />
