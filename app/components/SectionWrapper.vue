@@ -33,11 +33,87 @@ const handleButtonClick = (event: MouseEvent) => {
     emit("button-click", event);
   }
 };
+
+// Clip-path scrolling effect for wrapped sections
+const sectionRef = ref<HTMLElement>();
+const scrollY = ref(0);
+const clipPath = ref("");
+
+/**
+ * Calculate the clip-path inset values based on scroll position
+ * Gradually shrinks the wrapped section to container size with border radius
+ * Reaches final form when scrolled halfway through the section element
+ * Only works on desktop (1200px and wider)
+ */
+const updateClipPath = () => {
+  if (!import.meta.client || !sectionRef.value || !props.isWrapped) return;
+
+  // Only apply clip-path effect on desktop (1200px and wider)
+  if (window.innerWidth < 1200) {
+    clipPath.value = "";
+    return;
+  }
+
+  // Get section element dimensions and position
+  const sectionRect = sectionRef.value.getBoundingClientRect();
+  const sectionHeight = sectionRef.value.offsetHeight;
+  const sectionTop = window.scrollY + sectionRect.top;
+
+  // Calculate scroll progress through the section
+  // 0 = top of section, 1 = halfway through section (final form)
+  const scrollThroughSection = Math.max(0, scrollY.value - sectionTop);
+  const scrollProgress = Math.min(
+    scrollThroughSection / (sectionHeight * 0.5),
+    1
+  );
+
+  // Maximum inset values (when fully scrolled)
+  const maxInsetY = 2.06716; // Percentage from top/bottom
+  const maxInsetX = 8; // Approximate percentage to match container width
+  const maxRadius = 14.5528; // pixels
+
+  // Calculate current inset values
+  const currentInsetY = maxInsetY * scrollProgress;
+  const currentInsetX = maxInsetX * scrollProgress;
+  const currentRadius = maxRadius * scrollProgress;
+
+  // Apply clip-path
+  clipPath.value = `inset(${currentInsetY}% ${currentInsetX}% round ${currentRadius}px)`;
+};
+
+// Set up scroll listener for wrapped sections
+onMounted(() => {
+  if (!import.meta.client || !props.isWrapped) return;
+
+  const handleScroll = () => {
+    scrollY.value = window.scrollY;
+    updateClipPath();
+  };
+
+  const handleResize = () => {
+    updateClipPath();
+  };
+
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  window.addEventListener("resize", handleResize, { passive: true });
+
+  // Initial calculation with a slight delay to ensure element is rendered
+  nextTick(() => {
+    updateClipPath();
+  });
+
+  onUnmounted(() => {
+    window.removeEventListener("scroll", handleScroll);
+    window.removeEventListener("resize", handleResize);
+  });
+});
 </script>
 
 <template>
   <section
     :id="jumpmark"
+    ref="sectionRef"
+    :style="props.isWrapped ? { clipPath } : undefined"
     :class="[
       'section-wrapper',
       { 'section-wrapper__wrapper': props.isWrapped },
@@ -113,6 +189,13 @@ $block: "section-wrapper";
   &__wrapper {
     position: relative;
     overflow: hidden;
+
+    /* Smooth transition for clip-path changes */
+    transition: clip-path 0.1s ease-out;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
 
     &::before {
       content: "";
