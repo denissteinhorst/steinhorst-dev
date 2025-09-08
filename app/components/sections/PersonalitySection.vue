@@ -51,7 +51,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
         >
           <BaseCard :is-in-wrapper="true" class="personality-section__card">
             <template v-if="personalityCard.variant === 'polarChart'">
-              <PolarChart
+              <PolarchartCard
                 :title="personalityCard.title"
                 :subtitle="personalityCard.subtitle"
                 :text="personalityCard.text"
@@ -59,7 +59,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
               />
             </template>
             <template v-else-if="personalityCard.variant === 'barChart'">
-              <BarChart
+              <BarchartCard
                 :title="personalityCard.title"
                 :subtitle="personalityCard.subtitle"
                 :text="personalityCard.text"

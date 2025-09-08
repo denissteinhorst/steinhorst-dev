@@ -406,7 +406,7 @@ const averageLinePlugin = {
 </script>
 
 <template>
-  <div class="bar-chart">
+  <div class="bar-chart-card">
     <h3 class="bar-chart__title" :style="{ color: themeColors.titleColor }">
       {{ title }}
     </h3>
@@ -434,7 +434,7 @@ const averageLinePlugin = {
 </template>
 
 <style scoped lang="scss">
-$block: "bar-chart";
+$block: "bar-chart-card";
 
 .#{$block} {
   width: 100%;

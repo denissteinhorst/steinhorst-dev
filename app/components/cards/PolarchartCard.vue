@@ -256,7 +256,7 @@ const chartDisplayOptions = computed(() => {
 </script>
 
 <template>
-  <div class="polar-chart">
+  <div class="polar-chart-card">
     <h3 class="polar-chart__title" :style="{ color: themeColors.titleColor }">
       {{ title }}
     </h3>
@@ -283,7 +283,7 @@ const chartDisplayOptions = computed(() => {
 </template>
 
 <style scoped lang="scss">
-$block: "polar-chart";
+$block: "polar-chart-card";
 
 .#{$block} {
   width: 100%;

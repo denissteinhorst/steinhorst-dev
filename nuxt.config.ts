@@ -21,6 +21,7 @@ export default defineNuxtConfig({
   },
   components: [
     { path: '~/components/sections' },
+    { path: '~/components/cards' },
     '~/components'
   ],
   runtimeConfig: {
