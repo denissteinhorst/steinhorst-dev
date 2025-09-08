@@ -62,7 +62,7 @@
     "book_appointment": "Termin buchen",
     "pdf_download": "PDF Download",
     "pdf_tooltip": "Wird aktiv sobald die Zusammenfassung vollständig generiert wurde.",
-    "chatgpt_tooltip": "Diese Zusammenfassung wurde mithilfe von ChatGPT erstellt und lokal zwischengespeichert, um API-Ressourcen zu schonen. Die Darstellung wurde so gestaltet, dass sie dem originalen Chat-Erlebnis entspricht."
+    "chatgpt_tooltip": "Diese Zusammenfassung wurde mithilfe von ChatGPT erstellt und in Strapi zwischengespeichert, um API-Ressourcen zu schonen. Die Darstellung wurde so gestaltet, dass sie dem originalen Chat-Erlebnis entspricht."
   },
   "footer_section": {
     "copyright": "Alle Rechte vorbehalten.",
