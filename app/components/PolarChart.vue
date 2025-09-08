@@ -1,30 +1,3 @@
-<template>
-  <div class="polar-chart">
-    <h3 class="polar-chart__title" :style="{ color: themeColors.titleColor }">
-      {{ title }}
-    </h3>
-    <div class="polar-chart__canvas-wrapper">
-      <PolarArea
-        id="polar-chart"
-        :data="chartConfiguration"
-        :options="chartDisplayOptions"
-      />
-    </div>
-    <p
-      class="polar-chart__subtitle"
-      :style="{ color: themeColors.subtitleColor }"
-    >
-      {{ subtitle }}
-    </p>
-    <p
-      class="polar-chart__description"
-      :style="{ color: themeColors.descriptionColor }"
-    >
-      {{ text }}
-    </p>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { PolarArea } from "vue-chartjs";
 
@@ -39,39 +12,32 @@ const { title = "", subtitle = "", text = "", tooltips } = defineProps<Props>();
 
 const colorMode = useColorMode();
 const { currentLocaleString } = useStrapi();
-const hydrated = ref(false);
-if (import.meta.client) {
-  onMounted(() => {
-    hydrated.value = true;
-  });
-}
 
-// Personality trait mapping for both locales
-const PERSONALITY_TRAITS_MAPPING = {
+const isClientMounted = shallowRef(false);
+
+onMounted(() => {
+  isClientMounted.value = true;
+});
+
+const PERSONALITY_TRAITS_MAPPING = readonly({
   de: ["Initiativ", "Gewissenhaft", "Stetig", "Dominant"] as const,
   en: ["Initiative", "Conscientious", "Steady", "Dominance"] as const,
-};
+});
 
-// Get personality traits based on current locale
 const personalityTraits = computed(() => {
   const locale =
     currentLocaleString?.value as keyof typeof PERSONALITY_TRAITS_MAPPING;
-  // Fallback to 'de' if locale is undefined or not in mapping
-  if (!locale || !PERSONALITY_TRAITS_MAPPING[locale]) {
-    return PERSONALITY_TRAITS_MAPPING.de;
-  }
-  return PERSONALITY_TRAITS_MAPPING[locale];
+  return locale && PERSONALITY_TRAITS_MAPPING[locale]
+    ? PERSONALITY_TRAITS_MAPPING[locale]
+    : PERSONALITY_TRAITS_MAPPING.de;
 });
 
-/**
- * Chart theme colors - kept as hardcoded values since they need to be used in JavaScript
- * These values should match the CSS custom properties defined in theme.scss
- */
 const themeColors = computed(() => {
-  // Always use light mode colors on SSR to prevent hydration mismatches
-  // Only use actual color mode after client hydration
   const isDarkMode =
-    import.meta.client && hydrated.value ? colorMode.value === "dark" : false;
+    import.meta.client && isClientMounted.value
+      ? colorMode.value === "dark"
+      : false;
+
   return {
     tooltipBackground: isDarkMode ? "#0f172a" : "#ffffff",
     tooltipTitle: isDarkMode ? "#e2e8f0" : "#0f172a",
@@ -85,32 +51,20 @@ const themeColors = computed(() => {
   };
 });
 
-/**
- * Creates a mapping of tooltip data by personality trait name
- * This allows for consistent ordering regardless of input order
- */
 const tooltipsByTrait = computed(() => {
-  if (!tooltips || tooltips.length === 0) {
-    return {};
-  }
+  if (!tooltips?.length) return {};
+
   return tooltips.reduce((accumulator, tooltip) => {
     accumulator[tooltip.title] = tooltip;
     return accumulator;
   }, {} as Record<string, PolarChartTooltip>);
 });
 
-/**
- * Ordered chart labels based on predefined personality trait sequence
- */
 const chartLabels = computed(() => {
   const traits = personalityTraits.value || [];
   return traits.map((trait) => tooltipsByTrait.value[trait]?.title || trait);
 });
 
-/**
- * Extracts bullet point text from rich text content blocks
- * Processes list items and converts them to readable bullet points
- */
 const extractBulletPoints = (richTextBlocks: RichTextBlock[]): string[] => {
   const bulletPoints: string[] = [];
 
@@ -135,20 +89,15 @@ const extractBulletPoints = (richTextBlocks: RichTextBlock[]): string[] => {
   return bulletPoints;
 };
 
-/**
- * Chart data configuration with theme-appropriate colors
- * Uses translucent fills to maintain grid/tick visibility
- */
 const chartConfiguration = computed(() => {
   const isDarkMode = colorMode.value === "dark";
 
-  // Color schemes for personality traits
   const fillColors = isDarkMode
     ? [
-        "rgba(255,193,7,0.30)", // Initiativ - yellow
-        "rgba(59,130,246,0.28)", // Gewissenhaft - blue
-        "rgba(34,197,94,0.28)", // Stetig - green
-        "rgba(239,68,68,0.30)", // Dominant - red
+        "rgba(255,193,7,0.30)",
+        "rgba(59,130,246,0.28)",
+        "rgba(34,197,94,0.28)",
+        "rgba(239,68,68,0.30)",
       ]
     : [
         "rgba(255,193,7,0.40)",
@@ -171,7 +120,6 @@ const chartConfiguration = computed(() => {
         "rgba(220,53,69,0.95)",
       ];
 
-  // Extract percentage data in correct order
   const traits = personalityTraits.value || [];
   const chartData = traits.map(
     (trait) => tooltipsByTrait.value[trait]?.percentage || 0
@@ -190,10 +138,6 @@ const chartConfiguration = computed(() => {
   };
 });
 
-/**
- * Tooltip content organized by personality trait order
- * Pre-processes rich text into readable bullet points
- */
 const tooltipContent = computed(() => {
   const traits = personalityTraits.value || [];
   return traits.map((trait) => {
@@ -202,10 +146,6 @@ const tooltipContent = computed(() => {
   });
 });
 
-/**
- * Chart display configuration and interaction settings
- * Handles responsive behavior, tooltips, and visual styling
- */
 const chartDisplayOptions = computed(() => {
   return {
     responsive: true,
@@ -218,7 +158,7 @@ const chartDisplayOptions = computed(() => {
         display: false,
       },
       title: {
-        display: false, // External title element used instead
+        display: false,
       },
       tooltip: {
         callbacks: {
@@ -238,7 +178,6 @@ const chartDisplayOptions = computed(() => {
         titleColor: themeColors.value.tooltipTitle,
         bodyColor: themeColors.value.tooltipBody,
         borderColor: (context: unknown) => {
-          // Extract border color based on data point
           const contextData = context as
             | {
                 tooltip?: {
@@ -259,7 +198,6 @@ const chartDisplayOptions = computed(() => {
             const color = dataset?.backgroundColor?.[dataPoint.dataIndex];
 
             if (typeof color === "string" && color.startsWith("rgba")) {
-              // Convert to full opacity for border
               return color.replace(
                 /rgba\(([^,]+),([^,]+),([^,]+),[^)]+\)/,
                 "rgba($1,$2,$3,1)"
@@ -316,6 +254,33 @@ const chartDisplayOptions = computed(() => {
   };
 });
 </script>
+
+<template>
+  <div class="polar-chart">
+    <h3 class="polar-chart__title" :style="{ color: themeColors.titleColor }">
+      {{ title }}
+    </h3>
+    <div class="polar-chart__canvas-wrapper">
+      <PolarArea
+        id="polar-chart"
+        :data="chartConfiguration"
+        :options="chartDisplayOptions"
+      />
+    </div>
+    <p
+      class="polar-chart__subtitle"
+      :style="{ color: themeColors.subtitleColor }"
+    >
+      {{ subtitle }}
+    </p>
+    <p
+      class="polar-chart__description"
+      :style="{ color: themeColors.descriptionColor }"
+    >
+      {{ text }}
+    </p>
+  </div>
+</template>
 
 <style scoped lang="scss">
 $block: "polar-chart";

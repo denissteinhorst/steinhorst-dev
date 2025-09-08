@@ -9,10 +9,6 @@ interface Props {
   tooltips: BarChartTooltip[];
 }
 
-const { $t } = useI18n();
-const { title = "", subtitle = "", text = "", tooltips } = defineProps<Props>();
-
-// Motivation dimension data structure
 interface MotivationDimension {
   name: string;
   innerValue: number;
@@ -20,7 +16,6 @@ interface MotivationDimension {
   description: string;
 }
 
-// Motivation trait identifiers for consistent color mapping
 type MotivationTraitDE =
   | "Durchsetzung"
   | "Integration"
@@ -28,7 +23,6 @@ type MotivationTraitDE =
   | "Individualität"
   | "Erkenntnis"
   | "Empathie";
-
 type MotivationTraitEN =
   | "Assertiveness"
   | "Integration"
@@ -36,11 +30,21 @@ type MotivationTraitEN =
   | "Individuality"
   | "Insight"
   | "Empathy";
-
 type MotivationTrait = MotivationTraitDE | MotivationTraitEN;
 
-// Motivation trait mapping for both locales
-const MOTIVATION_TRAITS_MAPPING = {
+const { title = "", subtitle = "", text = "", tooltips } = defineProps<Props>();
+
+const { $t } = useI18n();
+const colorMode = useColorMode();
+const { currentLocaleString } = useStrapi();
+
+const isClientMounted = shallowRef(false);
+
+onMounted(() => {
+  isClientMounted.value = true;
+});
+
+const MOTIVATION_TRAITS_MAPPING = readonly({
   de: [
     "Durchsetzung",
     "Integration",
@@ -57,59 +61,36 @@ const MOTIVATION_TRAITS_MAPPING = {
     "Insight",
     "Empathy",
   ] as const,
-};
+});
 
-// Color scheme for each motivation trait (using German keys as base, but accessible by both)
-const TRAIT_COLOR_MAP: Record<MotivationTrait, { base: string }> = {
-  // German keys
-  Durchsetzung: { base: "#ef4444" }, // Red
-  Integration: { base: "#f59e0b" }, // Orange
-  Sicherheit: { base: "#22c55e" }, // Green
-  Individualität: { base: "#3b82f6" }, // Blue
-  Erkenntnis: { base: "#856dca" }, // Purple
-  Empathie: { base: "#ec4899" }, // Pink
-  // English keys (same colors)
-  Assertiveness: { base: "#ef4444" }, // Red
-  Security: { base: "#22c55e" }, // Green
-  Individuality: { base: "#3b82f6" }, // Blue
-  Insight: { base: "#856dca" }, // Purple
-  Empathy: { base: "#ec4899" }, // Pink
-};
+const TRAIT_COLOR_MAP: Record<MotivationTrait, { base: string }> = readonly({
+  Durchsetzung: { base: "#ef4444" },
+  Integration: { base: "#f59e0b" },
+  Sicherheit: { base: "#22c55e" },
+  Individualität: { base: "#3b82f6" },
+  Erkenntnis: { base: "#856dca" },
+  Empathie: { base: "#ec4899" },
+  Assertiveness: { base: "#ef4444" },
+  Security: { base: "#22c55e" },
+  Individuality: { base: "#3b82f6" },
+  Insight: { base: "#856dca" },
+  Empathy: { base: "#ec4899" },
+});
 
-// Composables
-
-// SSR-safe color mode composable
-const colorMode = useColorMode();
-const { currentLocaleString } = useStrapi();
-const hydrated = ref(false);
-if (import.meta.client) {
-  onMounted(() => {
-    hydrated.value = true;
-  });
-}
-
-// Get motivation traits based on current locale
 const motivationTraits = computed(() => {
   const locale =
     currentLocaleString?.value as keyof typeof MOTIVATION_TRAITS_MAPPING;
-  // Fallback to 'de' if locale is undefined or not in mapping
-  if (!locale || !MOTIVATION_TRAITS_MAPPING[locale]) {
-    return MOTIVATION_TRAITS_MAPPING.de;
-  }
-  return MOTIVATION_TRAITS_MAPPING[locale];
+  return locale && MOTIVATION_TRAITS_MAPPING[locale]
+    ? MOTIVATION_TRAITS_MAPPING[locale]
+    : MOTIVATION_TRAITS_MAPPING.de;
 });
 
-/**
- * Color palette that adapts to light/dark theme
- * Uses light mode colors during SSR to prevent hydration mismatches
- */
-// Chart theme colors - kept as hardcoded values since they need to be used in JavaScript
-// These values should match the CSS custom properties defined in theme.scss
 const themeColors = computed(() => {
-  // Always use light mode colors on SSR to prevent hydration mismatches
-  // Only use actual color mode after client hydration
   const isDarkMode =
-    import.meta.client && hydrated.value ? colorMode.value === "dark" : false;
+    import.meta.client && isClientMounted.value
+      ? colorMode.value === "dark"
+      : false;
+
   return {
     axisTick: isDarkMode ? "#cbd5e1" : "#334155",
     axisGrid: isDarkMode ? "rgba(148,163,184,0.22)" : "rgba(100,116,139,0.15)",
@@ -122,10 +103,6 @@ const themeColors = computed(() => {
   };
 });
 
-/**
- * Extracts descriptive text from rich text content blocks
- * Looks for paragraph content and returns the first meaningful text
- */
 const extractDescriptionText = (richTextBlocks: RichTextBlock[]): string => {
   for (const block of richTextBlocks) {
     if (block.type === "paragraph" && block.children) {
@@ -135,35 +112,22 @@ const extractDescriptionText = (richTextBlocks: RichTextBlock[]): string => {
         .join("")
         .trim();
 
-      if (textContent) {
-        return textContent;
-      }
+      if (textContent) return textContent;
     }
   }
   return "";
 };
 
-/**
- * Processes tooltip data into structured motivation dimensions
- * Each dimension contains inner/outer values and descriptive text
- * Ordered according to locale-specific trait sequence
- */
 const motivationDimensions = computed((): MotivationDimension[] => {
-  // Early return if tooltips are not available
-  if (!tooltips || tooltips.length === 0) {
-    return [];
-  }
+  if (!tooltips?.length) return [];
 
-  // Create a mapping of tooltip data by trait name
   const tooltipsByTrait = tooltips.reduce((acc, tooltip) => {
     acc[tooltip.title] = tooltip;
     return acc;
   }, {} as Record<string, BarChartTooltip>);
 
-  // Get traits safely - fallback to empty array if not available
   const traits = motivationTraits.value || [];
 
-  // Return dimensions in the correct order based on current locale
   return traits.map((trait) => {
     const tooltip = tooltipsByTrait[trait];
     return {
@@ -190,25 +154,25 @@ const outerSelfDifferences = computed(() =>
   )
 );
 
-/**
- * Converts hex color to RGBA with specified alpha transparency
- * Used for consistent color theming across chart elements
- */
 const createRgbaColor = (hexColor: string, alpha: number): string => {
   const hex = hexColor.replace("#", "");
   const red = parseInt(hex.substring(0, 2), 16);
   const green = parseInt(hex.substring(2, 4), 16);
   const blue = parseInt(hex.substring(4, 6), 16);
-
   return `rgba(${red},${green},${blue},${alpha})`;
 };
 
-/**
- * Safely gets the color for a motivation trait with fallback
- * Returns a default color if the trait is not found in the color map
- */
+// Memoize color creation to avoid recalculations
+const colorCache = new Map<string, string>();
+const getCachedRgbaColor = (hexColor: string, alpha: number): string => {
+  const key = `${hexColor}-${alpha}`;
+  if (!colorCache.has(key)) {
+    colorCache.set(key, createRgbaColor(hexColor, alpha));
+  }
+  return colorCache.get(key)!;
+};
+
 const getTraitColor = (traitName: string): string => {
-  // Ensure we have a valid trait name
   if (!traitName) {
     if (import.meta.dev) {
       console.warn(`Empty trait name provided to getTraitColor`);
@@ -218,7 +182,6 @@ const getTraitColor = (traitName: string): string => {
 
   const traitColor = TRAIT_COLOR_MAP[traitName as MotivationTrait];
 
-  // Debug logging for development
   if (import.meta.dev && !traitColor) {
     console.warn(
       `No color mapping found for trait: "${traitName}". Available traits:`,
@@ -226,13 +189,9 @@ const getTraitColor = (traitName: string): string => {
     );
   }
 
-  return traitColor?.base || "#6b7280"; // Default gray color as fallback
+  return traitColor?.base || "#6b7280";
 };
 
-/**
- * Chart data configuration with stacked bar datasets
- * Inner values form the base, outer differences stack on top
- */
 const chartConfiguration = computed(() => ({
   labels: dimensionLabels.value,
   datasets: [
@@ -241,7 +200,7 @@ const chartConfiguration = computed(() => ({
       data: innerSelfValues.value,
       backgroundColor: dimensionLabels.value
         .filter((label): label is string => Boolean(label))
-        .map((label) => createRgbaColor(getTraitColor(label), 0.8)),
+        .map((label) => getCachedRgbaColor(getTraitColor(label), 0.8)),
       borderRadius: {
         topLeft: 4,
         topRight: 4,
@@ -257,7 +216,7 @@ const chartConfiguration = computed(() => ({
       data: outerSelfDifferences.value,
       backgroundColor: dimensionLabels.value
         .filter((label): label is string => Boolean(label))
-        .map((label) => createRgbaColor(getTraitColor(label), 0.35)),
+        .map((label) => getCachedRgbaColor(getTraitColor(label), 0.35)),
       borderRadius: {
         topLeft: 4,
         topRight: 4,
@@ -271,10 +230,6 @@ const chartConfiguration = computed(() => ({
   ],
 }));
 
-/**
- * Wraps long text into multiple lines for better tooltip readability
- * Splits text at word boundaries to maintain readability
- */
 const wrapTextContent = (text: string, maxLineLength = 50): string[] => {
   const words = text.split(/\s+/);
   const lines: string[] = [];
@@ -299,10 +254,6 @@ const wrapTextContent = (text: string, maxLineLength = 50): string[] => {
   return lines.length > 0 ? lines : [text];
 };
 
-/**
- * Chart display configuration and interaction settings
- * Handles responsive behavior, tooltips, and visual styling
- */
 const chartDisplayOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
@@ -318,23 +269,18 @@ const chartDisplayOptions = computed(() => ({
       display: false,
     },
     title: {
-      display: false, // External title element used instead
+      display: false,
     },
     tooltip: {
       backgroundColor: () =>
         themeColors.value.axisTick === "#cbd5e1" ? "#0f172a" : "#ffffff",
       titleColor: themeColors.value.tooltipTitle,
       bodyColor: themeColors.value.tooltipBody,
-      filter: () => {
-        // Include both datasets in tooltip
-        return true;
-      },
+      filter: () => true,
       itemSort: (a: TooltipItem<"bar">, b: TooltipItem<"bar">) => {
-        // Sort so that "Inneres Selbstbild" (dataset 0) appears before "Äußeres Selbstbild" (dataset 1)
         return a.datasetIndex - b.datasetIndex;
       },
       borderColor: (context: unknown) => {
-        // Extract border color based on data point
         const contextData = context as
           | { tooltip?: { dataPoints?: Array<{ dataIndex: number }> } }
           | undefined;
@@ -361,14 +307,11 @@ const chartDisplayOptions = computed(() => ({
           const dimension = motivationDimensions.value[context.dataIndex];
           if (!dimension) return "";
 
-          // Show dataset-specific info with proper labeling
           if (context.datasetIndex === 0) {
-            // Inner dataset
             return `${$t("personality_section.internal_self_image")}: ${
               dimension.innerValue
             }`;
           } else if (context.datasetIndex === 1) {
-            // Outer dataset - show total outer value
             return `${$t("personality_section.external_self_image")}: ${
               dimension.outerValue
             }`;
@@ -376,7 +319,6 @@ const chartDisplayOptions = computed(() => ({
 
           return "";
         },
-        // Show the description after all dataset labels
         afterBody: (items: TooltipItem<"bar">[]) => {
           const firstItem = items?.[0];
           if (!firstItem) return "";
@@ -421,10 +363,7 @@ const chartDisplayOptions = computed(() => ({
   },
 }));
 
-/**
- * Chart plugin that draws a horizontal reference line at value 100
- * Provides visual indicator for average/normal range
- */
+// Chart plugin that draws a horizontal reference line at value 100
 const averageLinePlugin = {
   id: "averageLine",
   afterDatasetsDraw(chart: Chart) {
@@ -447,7 +386,6 @@ const averageLinePlugin = {
 
     if (!chartArea) return;
 
-    // Draw dashed line at y=100
     ctx.save();
     ctx.beginPath();
     ctx.lineWidth = 2;
@@ -457,7 +395,6 @@ const averageLinePlugin = {
     ctx.lineTo(chartArea.right, yPosition);
     ctx.stroke();
 
-    // Add average indicator label
     ctx.font =
       '10px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial';
     ctx.fillStyle = "#ffffff";
