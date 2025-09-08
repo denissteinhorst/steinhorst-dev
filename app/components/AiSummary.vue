@@ -32,14 +32,6 @@ const fullText = computed<string>(
   () => (data.value?.summary as string | undefined)?.trim() ?? ""
 );
 
-const slideoverUi = computed(() => ({
-  content: [
-    "ai-summary__panel",
-    "w-screen sm:w-[85vw] lg:w-[50vw] max-w-none",
-  ].join(" "),
-  footer: ["ai-summary__panel-footer"].join(" "),
-}));
-
 const tokens = computed<string[]>(() => fullText.value.match(/\S+\s*/g) || []);
 
 const progressPercentage = computed(() =>
@@ -48,6 +40,15 @@ const progressPercentage = computed(() =>
 
 const hasContent = computed(() => tokens.value.length > 0);
 const canDownload = computed(() => isComplete.value && hasContent.value);
+
+// Memoize slideoverUi to avoid object recreation on every render
+const slideoverUi = computed(() => ({
+  content: [
+    "ai-summary__panel",
+    "w-screen sm:w-[85vw] lg:w-[50vw] max-w-none",
+  ].join(" "),
+  footer: ["ai-summary__panel-footer"].join(" "),
+}));
 
 // Sparkles effect
 interface SparkleConfiguration {
@@ -58,8 +59,8 @@ interface SparkleConfiguration {
   tx: number;
 }
 
-const sparkles = ref<SparkleConfiguration[]>([]);
-const isClient = ref(false);
+const sparkles = shallowRef<SparkleConfiguration[]>([]);
+const isClient = shallowRef(false);
 
 const buildSparkles = (count: number = 5): SparkleConfiguration[] =>
   Array.from(
@@ -77,9 +78,11 @@ const clearAllTimers = (): void => {
   if (timer) clearTimeout(timer);
   if (searchTimer) clearTimeout(searchTimer);
   if (checkTimer) clearTimeout(checkTimer);
+  if (sparkleThrottleTimer) clearTimeout(sparkleThrottleTimer);
   timer = null;
   searchTimer = null;
   checkTimer = null;
+  sparkleThrottleTimer = null;
 };
 
 const resetTypingState = (): void => {
@@ -128,9 +131,18 @@ const scheduleFrame = (callback: () => void): number | NodeJS.Timeout =>
     ? window.requestAnimationFrame(callback)
     : setTimeout(callback, 16);
 
+// Throttle sparkle regeneration to avoid excessive DOM updates
+let sparkleThrottleTimer: ReturnType<typeof setTimeout> | null = null;
+
 const regenerateSparkles = (): void => {
   if (!isClient.value) return;
+  if (sparkleThrottleTimer) return; // Throttle sparkle updates
+
   sparkles.value = buildSparkles();
+
+  sparkleThrottleTimer = setTimeout(() => {
+    sparkleThrottleTimer = null;
+  }, 100); // 100ms throttle
 };
 
 const downloadPdf = async (): Promise<void> => {
