@@ -1,10 +1,21 @@
 <script setup lang="ts">
+import { useBreakpoints, useEventListener, useStorage } from "@vueuse/core";
+
+const props = withDefaults(
+  defineProps<{
+    blindTopOffsetPx?: number;
+  }>(),
+  {
+    blindTopOffsetPx: 0,
+  }
+);
+
 const { cmsRequest, buildImageUrl, currentLocaleString } = useStrapi();
 
 const { data, pending, error } =
   await useLazyAsyncData<LeaveNotificationResponse>(
-    () => `leaveNotification-${currentLocaleString.value}`,
-    (): Promise<LeaveNotificationResponse> =>
+    `leaveNotification-${currentLocaleString.value}`,
+    () =>
       cmsRequest<LeaveNotificationResponse>("leave-notification", [
         "title",
         "text",
@@ -12,19 +23,8 @@ const { data, pending, error } =
       ])
   );
 
-// Public API: only vertical offset for the activation band
-const props = withDefaults(defineProps<{ blindTopOffsetPx?: number }>(), {
-  blindTopOffsetPx: 0,
-});
-
-// Desktop detection
-const isDesktop = ref(true);
-
-const checkIfDesktop = (): void => {
-  if (!import.meta.client) return;
-  const mediaQuery = window.matchMedia("(min-width: 1024px)");
-  isDesktop.value = mediaQuery.matches;
-};
+const breakpoints = useBreakpoints({ lg: 1024 });
+const isDesktop = breakpoints.greaterOrEqual("lg");
 
 const qrCodeUrl = computed<string | undefined>(() => {
   const qrcode = Array.isArray(data.value?.qrcode)
@@ -34,105 +34,73 @@ const qrCodeUrl = computed<string | undefined>(() => {
   return url === null ? undefined : url;
 });
 
-// Internal state
 const isOpen = ref(false);
 const lastMouseY = ref<number | null>(null);
-const suppressedUntil = ref<number>(0);
 const hasScrolledHalfway = ref(false);
 const showIndicator = ref(true);
 
-// Minimal, readable constants (do not expose as props)
-const ACTIVATION_THRESHOLD_IN_PIXELS = 60; // Top band height triggering the modal
-const MINIMUM_UPWARD_DELTA_IN_PIXELS = 6; // Required upward pointer movement to signal intent
-const SUPPRESS_LOCAL_STORAGE_KEY = "leave-notification:suppress-until";
-
-const readSuppressedUntil = (): number => {
-  if (!import.meta.client) return 0;
-  try {
-    const raw = localStorage.getItem(SUPPRESS_LOCAL_STORAGE_KEY);
-    const parsed = raw ? parseInt(raw, 10) : 0;
-    return Number.isFinite(parsed) ? parsed : 0;
-  } catch {
-    return 0;
+const suppressedUntil = useStorage(
+  "leave-notification:suppress-until",
+  0,
+  localStorage,
+  {
+    serializer: { read: Number, write: String },
   }
-};
+);
+
+const ACTIVATION_THRESHOLD = 60;
+const MINIMUM_UPWARD_DELTA = 6;
 
 const suppressForToday = (): void => {
-  if (!import.meta.client) return;
   const nextDayStart = new Date();
   nextDayStart.setHours(24, 0, 0, 0);
   suppressedUntil.value = nextDayStart.getTime();
-  try {
-    localStorage.setItem(
-      SUPPRESS_LOCAL_STORAGE_KEY,
-      String(suppressedUntil.value)
-    );
-  } catch {
-    // ignore storage errors
-  }
 };
 
 const shouldOpenOnMove = (mouseY: number, deltaY: number): boolean => {
-  const topOffset = Math.max(0, props.blindTopOffsetPx ?? 0);
-  if (Date.now() < suppressedUntil.value) return false;
-  if (!hasScrolledHalfway.value) return false; // Only show after scrolling halfway
-  if (mouseY > ACTIVATION_THRESHOLD_IN_PIXELS) return false;
-  if (mouseY < topOffset) return false;
-  if (deltaY >= -MINIMUM_UPWARD_DELTA_IN_PIXELS) return false;
-  return true;
+  const topOffset = Math.max(0, props.blindTopOffsetPx);
+  return (
+    Date.now() >= suppressedUntil.value &&
+    hasScrolledHalfway.value &&
+    mouseY <= ACTIVATION_THRESHOLD &&
+    mouseY >= topOffset &&
+    deltaY < -MINIMUM_UPWARD_DELTA
+  );
 };
 
 const handleMouseMove = (event: MouseEvent): void => {
   const mouseY = event.clientY;
   const deltaY = lastMouseY.value === null ? 0 : mouseY - lastMouseY.value;
   lastMouseY.value = mouseY;
+
   if (shouldOpenOnMove(mouseY, deltaY)) {
     isOpen.value = true;
   }
 };
 
 const handleScroll = (): void => {
-  if (hasScrolledHalfway.value) return; // Already tracked, no need to continue
+  if (hasScrolledHalfway.value) return;
 
-  const scrollTop = window.scrollY || document.documentElement.scrollTop;
-  const documentHeight =
-    document.documentElement.scrollHeight -
-    document.documentElement.clientHeight;
-  const scrollPercentage = scrollTop / documentHeight;
+  const scrollPercentage =
+    window.scrollY /
+    (document.documentElement.scrollHeight -
+      document.documentElement.clientHeight);
 
   if (scrollPercentage >= 0.5) {
     hasScrolledHalfway.value = true;
-    // Remove scroll listener once halfway point is reached for performance
-    window.removeEventListener("scroll", handleScroll);
-
-    // Auto-hide indicator after 3 seconds when ready
-    setTimeout(() => {
-      showIndicator.value = false;
-    }, 3000);
+    setTimeout(() => (showIndicator.value = false), 3000);
   }
 };
 
 onMounted(() => {
-  suppressedUntil.value = readSuppressedUntil();
-  checkIfDesktop();
-
-  // Only enable leave notification on desktop devices
   if (isDesktop.value) {
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    useEventListener("mousemove", handleMouseMove, { passive: true });
+    useEventListener("scroll", handleScroll, { passive: true });
   }
 });
 
-onBeforeUnmount(() => {
-  if (isDesktop.value) {
-    window.removeEventListener("mousemove", handleMouseMove);
-    window.removeEventListener("scroll", handleScroll);
-  }
-});
-
-// Suppress re-open until tomorrow whenever the modal is closed
-watch(isOpen, (newValue: boolean, oldValue: boolean): void => {
-  if (oldValue === true && newValue === false) suppressForToday();
+watch(isOpen, (newValue: boolean, oldValue: boolean) => {
+  if (oldValue && !newValue) suppressForToday();
 });
 </script>
 
