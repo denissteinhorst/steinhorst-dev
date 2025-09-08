@@ -42,7 +42,7 @@ const showIndicator = ref(true);
 const suppressedUntil = useStorage(
   "leave-notification:suppress-until",
   0,
-  localStorage,
+  undefined,
   {
     serializer: { read: Number, write: String },
   }
