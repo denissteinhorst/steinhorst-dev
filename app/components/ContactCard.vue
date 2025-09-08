@@ -64,11 +64,6 @@ const getAriaLabel = (card: ContactCard): string => {
             :aria-label="getAriaLabel(data)"
             class="contact-card__button"
           >
-            <UIcon
-              :name="data.icon || 'i-lucide-help-circle'"
-              class="contact-card__button-icon"
-              aria-hidden="true"
-            />
             <span class="contact-card__button-text">{{
               data.buttonText || data.title
             }}</span>
