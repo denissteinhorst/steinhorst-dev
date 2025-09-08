@@ -1,46 +1,36 @@
 <script setup lang="ts">
 import "~/assets/scss/app.scss";
 
-// useColorMode is auto-imported by @nuxtjs/color-mode module
 const colorMode = useColorMode();
 const route = useRoute();
+
 const ambientBackground = ref<HTMLElement | null>(null);
 
-// Show ambient background on all routes except those that explicitly disable it via page meta
-const showAmbient = computed<boolean>(() => route.meta?.ambient !== false);
+const showAmbient = computed(() => route.meta?.ambient !== false);
 
-// Keep URL hash in sync with the section ≥50% in view (hero keeps path without hash)
 useScrollHashes();
 
-onMounted(() => {
-  // If the element exists on initial mount, apply the appropriate mode class
-  if (ambientBackground.value) {
-    updateAmbientBackground(colorMode.preference);
+const updateAmbientBackground = (preference: string): void => {
+  if (!ambientBackground.value) return;
+
+  if (preference === "light") {
+    ambientBackground.value.classList.add("ambient-background-light");
+  } else {
+    ambientBackground.value.classList.remove("ambient-background-light");
   }
+};
+
+onMounted(() => {
+  updateAmbientBackground(colorMode.preference);
 });
 
-watch(
-  () => colorMode.preference,
-  (newPreference) => {
-    updateAmbientBackground(newPreference);
-  }
-);
-
-// When the ambient background element is (re)mounted due to route changes, sync its mode class
+watch(() => colorMode.preference, updateAmbientBackground);
 watch(
   () => ambientBackground.value,
-  (el) => {
-    if (el) updateAmbientBackground(colorMode.preference);
+  (element) => {
+    if (element) updateAmbientBackground(colorMode.preference);
   }
 );
-
-function updateAmbientBackground(preference: string) {
-  if (preference === "light") {
-    ambientBackground.value?.classList.add("ambient-background-light");
-  } else {
-    ambientBackground.value?.classList.remove("ambient-background-light");
-  }
-}
 </script>
 
 <template>
