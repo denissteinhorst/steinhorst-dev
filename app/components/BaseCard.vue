@@ -8,19 +8,18 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div
+  <article
     class="base-card"
     :class="{
       'base-card--active': props.isActive,
       'base-card--dark': props.isDark,
       'base-card--in-wrapper': props.isInWrapper,
     }"
-    v-bind="$attrs"
   >
     <UCard variant="soft">
       <slot></slot>
     </UCard>
-  </div>
+  </article>
 </template>
 
 <style scoped lang="scss">
