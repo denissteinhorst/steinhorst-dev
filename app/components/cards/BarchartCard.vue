@@ -407,10 +407,13 @@ const averageLinePlugin = {
 
 <template>
   <div class="bar-chart-card">
-    <h3 class="bar-chart__title" :style="{ color: themeColors.titleColor }">
+    <h3
+      class="bar-chart-card__title"
+      :style="{ color: themeColors.titleColor }"
+    >
       {{ title }}
     </h3>
-    <div class="bar-chart__canvas-wrapper">
+    <div class="bar-chart-card__canvas-wrapper">
       <Bar
         id="motivation-profile"
         :data="chartConfiguration"
@@ -419,13 +422,13 @@ const averageLinePlugin = {
       />
     </div>
     <p
-      class="bar-chart__subtitle"
+      class="bar-chart-card__subtitle"
       :style="{ color: themeColors.subtitleColor }"
     >
       {{ subtitle }}
     </p>
     <p
-      class="bar-chart__description"
+      class="bar-chart-card__description"
       :style="{ color: themeColors.descriptionColor }"
     >
       {{ text }}

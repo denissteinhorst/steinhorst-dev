@@ -257,10 +257,13 @@ const chartDisplayOptions = computed(() => {
 
 <template>
   <div class="polar-chart-card">
-    <h3 class="polar-chart__title" :style="{ color: themeColors.titleColor }">
+    <h3
+      class="polar-chart-card__title"
+      :style="{ color: themeColors.titleColor }"
+    >
       {{ title }}
     </h3>
-    <div class="polar-chart__canvas-wrapper">
+    <div class="polar-chart-card__canvas-wrapper">
       <PolarArea
         id="polar-chart"
         :data="chartConfiguration"
@@ -268,13 +271,13 @@ const chartDisplayOptions = computed(() => {
       />
     </div>
     <p
-      class="polar-chart__subtitle"
+      class="polar-chart-card__subtitle"
       :style="{ color: themeColors.subtitleColor }"
     >
       {{ subtitle }}
     </p>
     <p
-      class="polar-chart__description"
+      class="polar-chart-card__description"
       :style="{ color: themeColors.descriptionColor }"
     >
       {{ text }}
