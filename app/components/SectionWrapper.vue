@@ -11,6 +11,7 @@ const props = withDefaults(
     target?: NavigationLinkTarget;
     footerText?: RichTextNodes | [];
     textAlign?: TextAlignment;
+    isWrapped?: boolean;
   }>(),
   {
     headerText: () => [] as unknown as RichTextNodes,
@@ -35,8 +36,14 @@ const handleButtonClick = (event: MouseEvent) => {
 </script>
 
 <template>
-  <section :id="jumpmark" class="SectionWrapper">
-    <UContainer class="SectionWrapper--container">
+  <section
+    :id="jumpmark"
+    :class="[
+      'section-wrapper',
+      { 'section-wrapper__wrapper': props.isWrapped },
+    ]"
+  >
+    <UContainer class="section-wrapper--container">
       <header
         class="section-header"
         :class="`section-header--${props.textAlign || 'left'}`"
@@ -100,9 +107,40 @@ const handleButtonClick = (event: MouseEvent) => {
 </template>
 
 <style scoped lang="scss">
-$block: "SectionWrapper";
+$block: "section-wrapper";
 
 .#{$block} {
+  &__wrapper {
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -2rem;
+      bottom: -2rem;
+      left: -100vw;
+      right: -100vw;
+      background-color: #fafafa;
+      pointer-events: none;
+      z-index: -1;
+
+      @at-root .dark #{&} {
+        background-color: rgba(0, 0, 0, 0.1) !important;
+      }
+
+      @media (min-width: 640px) {
+        top: -2.5rem;
+        bottom: -2.5rem;
+      }
+
+      @media (min-width: 1024px) {
+        top: 0;
+        bottom: 0;
+      }
+    }
+  }
+
   padding-top: var(--spacing-3xl);
   padding-bottom: var(--spacing-3xl);
 

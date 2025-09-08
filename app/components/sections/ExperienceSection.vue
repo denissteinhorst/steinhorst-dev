@@ -109,7 +109,7 @@ const visibleTimelineItems = computed(() => {
     variant="h2"
     :header-title="data.title || ''"
     :header-text="headerText"
-    class="experience-section__wrapper"
+    :is-wrapped="true"
   >
     <template #content>
       <div class="experience-section">
@@ -191,37 +191,6 @@ $block: "experience-section";
 
 .#{$block} {
   position: relative;
-
-  &__wrapper {
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: -2rem;
-      bottom: -2rem;
-      left: -100vw;
-      right: -100vw;
-      background-color: #fafafa;
-      pointer-events: none;
-      z-index: -1;
-
-      @at-root .dark #{&} {
-        background-color: rgba(0, 0, 0, 0.1) !important;
-      }
-
-      @media (min-width: 640px) {
-        top: -5rem;
-        bottom: -5rem;
-      }
-
-      @media (min-width: 1024px) {
-        top: 0;
-        bottom: 0;
-      }
-    }
-  }
 
   &__background {
     position: absolute;

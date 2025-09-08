@@ -34,7 +34,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
     :jumpmark="data.jumpmark || ''"
     :header-title="data.title || ''"
     :header-text="headerText"
-    class="personality-section__wrapper"
+    :is-wrapped="true"
   >
     <template #content>
       <div class="personality-section__grid">
@@ -73,37 +73,6 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 $block: "personality-section";
 
 .#{$block} {
-  &__wrapper {
-    position: relative;
-    overflow: hidden;
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: -2rem;
-      bottom: -2rem;
-      left: -100vw;
-      right: -100vw;
-      background-color: #fafafa;
-      pointer-events: none;
-      z-index: -1;
-
-      @at-root .dark #{&} {
-        background-color: rgba(0, 0, 0, 0.1) !important;
-      }
-
-      @media (min-width: 640px) {
-        top: -2.5rem;
-        bottom: -2.5rem;
-      }
-
-      @media (min-width: 1024px) {
-        top: 0;
-        bottom: 0;
-      }
-    }
-  }
-
   &__grid {
     display: grid;
     gap: 1.5rem;
