@@ -67,13 +67,13 @@ const logoUrl = computed<string | undefined>(() => {
           rel="noopener noreferrer"
           :aria-label="`${data.link} (${$t('ui.opens_in_new_tab')})`"
         >
+          <span class="certificate-card__button-text">{{ data.linkText }}</span>
+          <span class="sr-only">({{ $t("ui.opens_in_new_tab") }})</span>
           <UIcon
             name="i-heroicons-arrow-top-right-on-square"
             class="certificate-card__button-icon"
             aria-hidden="true"
           />
-          <span class="certificate-card__button-text">{{ data.linkText }}</span>
-          <span class="sr-only">({{ $t("ui.opens_in_new_tab") }})</span>
         </UButton>
       </UTooltip>
       <UButton
@@ -215,6 +215,11 @@ $block: "certificate-card";
 
   &__button-text {
     font-weight: 500;
+    color: #4b5563;
+
+    @at-root .dark #{&} {
+      color: #d1d5db;
+    }
   }
 
   &__highlight {
