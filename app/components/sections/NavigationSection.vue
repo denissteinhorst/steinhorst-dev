@@ -39,18 +39,37 @@ const brandNameParts = computed(() => {
   return { main, secondary };
 });
 
-const isActive = (to = ""): boolean => {
-  if (!to) return false;
-  if (to.startsWith("#")) return currentHash.value === to;
-  const [path, hash] = to.split("#");
-  if (hash) return route.path === path && currentHash.value === `#${hash}`;
-  return route.path === path;
-};
-
 const updateCurrentHash = () => {
   if (import.meta.client) {
-    currentHash.value = window.location.hash;
+    const hash = window.location.hash;
+    // Don't update if it's hero or empty (hero should not be active)
+    currentHash.value = hash === "#hero" ? "" : hash;
   }
+};
+
+const isActive = (to = ""): boolean => {
+  if (!to) return false;
+
+  // Handle hash-only links (e.g., "#about")
+  if (to.startsWith("#")) {
+    // Special case: if link is #hero or we're at root with no hash, don't make it active
+    if (to === "#hero" || to === "#") {
+      return route.path === "/" && !currentHash.value;
+    }
+    return currentHash.value === to;
+  }
+
+  // Handle full URLs with path and hash (e.g., "/#about")
+  const [path, hash] = to.split("#");
+  if (hash) {
+    if (hash === "hero") {
+      return route.path === path && !currentHash.value;
+    }
+    return route.path === path && currentHash.value === `#${hash}`;
+  }
+
+  // Handle path-only links (e.g., "/imprint")
+  return route.path === path;
 };
 
 const skipToHero = () => {
@@ -120,35 +139,45 @@ const handleClickOutside = (event: Event) => {
 
 onMounted(() => {
   if (import.meta.client) {
+    // Initialize current hash
     updateCurrentHash();
+
+    // Listen for hash changes from ANY source (user clicks, scroll updates, etc.)
     window.addEventListener("hashchange", updateCurrentHash, { passive: true });
     document.addEventListener("click", handleClickOutside);
 
+    // Also listen for history.replaceState calls (used by useScrollHashes)
     const originalReplaceState = window.history.replaceState.bind(
       window.history
-    ) as (data: unknown, title: string, url?: string | URL | null) => void;
+    );
 
-    const handleReplace = () => updateCurrentHash();
+    window.history.replaceState = ((
+      data: unknown,
+      title: string,
+      url?: string | URL | null
+    ) => {
+      originalReplaceState(data, title, url);
+      // Update navigation state after history changes
+      nextTick(() => updateCurrentHash());
+    }) as History["replaceState"];
 
-    try {
-      window.history.replaceState = ((
-        data: unknown,
-        title: string,
-        url?: string | URL | null
-      ) => {
-        originalReplaceState(data, title, url);
-        handleReplace();
-      }) as History["replaceState"];
-    } catch {
-      // Fallback if patching fails
-    }
+    // Polling fallback to catch any missed URL changes
+    const hashCheckInterval = setInterval(() => {
+      const newHash =
+        window.location.hash === "#hero" ? "" : window.location.hash;
+      if (newHash !== currentHash.value) {
+        updateCurrentHash();
+      }
+    }, 100);
 
     onUnmounted(() => {
       window.removeEventListener("hashchange", updateCurrentHash);
       document.removeEventListener("click", handleClickOutside);
+      clearInterval(hashCheckInterval);
       if (dropdownTimeout) {
         clearTimeout(dropdownTimeout);
       }
+      // Restore original replaceState
       try {
         window.history.replaceState = originalReplaceState;
       } catch {
@@ -157,6 +186,17 @@ onMounted(() => {
     });
   }
 });
+
+// Watch route changes to update hash state
+watch(
+  () => route.fullPath,
+  () => {
+    if (import.meta.client) {
+      nextTick(() => updateCurrentHash());
+    }
+  },
+  { immediate: true }
+);
 
 watch(isMobileMenuOpen, (isOpen: boolean): void => {
   if (!isOpen) {
