@@ -302,8 +302,8 @@ table {
   }
 }
 
-.visually-hidden {
-  position: absolute !important;
+.sr-only {
+  position: absolute;
   width: 1px;
   height: 1px;
   padding: 0;

@@ -317,7 +317,6 @@ const onBrandClick = (e: MouseEvent) => {
             @click="isMobileMenuOpen = true"
           >
             <UIcon name="i-lucide-menu" class="navigation-section__menu-icon" />
-            <span class="visually-hidden">Menü öffnen</span>
           </UButton>
 
           <USlideover

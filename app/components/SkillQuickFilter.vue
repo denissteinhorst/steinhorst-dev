@@ -60,39 +60,16 @@ onBeforeUnmount(() => {
   <UModal
     :id="modalId"
     v-model:open="modalOpen"
+    :title="quickFilter?.toggle || 'Schnellfilter'"
     :description="
       quickFilter?.text ||
       'Gib etwas ein und prüfe, ob ich damit bereits gearbeitet habe.'
     "
     close-icon="i-lucide-x"
+    class="skill-quick-filter"
     @close="closeOverlay"
   >
-    <template #header="{ close }">
-      <div class="skill-quick-filter__header">
-        <div class="skill-quick-filter__header-content">
-          <h3 class="skill-quick-filter__custom-title">
-            {{ quickFilter?.toggle || "Schnellfilter" }}
-          </h3>
-          <p class="skill-quick-filter__description">
-            {{
-              quickFilter?.text ||
-              "Gib etwas ein und prüfe, ob ich damit bereits gearbeitet habe."
-            }}
-          </p>
-        </div>
-        <button
-          type="button"
-          class="skill-quick-filter__close-button"
-          @click="close"
-        >
-          <UIcon name="i-lucide-x" class="skill-quick-filter__close-icon" />
-        </button>
-      </div>
-    </template>
     <template #body>
-      <label for="skill-search" class="visually-hidden"
-        >Skill eingeben zum Prüfen</label
-      >
       <UInput
         id="skill-search"
         v-model="skillQuery"
@@ -104,9 +81,7 @@ onBeforeUnmount(() => {
         aria-describedby="skill-search-desc"
         autofocus
       />
-      <p id="skill-search-desc" class="visually-hidden">
-        Tippe einen Begriff ein. Ergebnisse erscheinen live darunter.
-      </p>
+
       <div
         class="skill-quick-filter__result-container"
         aria-live="polite"
@@ -214,69 +189,6 @@ onBeforeUnmount(() => {
 $block: "skill-quick-filter";
 
 .#{$block} {
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  &__header-content {
-    flex: 1;
-  }
-
-  &__custom-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0 0 0.5rem 0;
-    color: inherit;
-  }
-
-  &__description {
-    font-size: 0.875rem;
-    color: #6b7280;
-    margin: 0;
-    line-height: 1.5;
-
-    @at-root .dark #{&} {
-      color: #9ca3af;
-    }
-  }
-
-  &__close-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.375rem;
-    border: none;
-    background: transparent;
-    color: #6b7280;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    flex-shrink: 0;
-
-    &:hover {
-      background: #f3f4f6;
-      color: #374151;
-    }
-
-    @at-root .dark #{&} {
-      color: #9ca3af;
-
-      &:hover {
-        background: #374151;
-        color: #f9fafb;
-      }
-    }
-  }
-
-  &__close-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-
   &__search-input {
     margin-bottom: 1rem;
     width: 100%;
@@ -313,6 +225,19 @@ $block: "skill-quick-filter";
   &__button {
     margin-left: auto;
     margin-right: auto;
+  }
+
+  :global(.skill-quick-filter h2),
+  :global(.skill-quick-filter [id*="dialog-title"]) {
+    font-size: 1.5rem !important;
+  }
+
+  :global(.skill-quick-filter button) {
+    cursor: pointer !important;
+  }
+
+  :global(.skill-quick-filter p) {
+    font-size: 1rem !important;
   }
 }
 
