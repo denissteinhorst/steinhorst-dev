@@ -1,24 +1,18 @@
-import { useIntersectionObserver } from '@vueuse/core'
+import { useDebounceFn, useIntersectionObserver } from '@vueuse/core'
 
 interface ScrollHashesOptions {
-  // CSS selector for sections to observe. Defaults to elements with data-scroll-hash or section[id].
   selector?: string
-  // Intersection threshold at which a section becomes active (0.5 = 50%).
   threshold?: number
-  // IDs or data-scroll-hash values that should map to root path (no hash), e.g., 'hero'.
   heroIds?: string[]
-  // Root margin for the observer (account for sticky headers), e.g., '0px 0px -64px 0px'.
   rootMargin?: string
 }
 
-type StopFn = (() => void) | undefined
-
 /**
  * Observe sections and keep the URL hash in sync with the section that is ≥ threshold visible in the viewport.
- * - Chooses the section with the highest viewport coverage above threshold.
- * - Uses data-scroll-hash when present, otherwise falls back to element id.
- * - Values matching heroIds or '/' clear the hash (keeps just '/path').
- * - Uses history.replaceState to avoid scroll jumps and history spam.
+ * Chooses the section with the highest viewport coverage above threshold.
+ * Uses data-scroll-hash when present, otherwise falls back to element id.
+ * Values matching heroIds or '/' clear the hash (keeps just '/path').
+ * Uses history.replaceState to avoid scroll jumps and history spam.
  */
 export const useScrollHashes = (options: ScrollHashesOptions = {}) => {
   const selector = options.selector ?? '[data-scroll-hash], section[id]'
@@ -26,168 +20,146 @@ export const useScrollHashes = (options: ScrollHashesOptions = {}) => {
   const heroIds = new Set(options.heroIds ?? ['hero'])
   const rootMargin = options.rootMargin ?? '0px'
 
-  // no route usage needed; we operate on window.location to avoid navigation side-effects
-
-  const elements = ref<HTMLElement[]>([])
+  const elements = shallowRef<HTMLElement[]>([])
   const activeHash = ref<string>('')
-  // Stores visibility ratio relative to the viewport (not the element)
-  const ratios = new Map<Element, number>()
-  let stopObserver: StopFn
+  const visibilityRatios = new Map<Element, number>()
+  let intersectionObserverStop: (() => void) | undefined
+  let mutationObserver: MutationObserver | undefined
 
-  const resolveHash = (el: Element): string => {
-    const node = el as HTMLElement
-    const raw = (node.dataset?.scrollHash ?? node.id ?? '').trim()
-    if (!raw) return ''
-    if (raw === '/' || heroIds.has(raw)) return ''
-    const id = raw.startsWith('#') ? raw.slice(1) : raw
-    return `#${id}`
+  const resolveHash = (element: Element): string => {
+    const htmlElement = element as HTMLElement
+    const rawHash = (htmlElement.dataset?.scrollHash ?? htmlElement.id ?? '').trim()
+
+    if (!rawHash || rawHash === '/' || heroIds.has(rawHash)) return ''
+
+    const cleanId = rawHash.startsWith('#') ? rawHash.slice(1) : rawHash
+    return `#${cleanId}`
   }
 
-  const replaceHash = (hash: string) => {
+  const updateUrlHash = (hash: string): void => {
     if (!import.meta.client) return
-    const current = window.location.hash || ''
-    if (hash === current) return
 
-    // Build URL without causing navigation/scroll
-    const base = `${window.location.pathname}${window.location.search}`
-    const next = hash ? `${base}${hash}` : base
+    const currentHash = window.location.hash || ''
+    if (hash === currentHash) return
+
+    const baseUrl = `${window.location.pathname}${window.location.search}`
+    const newUrl = hash ? `${baseUrl}${hash}` : baseUrl
+
     try {
-      window.history.replaceState(window.history.state, '', next)
+      window.history.replaceState(window.history.state, '', newUrl)
     } catch {
-      // As a last resort, assign without hash when clearing to avoid scroll jump
-      if (!hash) window.history.replaceState(window.history.state, '', base)
+      if (!hash) window.history.replaceState(window.history.state, '', baseUrl)
     }
   }
 
-  const pickActiveFromRatios = (): Element | null => {
-    let best: { el: Element; ratio: number } | null = null
-    for (const [el, r] of ratios.entries()) {
-      if (r >= threshold) {
-        if (!best || r > best.ratio) best = { el, ratio: r }
+  const findMostVisibleElement = (): Element | null => {
+    let bestElement: { element: Element; ratio: number } | null = null
+
+    for (const [element, ratio] of visibilityRatios.entries()) {
+      if (ratio >= threshold && (!bestElement || ratio > bestElement.ratio)) {
+        bestElement = { element, ratio }
       }
     }
-    return best?.el ?? null
+
+    return bestElement?.element ?? null
   }
 
-  const handleEntries: IntersectionObserverCallback = (entries) => {
-    for (const e of entries) {
-      if (!e.isIntersecting) {
-        ratios.set(e.target, 0)
+  const handleIntersectionEntries: IntersectionObserverCallback = (entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) {
+        visibilityRatios.set(entry.target, 0)
         continue
       }
-      // Compute how much of the viewport height this element covers
-      const rootH = e.rootBounds?.height ?? window.innerHeight
-      const vRatio = rootH > 0 ? Math.min(1, Math.max(0, e.intersectionRect.height / rootH)) : 0
-      ratios.set(e.target, vRatio)
+
+      const rootHeight = entry.rootBounds?.height ?? window.innerHeight
+      const viewportRatio = rootHeight > 0
+        ? Math.min(1, Math.max(0, entry.intersectionRect.height / rootHeight))
+        : 0
+
+      visibilityRatios.set(entry.target, viewportRatio)
     }
-    const el = pickActiveFromRatios()
-    if (!el) return
-    const nextHash = resolveHash(el)
-    if (nextHash !== activeHash.value) {
-      activeHash.value = nextHash
-      replaceHash(nextHash)
+
+    const mostVisibleElement = findMostVisibleElement()
+    if (!mostVisibleElement) return
+
+    const newHash = resolveHash(mostVisibleElement)
+    if (newHash !== activeHash.value) {
+      activeHash.value = newHash
+      updateUrlHash(newHash)
     }
   }
 
-  const observe = () => {
+  const observeElements = (): void => {
     if (!import.meta.client) return
-    elements.value = Array.from(document.querySelectorAll(selector)).filter((n): n is HTMLElement => n instanceof HTMLElement)
+
+    const queriedElements = Array.from(document.querySelectorAll(selector))
+      .filter((element): element is HTMLElement => element instanceof HTMLElement)
+
+    elements.value = queriedElements
     if (!elements.value.length) return
 
-    // Clean previous observer
-    if (stopObserver) stopObserver()
-    ratios.clear()
+    intersectionObserverStop?.()
+    visibilityRatios.clear()
 
     const { stop } = useIntersectionObserver(
       () => elements.value,
-      handleEntries,
+      handleIntersectionEntries,
       {
-        // Use a few steps so entries fire as coverage changes; we compute viewport ratio ourselves
         threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
         rootMargin,
       }
     )
-    stopObserver = stop
 
-    // Prime initial selection on the next microtask if any element already intersects
+    intersectionObserverStop = stop
+
     queueMicrotask(() => {
-      const el = pickActiveFromRatios()
-      if (!el) return
-      const nextHash = resolveHash(el)
-      if (nextHash !== activeHash.value) {
-        activeHash.value = nextHash
-        replaceHash(nextHash)
+      const mostVisibleElement = findMostVisibleElement()
+      if (!mostVisibleElement) return
+
+      const newHash = resolveHash(mostVisibleElement)
+      if (newHash !== activeHash.value) {
+        activeHash.value = newHash
+        updateUrlHash(newHash)
       }
     })
   }
 
-  // MutationObserver to catch DOM replacements (e.g. locale switch that updates
-  // sections without a full navigation). Debounced to avoid rapid re-observations.
-  let mutationObserver: MutationObserver | undefined
-  let mutationTimer: ReturnType<typeof setTimeout> | undefined
-  const scheduleObserve = (delay = 50) => {
-    if (!import.meta.client) return
-    if (mutationTimer) clearTimeout(mutationTimer)
-    mutationTimer = setTimeout(() => {
-      observe()
-      mutationTimer = undefined
-    }, delay)
-  }
+  const debouncedObserve = useDebounceFn(observeElements, 50)
 
   onMounted(() => {
-    // Defer to ensure DOM is ready
-    requestAnimationFrame(() => observe())
+    requestAnimationFrame(() => observeElements())
 
     if (import.meta.client && typeof MutationObserver !== 'undefined') {
-      mutationObserver = new MutationObserver(() => scheduleObserve())
-      // Observe the whole document for subtree changes that may replace section nodes
+      mutationObserver = new MutationObserver(() => debouncedObserve())
+
       try {
         mutationObserver.observe(document.body, { childList: true, subtree: true })
       } catch {
-        // ignore if document.body isn't available or observe throws
+        // Ignore if document.body isn't available
       }
     }
   })
 
-  // Re-observe when the route changes (covers locale switches that update the route
-  // or replace the page content without a full reload). Wait for the DOM update
-  // before scanning elements.
-  try {
-    const route = useRoute()
+  const route = useRoute?.()
+  if (route) {
     watch(
       () => route.fullPath,
       () => {
-        if (!import.meta.client) return
-        // allow the DOM to update after navigation/locale switch
-        nextTick(() => {
-          observe()
-        })
+        if (import.meta.client) {
+          nextTick(() => observeElements())
+        }
       }
     )
-  } catch {
-    // If useRoute isn't available in the environment, silently ignore.
   }
 
   onBeforeUnmount(() => {
-    if (stopObserver) stopObserver()
-    if (mutationObserver) {
-      try {
-        mutationObserver.disconnect()
-      } catch {
-        /* ignore */
-      }
-    }
-    if (mutationTimer) {
-      clearTimeout(mutationTimer)
-      mutationTimer = undefined
-    }
+    intersectionObserverStop?.()
+    mutationObserver?.disconnect()
   })
-
-  const refresh = () => observe()
 
   return {
     activeHash: computed(() => activeHash.value),
-    refresh,
-    stop: () => stopObserver?.(),
+    refresh: observeElements,
+    stop: () => intersectionObserverStop?.(),
   }
 }
