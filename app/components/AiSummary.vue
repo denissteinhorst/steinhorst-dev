@@ -1,10 +1,26 @@
 <script setup lang="ts">
 const { cmsRequest, currentLocaleString } = useStrapi();
 const { $t } = useI18n();
+const { generatePdfFromMarkdown } = usePdfEasy();
 
-// Fetch summary per-locale and keep it reactive when locale changes.
-// Using a reactive key ensures Nuxt will re-run the fetch when
-// `currentLocaleString` updates (for example via the LanguageSelector).
+const WORDS_PER_SECOND = 32;
+const WORDS_PER_SECOND_FINAL = 9000;
+
+const open = ref(false);
+const currentText = ref("");
+const index = ref(0);
+const isComplete = ref(false);
+const hasStarted = ref(false);
+const searchPhase = ref(false);
+const searchCheckedPhase = ref(false);
+const parsedMarkdown = ref("");
+
+let timer: ReturnType<typeof setTimeout> | null = null;
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+let checkTimer: ReturnType<typeof setTimeout> | null = null;
+let framePending = false;
+
+// Data fetching
 const summaryKey = computed(() => `summary-${currentLocaleString.value}`);
 const { data, pending, error, refresh } = useAsyncData<AiSummaryResponse>(
   summaryKey,
@@ -12,49 +28,10 @@ const { data, pending, error, refresh } = useAsyncData<AiSummaryResponse>(
   { immediate: true, server: true }
 );
 
-// If locale changes, refresh the data and reset any typing/progress state so
-// the slideover and typing animation don't get stuck in an inconsistent state.
-const resetTyping = (): void => {
-  if (timer) clearTimeout(timer);
-  if (searchTimer) clearTimeout(searchTimer);
-  if (checkTimer) clearTimeout(checkTimer);
-  timer = null;
-  searchTimer = null;
-  checkTimer = null;
-  index.value = 0;
-  currentText.value = "";
-  isComplete.value = false;
-  hasStarted.value = false;
-  searchPhase.value = false;
-  searchCheckedPhase.value = false;
-};
-
-watch(currentLocaleString, async () => {
-  try {
-    await refresh();
-  } catch {
-    // ignore refresh errors here; UI will show `error` if needed
-  }
-  // reset typing state so the component is usable after locale switch
-  resetTyping();
-  // also ensure the slideover is closed to avoid stale UI
-  open.value = false;
-});
-
-// Use PDFEasy composable
-const { generatePdfFromMarkdown } = usePdfEasy();
-
-// Typing speed configuration (words per second)
-const WORDS_PER_SECOND = 32;
-const WORDS_PER_SECOND_FINAL = 9000;
-
-const open = ref(false);
-// Use only remote summary from API (no local fallback)
 const fullText = computed<string>(
   () => (data.value?.summary as string | undefined)?.trim() ?? ""
 );
 
-// Build UI config for USlideover dynamically
 const slideoverUi = computed(() => ({
   content: [
     "ai-summary__panel",
@@ -63,21 +40,58 @@ const slideoverUi = computed(() => ({
   footer: ["ai-summary__panel-footer"].join(" "),
 }));
 
-// Tokenize into "word + trailing whitespace" chunks (reactive)
 const tokens = computed<string[]>(() => fullText.value.match(/\S+\s*/g) || []);
-const currentText = ref("");
-const index = ref(0);
-const isComplete = ref(false);
-const hasStarted = ref(false);
-// Staged progress: search -> check -> typing
-const searchPhase = ref(false);
-const searchCheckedPhase = ref(false);
-let searchTimer: ReturnType<typeof setTimeout> | null = null;
-let checkTimer: ReturnType<typeof setTimeout> | null = null;
 
-let timer: ReturnType<typeof setTimeout> | null = null;
+const progressPercentage = computed(() =>
+  Math.min(100, Math.round((index.value / (tokens.value.length || 1)) * 100))
+);
 
-// Acceleration curve
+const hasContent = computed(() => tokens.value.length > 0);
+const canDownload = computed(() => isComplete.value && hasContent.value);
+
+// Sparkles effect
+interface SparkleConfiguration {
+  left: number;
+  delay: number;
+  duration: number;
+  scale: number;
+  tx: number;
+}
+
+const sparkles = ref<SparkleConfiguration[]>([]);
+const isClient = ref(false);
+
+const buildSparkles = (count: number = 5): SparkleConfiguration[] =>
+  Array.from(
+    { length: count },
+    (): SparkleConfiguration => ({
+      left: 15 + Math.random() * 70,
+      delay: Math.random() * 0.6,
+      duration: 0.7 + Math.random() * 0.7,
+      scale: 0.4 + Math.random() * 0.5,
+      tx: (Math.random() - 0.5) * 8,
+    })
+  );
+
+const clearAllTimers = (): void => {
+  if (timer) clearTimeout(timer);
+  if (searchTimer) clearTimeout(searchTimer);
+  if (checkTimer) clearTimeout(checkTimer);
+  timer = null;
+  searchTimer = null;
+  checkTimer = null;
+};
+
+const resetTypingState = (): void => {
+  clearAllTimers();
+  index.value = 0;
+  currentText.value = "";
+  isComplete.value = false;
+  hasStarted.value = false;
+  searchPhase.value = false;
+  searchCheckedPhase.value = false;
+};
+
 const computeCurrentDelay = (): number => {
   if (tokens.value.length === 0) return 0;
   const progress = index.value / tokens.value.length;
@@ -101,7 +115,6 @@ const scheduleNext = (): void => {
 const startTyping = (): void => {
   if (timer || isComplete.value) return;
   if (tokens.value.length === 0) {
-    // No content available; mark complete to stop progress states
     hasStarted.value = true;
     isComplete.value = true;
     return;
@@ -110,104 +123,16 @@ const startTyping = (): void => {
   scheduleNext();
 };
 
-watch(open, async (val) => {
-  if (typeof document !== "undefined") {
-    if (val) {
-      document.documentElement.setAttribute("data-ai-summary-open", "true");
-    } else {
-      document.documentElement.removeAttribute("data-ai-summary-open");
-    }
-  }
-  if (!val) return;
-  await nextTick();
-  // Start staged phases immediately
-  // Clear previous timers
-  if (searchTimer) clearTimeout(searchTimer);
-  if (checkTimer) clearTimeout(checkTimer);
-  searchPhase.value = true;
-  searchCheckedPhase.value = false;
-  // After 1.5s, show checkmark for 0.5s
-  searchTimer = setTimeout(() => {
-    searchCheckedPhase.value = true;
-    checkTimer = setTimeout(() => {
-      // End search phases and start typing
-      searchPhase.value = false;
-      searchCheckedPhase.value = false;
-      startTyping();
-    }, 500);
-  }, 1500);
-});
-
-onBeforeUnmount(() => {
-  if (timer) clearTimeout(timer);
-  if (searchTimer) clearTimeout(searchTimer);
-  if (checkTimer) clearTimeout(checkTimer);
-  if (typeof document !== "undefined") {
-    document.documentElement.removeAttribute("data-ai-summary-open");
-  }
-});
-
-// Throttled markdown parsing
-const parsedMarkdown = ref("");
-let framePending = false;
 const scheduleFrame = (callback: () => void): number | NodeJS.Timeout =>
   typeof window !== "undefined"
     ? window.requestAnimationFrame(callback)
     : setTimeout(callback, 16);
-
-watch(currentText, (): void => {
-  if (framePending) return;
-  framePending = true;
-  scheduleFrame((): void => {
-    parsedMarkdown.value = currentText.value;
-    framePending = false;
-  });
-});
-
-parsedMarkdown.value = "";
-const progressPercentage = computed(() =>
-  Math.min(100, Math.round((index.value / (tokens.value.length || 1)) * 100))
-);
-
-// Derive availability states
-const hasContent = computed(() => tokens.value.length > 0);
-const canDownload = computed(() => isComplete.value && hasContent.value);
-
-// Sparkle particle generation
-interface SparkleConf {
-  left: number;
-  delay: number;
-  duration: number;
-  scale: number;
-  tx: number;
-}
-
-const sparkles = ref<SparkleConf[]>([]);
-const isClient = ref(false);
-
-const buildSparkles = (count: number = 5): SparkleConf[] =>
-  Array.from(
-    { length: count },
-    (): SparkleConf => ({
-      left: 15 + Math.random() * 70,
-      delay: Math.random() * 0.6,
-      duration: 0.7 + Math.random() * 0.7,
-      scale: 0.4 + Math.random() * 0.5,
-      tx: (Math.random() - 0.5) * 8,
-    })
-  );
 
 const regenerateSparkles = (): void => {
   if (!isClient.value) return;
   sparkles.value = buildSparkles();
 };
 
-onMounted((): void => {
-  isClient.value = true;
-  regenerateSparkles();
-});
-
-// PDF generation (only from API summary)
 const downloadPdf = async (): Promise<void> => {
   if (!canDownload.value) return;
   try {
@@ -218,10 +143,67 @@ const downloadPdf = async (): Promise<void> => {
       size: "a4",
     });
   } catch (error) {
-    // Optionally surface a toast; keep silent fallback here
     console.error(error);
   }
 };
+
+watch(currentLocaleString, async () => {
+  try {
+    await refresh();
+  } catch {
+    // Ignore refresh errors; UI will show error state if needed
+  }
+  resetTypingState();
+  open.value = false;
+});
+
+watch(open, async (isOpen) => {
+  if (typeof document !== "undefined") {
+    if (isOpen) {
+      document.documentElement.setAttribute("data-ai-summary-open", "true");
+    } else {
+      document.documentElement.removeAttribute("data-ai-summary-open");
+    }
+  }
+
+  if (!isOpen) return;
+
+  await nextTick();
+  clearAllTimers();
+  searchPhase.value = true;
+  searchCheckedPhase.value = false;
+
+  // Staged animation phases
+  searchTimer = setTimeout(() => {
+    searchCheckedPhase.value = true;
+    checkTimer = setTimeout(() => {
+      searchPhase.value = false;
+      searchCheckedPhase.value = false;
+      startTyping();
+    }, 500);
+  }, 1500);
+});
+
+watch(currentText, (): void => {
+  if (framePending) return;
+  framePending = true;
+  scheduleFrame((): void => {
+    parsedMarkdown.value = currentText.value;
+    framePending = false;
+  });
+});
+
+onMounted((): void => {
+  isClient.value = true;
+  regenerateSparkles();
+});
+
+onBeforeUnmount(() => {
+  clearAllTimers();
+  if (typeof document !== "undefined") {
+    document.documentElement.removeAttribute("data-ai-summary-open");
+  }
+});
 </script>
 
 <template>

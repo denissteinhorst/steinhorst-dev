@@ -178,6 +178,8 @@ const { someFunction, someOtherFunction } = useUsers();
 // 6. Methods
 // 7. Lifecycle hooks
 // 8. Watchers
+
+Info: Do not set any comments for those sections, this is just for your understanding.
 </script>
 
 <template>
