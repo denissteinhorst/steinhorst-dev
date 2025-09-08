@@ -333,44 +333,76 @@ const downloadPdf = async (): Promise<void> => {
       </template>
       <template #footer>
         <div class="ai-summary__footer">
-          <UButton
-            :label="String($t('ai_summary.book_appointment'))"
-            color="secondary"
-            variant="soft"
-            :ui="{ base: 'rounded-md' }"
-            href="https://calendly.com/denis-steinhorst"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <UIcon name="i-lucide-calendar" class="ai-summary__footer-icon" />
-            <span class="ai-summary__footer-text">{{
-              $t("ai_summary.book_appointment")
-            }}</span>
-          </UButton>
-          <template v-if="!canDownload">
-            <UTooltip
-              :text="String($t('ai_summary.pdf_tooltip'))"
+          <div class="ai-summary__footer-left">
+            <UPopover
+              mode="hover"
               :open-delay="150"
+              :close-delay="100"
+              :content="{ side: 'top', align: 'start' }"
+              :ui="{ content: 'max-w-xs p-3' }"
             >
               <UButton
-                label="PDF Download"
-                color="primary"
-                variant="soft"
-                :disabled="true"
-                :ui="{ base: 'rounded-md' }"
-              />
-            </UTooltip>
-          </template>
-          <template v-else>
+                color="neutral"
+                variant="ghost"
+                size="sm"
+                :ui="{
+                  base: 'rounded-full p-1.5 h-7 w-7',
+                }"
+                aria-label="Information about AI generation"
+              >
+                <UIcon
+                  name="i-lucide:help-circle"
+                  class="h-3.5 w-3.5 faq-section__question-icon"
+                />
+              </UButton>
+
+              <template #content>
+                <p class="ai-summary__popover-text text-2xs leading-relaxed">
+                  {{ $t("ai_summary.chatgpt_tooltip") }}
+                </p>
+              </template>
+            </UPopover>
+          </div>
+          <div class="ai-summary__footer-right">
             <UButton
-              label="PDF Download"
+              :label="String($t('ai_summary.book_appointment'))"
               color="secondary"
               variant="soft"
-              :disabled="false"
               :ui="{ base: 'rounded-md' }"
-              @click="downloadPdf"
-            />
-          </template>
+              href="https://calendly.com/denis-steinhorst"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <UIcon name="i-lucide-calendar" class="ai-summary__footer-icon" />
+              <span class="ai-summary__footer-text">{{
+                $t("ai_summary.book_appointment")
+              }}</span>
+            </UButton>
+            <template v-if="!canDownload">
+              <UTooltip
+                :text="String($t('ai_summary.pdf_tooltip'))"
+                :open-delay="150"
+              >
+                <UButton
+                  label="PDF Download"
+                  color="primary"
+                  variant="soft"
+                  :disabled="true"
+                  :ui="{ base: 'rounded-md' }"
+                />
+              </UTooltip>
+            </template>
+            <template v-else>
+              <UButton
+                label="PDF Download"
+                color="secondary"
+                variant="soft"
+                :disabled="false"
+                :ui="{ base: 'rounded-md' }"
+                @click="downloadPdf"
+              />
+            </template>
+          </div>
         </div>
       </template>
     </USlideover>
@@ -668,6 +700,18 @@ $block: "ai-summary";
 
   &__footer {
     width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__footer-left {
+    display: flex;
+    align-items: center;
+  }
+
+  &__footer-right {
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
@@ -1061,6 +1105,11 @@ $block: "ai-summary";
   }
 
   :global(.ai-summary__slideover p) {
+    font-size: 1rem !important;
+  }
+
+  // Specific styling for popover content
+  :global(.ai-summary__popover-text) {
     font-size: 1rem !important;
   }
 }

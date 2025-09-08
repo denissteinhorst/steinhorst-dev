@@ -61,7 +61,8 @@
     "writing": "Writing… ({percentage}%)",
     "book_appointment": "Book appointment",
     "pdf_download": "PDF Download",
-    "pdf_tooltip": "Will be activated once the summary is fully generated."
+    "pdf_tooltip": "Will be activated once the summary is fully generated.",
+    "chatgpt_tooltip": "This summary was generated using ChatGPT and locally cached to preserve API resources. The visual layout is designed to closely resemble the original chat experience."
   },
   "footer_section": {
     "copyright": "All rights reserved.",
