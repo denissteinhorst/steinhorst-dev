@@ -276,31 +276,16 @@ const downloadPdf = async (): Promise<void> => {
       :overlay="true"
       side="right"
       class="ai-summary__slideover ai-summary-slideover"
+      title="AI Summary"
+      :description="data.subtitle"
     >
-      <template #header>
-        <div class="ai-summary__header">
-          <div class="ai-summary__header-content">
-            <h2 class="ai-summary__title">
-              <UIcon
-                name="i-heroicons-sparkles"
-                class="ai-summary__title-icon"
-              />
-              <span>AI Summary</span>
-            </h2>
-            <p class="ai-summary__subtitle">{{ data.subtitle }}</p>
-          </div>
-          <UButton
-            variant="ghost"
-            square
-            color="neutral"
-            :aria-label="$t('ai_summary.close')"
-            @click="open = false"
-          >
-            <UIcon name="i-lucide-x" class="ai-summary__close-icon" />
-            <span class="sr-only">{{ $t("ai_summary.close") }}</span>
-          </UButton>
+      <template #title>
+        <div class="flex items-center gap-2">
+          <UIcon name="i-heroicons-sparkles" class="ai-summary__title-icon" />
+          <span>AI Summary</span>
         </div>
       </template>
+
       <template #body>
         <div class="ai-summary__body ai-summary-scroll">
           <ClientOnly>
@@ -1064,6 +1049,19 @@ $block: "ai-summary";
         color: #a5b4fc;
       }
     }
+  }
+
+  :global(.ai-summary__slideover h2),
+  :global(.ai-summary__slideover [id*="dialog-title"]) {
+    font-size: 1.5rem !important;
+  }
+
+  :global(.ai-summary__slideover button) {
+    cursor: pointer !important;
+  }
+
+  :global(.ai-summary__slideover p) {
+    font-size: 1rem !important;
   }
 }
 
