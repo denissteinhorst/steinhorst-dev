@@ -21,10 +21,11 @@ const { data, pending, error } =
         "text",
         "qrcode",
         "openWhatsapp",
-        "directMessage", 
+        "directMessage",
         "disclaimer",
       ])
-  );const breakpoints = useBreakpoints({ lg: 1024 });
+  );
+const breakpoints = useBreakpoints({ lg: 1024 });
 const isDesktop = breakpoints.greaterOrEqual("lg");
 
 const qrCodeUrl = computed<string | undefined>(() => {
@@ -157,7 +158,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
             </section>
 
             <div class="leave-notification__separator" aria-hidden="true">
-              <span>{{ $t('leave_notification.separator') }}</span>
+              <span>{{ $t("leave_notification.separator") }}</span>
             </div>
 
             <section
@@ -175,7 +176,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                   name="i-lucide-calendar"
                   class="leave-notification__icon"
                 />
-                <span>{{ $t('leave_notification.appointment') }}</span>
+                <span>{{ $t("leave_notification.appointment") }}</span>
               </a>
 
               <a
@@ -185,7 +186,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                 class="leave-notification__contact-link"
               >
                 <UIcon name="i-lucide-mail" class="leave-notification__icon" />
-                <span>{{ $t('leave_notification.email') }}</span>
+                <span>{{ $t("leave_notification.email") }}</span>
               </a>
 
               <a
@@ -199,7 +200,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                   name="i-simple-icons-linkedin"
                   class="leave-notification__icon"
                 />
-                <span>{{ $t('leave_notification.linkedin') }}</span>
+                <span>{{ $t("leave_notification.linkedin") }}</span>
               </a>
 
               <a
@@ -213,7 +214,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                   name="i-simple-icons-xing"
                   class="leave-notification__icon"
                 />
-                <span>{{ $t('leave_notification.xing') }}</span>
+                <span>{{ $t("leave_notification.xing") }}</span>
               </a>
             </section>
 

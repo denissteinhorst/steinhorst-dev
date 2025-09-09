@@ -21,6 +21,11 @@ const { data, pending, error } =
       )
   );
 
+const { data: jobSearchData } = useLazyAsyncData<JobBadgeResponse>(
+  () => `badge-${currentLocaleString.value}`,
+  () => cmsRequest<JobBadgeResponse>("job-badge", ["isEnabled"], false, [])
+);
+
 const visibleStationsBase = ref(3);
 const isMobile = ref(false);
 
@@ -33,7 +38,18 @@ const timelineStatus = computed(() => {
 
 const timelineItems = computed(() => {
   const cards = data.value?.experienceCards ?? [];
-  return cards.map((card, cardIndex) => ({
+  let filteredCards = cards;
+
+  // Skip first card if it's jobsearch-only and badge is disabled
+  if (
+    jobSearchData.value?.isEnabled === false &&
+    cards.length > 0 &&
+    cards[0]?.isJobsearch === true
+  ) {
+    filteredCards = cards.slice(1);
+  }
+
+  return filteredCards.map((card, cardIndex) => ({
     date: "",
     title: "",
     description: "",
@@ -65,6 +81,9 @@ onMounted(() => {
   checkMobile();
   visibleStationsBase.value = isMobile.value ? 2 : 3;
   window.addEventListener("resize", checkMobile);
+
+  // For debugging purposes
+  console.log("Job Search Badge:", jobSearchData.value);
 });
 
 onUnmounted(() => {
@@ -129,8 +148,15 @@ watch(visibleStationsBase, (newValue, oldValue) => {
           class="experience-section__timeline"
         >
           <template #description="{ item }">
-            <ExperienceCard :data="item.card" :index="item.index" />
-            <div v-if="item.isFirst" class="experience-section__contact-cta">
+            <ExperienceCard
+              :data="item.card"
+              :index="item.index"
+              :show-jobsearch-badge="jobSearchData?.isEnabled"
+            />
+            <div
+              v-if="jobSearchData?.isEnabled"
+              class="experience-section__contact-cta"
+            >
               <UButton
                 to="#contact"
                 variant="outline"

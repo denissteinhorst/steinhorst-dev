@@ -2,6 +2,7 @@
 const props = defineProps<{
   data: ExperienceCard;
   index?: number;
+  showJobsearchBadge?: boolean;
 }>();
 
 const { buildImageUrl } = useStrapi();
@@ -131,11 +132,21 @@ const dutyItems = computed(() => extractListItems(props.data.duty));
 const learningText = computed(() => renderRichTextAsText(props.data.learning));
 const logoUrl = computed(() => buildImageUrl(props.data.logo, "small"));
 const aosDelay = computed(() => Math.min(props.index ?? 0, 5) * 100);
+
+// Determine if this card should be visible based on jobsearch logic
+const shouldShowCard = computed(() => {
+  // If this card is marked as jobsearch, show it only when showJobsearchBadge is true
+  if (props.data.isJobsearch === true) {
+    return props.showJobsearchBadge === true;
+  }
+  // For all other cards (not marked as jobsearch), always show them
+  return true;
+});
 </script>
 
 <template>
   <div
-    v-if="data"
+    v-if="data && shouldShowCard"
     data-aos="fade-up"
     :data-aos-delay="aosDelay"
     class="experience-card"

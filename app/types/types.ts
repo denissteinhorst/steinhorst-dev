@@ -256,6 +256,7 @@ export interface ProjectCard {
   target?: NavigationLinkTarget;
   company?: string;
   logo?: StrapiImage | null;
+  isJobsearch?: boolean;
 }
 
 /** Item within the last project card content */
@@ -304,6 +305,7 @@ export interface ExperienceCard {
   duty?: RichTextBlock[];
   learning?: RichTextBlock[];
   logo?: StrapiImage | null;
+  isJobsearch?: boolean;
 }
 
 /**
