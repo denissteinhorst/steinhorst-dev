@@ -64,6 +64,13 @@
     "pdf_tooltip": "Wird aktiv sobald die Zusammenfassung vollständig generiert wurde.",
     "chatgpt_tooltip": "Diese Zusammenfassung wurde mithilfe von ChatGPT erstellt und in Strapi zwischengespeichert, um API-Ressourcen zu schonen. Die Darstellung wurde so gestaltet, dass sie dem originalen Chat-Erlebnis entspricht."
   },
+  "leave_notification": {
+    "appointment": "Termin",
+    "email": "E‑Mail",
+    "linkedin": "LinkedIn",
+    "xing": "Xing",
+    "separator": "oder"
+  },
   "footer_section": {
     "copyright": "Alle Rechte vorbehalten.",
     "imprint": "Impressum"

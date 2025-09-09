@@ -20,10 +20,11 @@ const { data, pending, error } =
         "title",
         "text",
         "qrcode",
+        "openWhatsapp",
+        "directMessage", 
+        "disclaimer",
       ])
-  );
-
-const breakpoints = useBreakpoints({ lg: 1024 });
+  );const breakpoints = useBreakpoints({ lg: 1024 });
 const isDesktop = breakpoints.greaterOrEqual("lg");
 
 const qrCodeUrl = computed<string | undefined>(() => {
@@ -120,6 +121,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
         v-model:open="isOpen"
         :title="data.title || 'Kontakt aufnehmen'"
         :description="data.text || 'Nehmen Sie direkt Kontakt auf'"
+        :prevent-close="true"
         class="leave-modal-custom"
       >
         <template #body>
@@ -132,7 +134,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                 id="leave-notification-qr-title"
                 class="leave-notification__section-title"
               >
-                Direkt Nachricht per WhatsApp:
+                {{ data.directMessage || "Direkt Nachricht per WhatsApp:" }}
               </h3>
               <img
                 :src="qrCodeUrl"
@@ -150,12 +152,12 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                   name="i-simple-icons-whatsapp"
                   class="leave-notification__icon"
                 />
-                <span>WhatsApp öffnen</span>
+                <span>{{ data.openWhatsapp || "WhatsApp öffnen" }}</span>
               </a>
             </section>
 
             <div class="leave-notification__separator" aria-hidden="true">
-              <span>oder</span>
+              <span>{{ $t('leave_notification.separator') }}</span>
             </div>
 
             <section
@@ -173,7 +175,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                   name="i-lucide-calendar"
                   class="leave-notification__icon"
                 />
-                <span>Termin</span>
+                <span>{{ $t('leave_notification.appointment') }}</span>
               </a>
 
               <a
@@ -183,7 +185,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                 class="leave-notification__contact-link"
               >
                 <UIcon name="i-lucide-mail" class="leave-notification__icon" />
-                <span>E‑Mail</span>
+                <span>{{ $t('leave_notification.email') }}</span>
               </a>
 
               <a
@@ -197,7 +199,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                   name="i-simple-icons-linkedin"
                   class="leave-notification__icon"
                 />
-                <span>LinkedIn</span>
+                <span>{{ $t('leave_notification.linkedin') }}</span>
               </a>
 
               <a
@@ -211,12 +213,14 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                   name="i-simple-icons-xing"
                   class="leave-notification__icon"
                 />
-                <span>Xing</span>
+                <span>{{ $t('leave_notification.xing') }}</span>
               </a>
             </section>
 
             <p class="leave-notification__footnote" aria-hidden="true">
-              * Unverbindlich. Keine Vorbereitung nötig.
+              {{
+                data.disclaimer || "* Unverbindlich. Keine Vorbereitung nötig."
+              }}
             </p>
           </div>
         </template>

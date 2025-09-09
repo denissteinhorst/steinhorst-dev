@@ -455,5 +455,8 @@ export interface LeaveNotificationResponse extends BaseResponse<LeaveNotificatio
   title?: string;
   text?: string;
   qrcode?: StrapiImage[];
+  openWhatsapp?: string;
+  directMessage?: string;
+  disclaimer?: string;
   createdAt?: ISODateString;
 }

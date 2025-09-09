@@ -64,6 +64,13 @@
     "pdf_tooltip": "Will be activated once the summary is fully generated.",
     "chatgpt_tooltip": "This summary was generated using ChatGPT and saved in Strapi to preserve API resources. The visual layout is designed to closely resemble the original chat experience."
   },
+  "leave_notification": {
+    "appointment": "Appointment",
+    "email": "E‑Mail",
+    "linkedin": "LinkedIn",
+    "xing": "Xing",
+    "separator": "or"
+  },
   "footer_section": {
     "copyright": "All rights reserved.",
     "imprint": "Imprint"
