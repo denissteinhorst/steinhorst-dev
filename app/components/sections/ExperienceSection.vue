@@ -21,7 +21,8 @@ const { data, pending, error } =
       )
   );
 
-const { data: jobSearchData } = useLazyAsyncData<JobBadgeResponse>(
+// Fetch job badge data server-first (non-lazy) so SSR & client markup stay identical
+const { data: jobSearchData } = await useAsyncData<JobBadgeResponse>(
   () => `job-badge-${currentLocaleString.value}`,
   () => cmsRequest<JobBadgeResponse>("job-badge", ["isEnabled"], false, [])
 );
@@ -81,9 +82,6 @@ onMounted(() => {
   checkMobile();
   visibleStationsBase.value = isMobile.value ? 2 : 3;
   window.addEventListener("resize", checkMobile);
-
-  // For debugging purposes
-  console.log("Job Search Badge:", jobSearchData.value);
 });
 
 onUnmounted(() => {
@@ -151,7 +149,7 @@ watch(visibleStationsBase, (newValue, oldValue) => {
             <ExperienceCard
               :data="item.card"
               :index="item.index"
-              :show-jobsearch-badge="jobSearchData?.isEnabled"
+              :show-jobsearch-badge="!!jobSearchData?.isEnabled"
             />
             <div
               v-if="jobSearchData?.isEnabled"
