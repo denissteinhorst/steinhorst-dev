@@ -13,6 +13,8 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
+const { $sanitizeHtml } = useNuxtApp();
+
 const modalId = "skills-filter-modal";
 const MODAL_ATTRIBUTE = "data-skill-quickfilter-open";
 
@@ -112,7 +114,13 @@ onBeforeUnmount(() => {
             class="skill-quick-filter__alert skill-quick-filter__alert--loading"
           >
             <template #description>
-              Suche nach "{{ skillQuery.trim() }}"...
+              <span
+                v-html="
+                  $sanitizeHtml(
+                    `Suche nach &quot;${skillQuery.trim()}&quot;...`
+                  )
+                "
+              ></span>
             </template>
           </UAlert>
 
@@ -126,16 +134,27 @@ onBeforeUnmount(() => {
             class="skill-quick-filter__alert"
           >
             <template #description>
-              {{
-                quickFilter?.hintSuccess
-                  ? quickFilter.hintSuccess.includes("%SKILL%")
-                    ? quickFilter.hintSuccess.replace(
-                        "%SKILL%",
-                        skillResult.skill
-                      )
-                    : quickFilter.hintSuccess
-                  : `Ja, mit ${skillResult.skill} habe ich bereits gearbeitet!`
-              }}
+              <span
+                v-if="quickFilter?.hintSuccess"
+                v-html="
+                  $sanitizeHtml(
+                    quickFilter.hintSuccess.includes('%SKILL%')
+                      ? quickFilter.hintSuccess.replace(
+                          '%SKILL%',
+                          skillResult.skill
+                        )
+                      : quickFilter.hintSuccess
+                  )
+                "
+              ></span>
+              <span
+                v-else
+                v-html="
+                  $sanitizeHtml(
+                    `Ja, mit ${skillResult.skill} habe ich bereits gearbeitet!`
+                  )
+                "
+              ></span>
             </template>
           </UAlert>
 
@@ -149,16 +168,20 @@ onBeforeUnmount(() => {
             class="skill-quick-filter__alert"
           >
             <template #description>
-              {{
-                quickFilter?.hintError
-                  ? quickFilter.hintError.includes("%SKILL%")
-                    ? quickFilter.hintError.replace(
-                        "%SKILL%",
-                        skillResult.skill
-                      )
-                    : quickFilter.hintError
-                  : `Nein, mit ${skillResult.skill} habe ich noch nicht gearbeitet oder kenne es nicht gut genug.`
-              }}
+              <span
+                v-html="
+                  $sanitizeHtml(
+                    quickFilter?.hintError
+                      ? quickFilter.hintError.includes('%SKILL%')
+                        ? quickFilter.hintError.replace(
+                            '%SKILL%',
+                            skillResult.skill
+                          )
+                        : quickFilter.hintError
+                      : `Nein, mit ${skillResult.skill} habe ich noch nicht gearbeitet oder kenne es nicht gut genug.`
+                  )
+                "
+              ></span>
             </template>
           </UAlert>
         </div>

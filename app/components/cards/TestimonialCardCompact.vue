@@ -1,8 +1,7 @@
 <script setup lang="ts">
-const props = defineProps<{
+defineProps<{
   data: RecommendationCard;
   isActive?: boolean;
-  index?: number;
 }>();
 
 const emit = defineEmits<{

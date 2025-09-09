@@ -32,6 +32,7 @@ const emit = defineEmits<{
 }>();
 
 const { t } = useI18n();
+const { $sanitizeHtml } = useNuxtApp();
 
 // Controls whether all projects are shown
 const isShowingAllProjects = ref(false);
@@ -179,10 +180,12 @@ const handleFilterInputChange = (event: Event): void => {
           <span
             class="project-filter__count-info"
             v-html="
-              t('project_section.filter.showing_count', {
-                filtered: props.filteredCount,
-                total: props.projectCount,
-              })
+              $sanitizeHtml(
+                t('project_section.filter.showing_count', {
+                  filtered: props.filteredCount,
+                  total: props.projectCount,
+                }) as string
+              )
             "
           >
           </span>

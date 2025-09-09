@@ -11,7 +11,7 @@ const setPreference = (preference: string): void => {
   <div class="color-selector">
     <UTooltip
       v-if="colorMode.value === 'light'"
-      :text="$t('ui.switch_to_dark_mode') as string"
+      :text="String($t('ui.switch_to_dark_mode'))"
       :delay-duration="0"
       :content="{ side: 'top', sideOffset: 12 }"
     >
@@ -19,13 +19,13 @@ const setPreference = (preference: string): void => {
         name="i-lucide-moon"
         class="color-selector__icon"
         style="--color-secondary: var(--color-secondary, #8b5cf6)"
-        :aria-label="$t('ui.switch_to_dark_mode') as string"
+        :aria-label="String($t('ui.switch_to_dark_mode'))"
         @click="setPreference('dark')"
       />
     </UTooltip>
     <UTooltip
       v-else
-      :text="$t('ui.switch_to_light_mode') as string"
+      :text="String($t('ui.switch_to_light_mode'))"
       :delay-duration="0"
       :content="{ side: 'top', sideOffset: 12 }"
     >
@@ -33,7 +33,7 @@ const setPreference = (preference: string): void => {
         name="i-lucide-sun"
         class="color-selector__icon"
         style="--color-secondary: var(--color-secondary, #8b5cf6)"
-        :aria-label="$t('ui.switch_to_light_mode') as string"
+        :aria-label="String($t('ui.switch_to_light_mode'))"
         @click="setPreference('light')"
       />
     </UTooltip>

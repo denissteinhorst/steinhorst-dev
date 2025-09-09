@@ -15,7 +15,6 @@ const computeDuration = (period?: string): string => {
     januar: 1,
     februar: 2,
     märz: 3,
-    maerz: 3,
     april: 4,
     mai: 5,
     juni: 6,
@@ -42,6 +41,7 @@ const computeDuration = (period?: string): string => {
     if (Number.isNaN(year)) return null;
     const month = monthMap[monthName] ?? NaN;
     if (Number.isNaN(month)) return null;
+
     // Create date representing first day of month
     return new Date(year, month - 1, 1);
   };
@@ -73,6 +73,7 @@ const computeDuration = (period?: string): string => {
 
   // When years > 0, display months as remainder + 1 (if there's a remainder)
   let shownMonths = rem > 0 ? rem + 1 : 0;
+
   // Rollover: 12 months -> +1 year, 0 months
   if (shownMonths === 12) {
     years += 1;
@@ -124,7 +125,6 @@ const extractListItems = (blocks?: RichTextBlock[]): string[] => {
   return items;
 };
 
-// Computed properties
 const durationDisplay = computed(() => computeDuration(props.data.period));
 const mainText = computed(() => renderRichTextAsText(props.data.text));
 const dutyItems = computed(() => extractListItems(props.data.duty));

@@ -11,18 +11,9 @@ const switchLocale = (): void => {
   $switchLocale(targetLocale.value);
 };
 
-// Locale helpers with fallbacks - ensure consistent rendering
-const toWord = computed<string>(() => {
-  const translatedValue = $t("language_switcher.to");
-  if (typeof translatedValue === "string" && translatedValue) {
-    return translatedValue;
-  }
-  return currentLocale.value === "de" ? "zu" : "to";
-});
-
 const localeSwitchTooltip = computed<string>(
   () =>
-    `${$t("language_switcher.label")} ${toWord.value} ${$t(
+    `${$t("language_switcher.label")} ${$t("language_switcher.to")} ${$t(
       `language_switcher.${targetLocale.value}`
     )}`
 );
@@ -62,7 +53,6 @@ $block: "language-selector";
     }
   }
 
-  // Adjust spacing for desktop navigation context
   .navigation-section__extra & :deep(.iconify) {
     margin-left: 12px;
   }

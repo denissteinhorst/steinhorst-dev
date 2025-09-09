@@ -4,10 +4,8 @@ const props = defineProps<{
   aosDelay: number;
 }>();
 
-// Compute text nodes for StrapiBlocksText
 const textNodes = computed<RichTextNodes>(() => props.data.text ?? []);
 
-// Compute aria label based on target
 const getAriaLabel = (card: ContactCard): string => {
   const baseLabel = card.title || "";
   if (card.target === "_blank") {

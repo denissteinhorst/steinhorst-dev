@@ -3,7 +3,7 @@ defineProps<{ data: ProjectCard }>();
 
 const { buildImageUrl } = useStrapi();
 
-// Helper function to extract text content from RichTextBlock
+// extract Tags from RichText (one tag per line)
 const extractTextFromRichText = (block: RichTextBlock): string => {
   if (block.text) {
     return block.text;
