@@ -10,7 +10,7 @@ const { data, pending, error } = await useLazyAsyncData<JobBadgeResponse>(
 <template>
   <div v-if="pending" class="job-search-badge">Loading badge...</div>
   <div v-else-if="error" class="job-search-badge">Failed to load badge.</div>
-  <div v-else-if="data" class="job-search-badge">
+  <div v-else-if="data && data.isEnabled" class="job-search-badge">
     <a :href="data.link" class="job-search-badge__link">
       <UIcon
         :name="data.icon || 'check-circle'"

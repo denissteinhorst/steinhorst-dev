@@ -22,7 +22,7 @@ const { data, pending, error } =
   );
 
 const { data: jobSearchData } = useLazyAsyncData<JobBadgeResponse>(
-  () => `badge-${currentLocaleString.value}`,
+  () => `job-badge-${currentLocaleString.value}`,
   () => cmsRequest<JobBadgeResponse>("job-badge", ["isEnabled"], false, [])
 );
 
