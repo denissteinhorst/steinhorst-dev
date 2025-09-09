@@ -152,7 +152,7 @@ watch(visibleStationsBase, (newValue, oldValue) => {
               :show-jobsearch-badge="!!jobSearchData?.isEnabled"
             />
             <div
-              v-if="item.index == 0 && jobSearchData?.isEnabled"
+              v-if="item.index === 0 && jobSearchData?.isEnabled"
               class="experience-section__contact-cta"
             >
               <UButton
