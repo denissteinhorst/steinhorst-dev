@@ -6,6 +6,7 @@ const props = defineProps<{
 }>();
 
 const { buildImageUrl } = useStrapi();
+const { t } = useI18n();
 
 // Helper function to compute duration from period string
 const computeDuration = (period?: string): string => {
@@ -210,23 +211,36 @@ const shouldShowCard = computed(() => {
         <p v-if="mainText" class="experience-card__summary">
           {{ mainText }}
         </p>
-        <ul v-if="dutyItems.length" class="experience-card__duties">
-          <li
-            v-for="item in dutyItems"
-            :key="item"
-            class="experience-card__duty-item"
-          >
-            {{ item }}
-          </li>
-        </ul>
-        <blockquote v-if="learningText" class="experience-card__learning">
-          <UIcon
-            name="i-material-symbols-format-quote"
-            aria-hidden="true"
-            class="experience-card__quote-icon"
-          />
-          {{ learningText }}
-        </blockquote>
+
+        <!-- Responsibilities Section -->
+        <div v-if="dutyItems.length" class="experience-card__responsibilities">
+          <h4 class="experience-card__responsibilities-title">
+            {{ t("experience_section.responsibilities") }}
+          </h4>
+          <ul class="experience-card__responsibilities-list">
+            <li
+              v-for="item in dutyItems"
+              :key="item"
+              class="experience-card__responsibility-item"
+            >
+              {{ item }}
+            </li>
+          </ul>
+        </div>
+
+        <!-- Key Learning Insight -->
+        <div v-if="learningText" class="experience-card__insight">
+          <div class="experience-card__insight-header">
+            <UIcon
+              name="i-heroicons-light-bulb"
+              class="experience-card__insight-icon"
+            />
+            <span class="experience-card__insight-label">{{
+              t("experience_section.key_learning")
+            }}</span>
+          </div>
+          <p class="experience-card__insight-text">{{ learningText }}</p>
+        </div>
       </div>
 
       <!-- Logo for Larger Screens -->
@@ -283,7 +297,7 @@ $block: "experience-card";
   }
 
   &__title {
-    margin-top: var(--spacing-sm);
+    margin-top: 0;
     font-size: var(--font-size-lg);
     font-weight: 600;
     line-height: 1.4;
@@ -342,33 +356,93 @@ $block: "experience-card";
     margin: 0;
   }
 
-  &__duties {
-    margin-top: var(--spacing-sm);
-    padding-left: 1.25rem;
-    list-style-type: disc;
+  &__responsibilities {
+    margin-top: var(--spacing-md);
+  }
 
-    &:deep(li) {
+  &__responsibilities-title {
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__responsibilities-list {
+    margin: 0;
+    padding: 8px 0;
+    list-style: none;
+  }
+
+  &__responsibility-item {
+    position: relative;
+    padding-left: 1.25rem;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+
+    &:not(:last-child) {
       margin-bottom: var(--spacing-xs);
-      font-size: var(--font-size-sm);
+    }
+
+    &::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+      font-weight: 600;
     }
   }
 
-  &__duty-item {
+  &__insight {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.05) 0%,
+      rgba(147, 51, 234, 0.05) 100%
+    );
+    border-left: 3px solid var(--color-primary);
+    border-radius: var(--radius-medium);
+
+    @at-root .dark #{&} {
+      background: linear-gradient(
+        135deg,
+        rgba(59, 130, 246, 0.1) 0%,
+        rgba(147, 51, 234, 0.1) 100%
+      );
+    }
+  }
+
+  &__insight-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
     margin-bottom: var(--spacing-xs);
-    font-size: var(--font-size-sm);
   }
 
-  &__learning {
-    margin-top: 1.25rem;
+  &__insight-icon {
+    font-size: var(--font-size-base);
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  &__insight-label {
     font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--color-primary);
+    text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--color-text-muted);
-    font-weight: 500;
   }
 
-  &__quote-icon {
-    font-size: var(--font-size-lg);
-    margin-right: 0.25rem;
+  &__insight-text {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    font-style: italic;
   }
 
   &__desktop-logo {

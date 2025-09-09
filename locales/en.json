@@ -22,6 +22,8 @@
     "description": "Portfolio & experiences of Denis Steinhorst – Fullstack / Vue & Nuxt focused developer. Projects, skills, references & contact."
   },
   "experience_section": {
+    "responsibilities": "Responsibilities",
+    "key_learning": "Key Learning",
     "testimonial": {
       "show_german": "Show German translation",
       "show_english": "Show English original",
