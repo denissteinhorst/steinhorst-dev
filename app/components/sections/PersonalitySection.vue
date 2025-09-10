@@ -39,6 +39,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
     :header-title="data.title || ''"
     :header-text="headerText"
     :is-wrapped="true"
+    :next-section="'projects'"
   >
     <template #content>
       <div class="personality-section__grid">

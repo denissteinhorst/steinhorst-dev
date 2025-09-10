@@ -11,6 +11,13 @@ const emit = defineEmits<{
 const handleClick = () => {
   emit("click");
 };
+
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === "Enter" || event.key === " ") {
+    event.preventDefault();
+    emit("click");
+  }
+};
 </script>
 
 <template>
@@ -18,9 +25,12 @@ const handleClick = () => {
     :is-active="isActive"
     class="testimonial-card-compact"
     :class="{ 'testimonial-card-compact--active': isActive }"
-    role="listitem"
+    role="button"
     :aria-labelledby="`testimonial-${data.id}`"
+    :aria-pressed="isActive"
+    tabindex="0"
     @click="handleClick"
+    @keydown="handleKeydown"
   >
     <article class="testimonial-card-compact__article">
       <span class="testimonial-card-compact__summary">

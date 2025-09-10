@@ -30,6 +30,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
     :header-text="headerText"
     text-align="center"
     :is-wrapped="true"
+    :next-section="'testimonials'"
   >
     <template #content>
       <div class="faq-section" aria-label="Main">
@@ -63,21 +64,6 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
                     label: 'faq-section__accordion-label',
                   }"
                 >
-                  <template #default="{ item: accordionItem }">
-                    <div class="faq-section__question-wrapper">
-                      <UIcon
-                        name="i-lucide:help-circle"
-                        class="faq-section__question-icon"
-                        aria-hidden="true"
-                      />
-                      <h6
-                        :id="`faq-q-` + accordionItem.question"
-                        class="faq-section__question"
-                      >
-                        {{ accordionItem.question }}
-                      </h6>
-                    </div>
-                  </template>
                   <template #body="{ item: accordionItem }">
                     <div class="faq-section__answer">
                       {{ accordionItem.answer }}
@@ -148,39 +134,6 @@ $block: "faq-section";
     width: 100%;
   }
 
-  &__question-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transform: none !important;
-    scale: 1 !important;
-    transition: none !important;
-
-    &:hover {
-      transform: none !important;
-      scale: 1 !important;
-
-      .#{$block}__question {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  &__question-icon {
-    flex-shrink: 0;
-    width: 1.125rem;
-    height: 1.125rem;
-    color: rgb(var(--color-primary));
-  }
-
-  &__question {
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.375;
-    transition: text-decoration 150ms ease;
-  }
-
   &__answer {
     font-size: 1rem;
     line-height: 1.625;
@@ -189,9 +142,15 @@ $block: "faq-section";
 
 :deep(.#{$block}__accordion-item) {
   border-bottom: 1px solid rgb(var(--color-gray-200));
+  border-radius: 0.375rem;
+  transition: background-color 0.2s ease;
 
   @media (prefers-color-scheme: dark) {
     border-bottom-color: rgb(var(--color-gray-800));
+  }
+
+  &:focus-within {
+    background-color: rgba(var(--color-primary), 0.05);
   }
 }
 
@@ -213,16 +172,24 @@ $block: "faq-section";
   min-width: 0;
   transform: none !important;
   scale: 1 !important;
-  transition: none !important;
+  transition: all 0.2s ease !important;
+  border-radius: 0.375rem;
 
   &:hover {
     transform: none !important;
     scale: 1 !important;
+    background-color: rgba(var(--color-primary), 0.05);
+  }
+
+  &:focus {
+    outline: none;
+    background-color: rgba(var(--color-primary), 0.05);
   }
 
   &:focus-visible {
-    outline: 2px solid rgb(var(--color-primary));
+    outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+    background-color: rgba(var(--color-primary), 0.05);
   }
 }
 

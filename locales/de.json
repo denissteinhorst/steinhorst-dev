@@ -76,5 +76,11 @@
   "footer_section": {
     "copyright": "Alle Rechte vorbehalten.",
     "imprint": "Impressum"
+  },
+  "a11y_helper": {
+    "skip_current_section": "{section} überspringen",
+    "skip_to_nav": "Zur Navigation springen",
+    "skip_to_main_content": "Zum Hauptinhalt springen",
+    "skip_to_contact": "Direkt zum Kontaktbereich springen"
   }
 }

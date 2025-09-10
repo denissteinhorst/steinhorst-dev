@@ -28,11 +28,16 @@ const localeSwitchTooltip = computed<string>(
       :delay-duration="0"
       :content="{ side: 'top', sideOffset: 15 }"
     >
-      <UIcon
-        name="i-heroicons-language-20-solid"
-        class="language-selector__icon"
+      <button
+        class="language-selector__button"
+        :aria-label="localeSwitchTooltip"
         @click="switchLocale()"
-      />
+      >
+        <UIcon
+          name="i-heroicons-language-20-solid"
+          class="language-selector__icon"
+        />
+      </button>
     </UTooltip>
   </div>
 </template>
@@ -41,6 +46,38 @@ const localeSwitchTooltip = computed<string>(
 $block: "language-selector";
 
 .#{$block} {
+  &__button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    transition: color 0.2s ease-in-out;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary, #a78bfa);
+      outline-offset: 2px;
+    }
+
+    &:hover,
+    &:focus {
+      color: var(--color-secondary);
+
+      .language-selector__icon {
+        color: var(--color-secondary);
+      }
+    }
+  }
+
+  &__icon {
+    margin-top: 6px;
+    margin-left: 0;
+    transition: color 0.2s ease-in-out;
+  }
+
   :deep(.iconify) {
     cursor: pointer;
     transition: color 0.2s ease-in-out;

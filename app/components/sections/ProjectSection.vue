@@ -92,6 +92,7 @@ const filteredProjects = computed((): ProjectCard[] => {
     :header-title="data.title || ''"
     :header-text="headerText"
     :footer-text="footerText"
+    :next-section="'experiences'"
   >
     <template #content>
       <!-- PROJECT FILTER -->

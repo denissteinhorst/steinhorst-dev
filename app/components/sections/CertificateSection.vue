@@ -35,6 +35,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
     variant="h2"
     :header-title="data.title || ''"
     :header-text="headerText"
+    :next-section="'faq'"
   >
     <template #content>
       <div class="certificate-section" aria-label="Main">

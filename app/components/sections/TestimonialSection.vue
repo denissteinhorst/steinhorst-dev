@@ -19,16 +19,6 @@ const showAlternativeLanguage = ref(false);
 const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 const testimonials = computed(() => data.value?.recommendationCards || []);
 
-const leftColumnItems = computed(() => {
-  const items = testimonials.value;
-  return items.filter((_, cardIndex) => cardIndex % 2 === 0);
-});
-
-const rightColumnItems = computed(() => {
-  const items = testimonials.value;
-  return items.filter((_, cardIndex) => cardIndex % 2 === 1);
-});
-
 const activeIndex = computed(() =>
   Math.max(
     0,
@@ -80,54 +70,75 @@ watch(page, () => {
     variant="h2"
     :header-title="data.title || ''"
     :header-text="headerText"
+    :next-section="'contact'"
   >
     <template #content>
       <div class="testimonial-section">
-        <!-- Left column: Alternating items (even indices) -->
-        <div class="testimonial-section__left-column">
-          <TestimonialCardCompact
-            v-for="(card, index) in leftColumnItems"
-            :key="card.id"
-            :data="card"
-            :is-active="index * 2 === activeIndex"
-            @click="handleCardClick(index * 2)"
-          />
-        </div>
-
-        <!-- Center column: Large card with pagination -->
-        <div class="testimonial-section__center-column">
-          <TestimonialCardLarge
-            v-if="currentTestimonial"
-            :key="currentTestimonial.id || activeIndex"
-            :data="currentTestimonial"
-            :show-alternative="showAlternativeLanguage"
-            @toggle-language="handleLanguageToggle"
-          />
-
-          <!-- Pagination -->
-          <div
-            v-if="testimonials.length > 1"
-            class="testimonial-section__pagination"
-          >
-            <UPagination
-              v-model:page="page"
-              :total="testimonials.length"
-              :items-per-page="1"
-              size="md"
-              active-color="primary"
+        <!-- Mobile/tablet: Show only center column -->
+        <div class="testimonial-section__mobile-layout">
+          <div class="testimonial-section__center-column">
+            <TestimonialCardLarge
+              v-if="currentTestimonial"
+              :key="currentTestimonial.id || activeIndex"
+              :data="currentTestimonial"
+              :show-alternative="showAlternativeLanguage"
+              @toggle-language="handleLanguageToggle"
             />
+
+            <!-- Pagination -->
+            <div
+              v-if="testimonials.length > 1"
+              class="testimonial-section__pagination"
+            >
+              <UPagination
+                v-model:page="page"
+                :total="testimonials.length"
+                :items-per-page="1"
+                size="md"
+                active-color="primary"
+              />
+            </div>
           </div>
         </div>
 
-        <!-- Right column: Alternating items (odd indices) -->
-        <div class="testimonial-section__right-column">
+        <!-- Desktop: Three-column layout with proper tab order -->
+        <div class="testimonial-section__desktop-layout">
+          <!-- All compact cards in tab order (DOM order determines tab order) -->
           <TestimonialCardCompact
-            v-for="(card, index) in rightColumnItems"
+            v-for="(card, index) in testimonials"
             :key="card.id"
             :data="card"
-            :is-active="index * 2 + 1 === activeIndex"
-            @click="handleCardClick(index * 2 + 1)"
+            :is-active="index === activeIndex"
+            :class="`testimonial-section__compact-card testimonial-section__compact-card--${
+              index % 2 === 0 ? 'left' : 'right'
+            }`"
+            @click="handleCardClick(index)"
           />
+
+          <!-- Large card -->
+          <div class="testimonial-section__center-column">
+            <TestimonialCardLarge
+              v-if="currentTestimonial"
+              :key="currentTestimonial.id || activeIndex"
+              :data="currentTestimonial"
+              :show-alternative="showAlternativeLanguage"
+              @toggle-language="handleLanguageToggle"
+            />
+
+            <!-- Pagination -->
+            <div
+              v-if="testimonials.length > 1"
+              class="testimonial-section__pagination"
+            >
+              <UPagination
+                v-model:page="page"
+                :total="testimonials.length"
+                :items-per-page="1"
+                size="md"
+                active-color="primary"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </template>
@@ -143,29 +154,57 @@ $block: "testimonial-section";
   gap: 2rem;
   align-items: stretch;
 
-  // Large screens: three-column layout
-  @media (min-width: 1024px) {
-    grid-template-columns: 1fr 2fr 1fr;
-    gap: 2rem;
+  &__mobile-layout {
+    display: block;
+
+    @media (min-width: 1024px) {
+      display: none;
+    }
   }
 
-  &__left-column,
-  &__right-column {
+  &__desktop-layout {
     display: none;
 
     @media (min-width: 1024px) {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      height: 100%;
-      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      grid-template-rows: repeat(
+        20,
+        min-content
+      ); // Large number to accommodate all cards
+      gap: 2rem;
+      align-items: start;
+    }
+  }
+
+  &__compact-card {
+    @media (min-width: 1024px) {
+      &--left {
+        // Left column: even indices (0, 2, 4...)
+        grid-column: 1;
+      }
+
+      &--right {
+        // Right column: odd indices (1, 3, 5...)
+        grid-column: 3;
+      }
     }
   }
 
   &__center-column {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    @media (min-width: 1024px) {
+      grid-column: 2;
+      grid-row: 1 / -1; // Span all rows
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1023px) {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
   }
 
   &__pagination {

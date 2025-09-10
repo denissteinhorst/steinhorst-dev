@@ -76,5 +76,11 @@
   "footer_section": {
     "copyright": "All rights reserved.",
     "imprint": "Imprint"
+  },
+  "a11y_helper": {
+    "skip_current_section": "Skip {section}",
+    "skip_to_nav": "Skip to navigation",
+    "skip_to_main_content": "Skip to main content",
+    "skip_to_contact": "Skip directly to contact section"
   }
 }

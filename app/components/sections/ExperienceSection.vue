@@ -120,6 +120,7 @@ watch(visibleStationsBase, (newValue, oldValue) => {
     :header-title="data.title || ''"
     :header-text="headerText"
     :is-wrapped="true"
+    :next-section="'certifications'"
   >
     <template #content>
       <div class="experience-section">

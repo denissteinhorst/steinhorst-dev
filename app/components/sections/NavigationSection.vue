@@ -79,6 +79,45 @@ const skipToHero = () => {
   (heroElement as HTMLElement).focus?.();
 };
 
+const navigateToSectionWithFocus = async (to: string): Promise<void> => {
+  if (!to) return;
+
+  // Navigate to the target
+  await router.push(to);
+
+  // Wait for next tick to ensure DOM is updated
+  await nextTick();
+
+  // Focus management for hash links (sections)
+  if (to.startsWith("#")) {
+    const sectionId = to.substring(1); // Remove the #
+    const targetElement = document.getElementById(sectionId);
+
+    if (targetElement) {
+      // Scroll to the element first
+      targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      // Set focus to the section for keyboard navigation
+      // Add tabindex temporarily if it doesn't have one
+      const originalTabIndex = targetElement.getAttribute("tabindex");
+      if (!originalTabIndex) {
+        targetElement.setAttribute("tabindex", "-1");
+      }
+
+      // Focus the section
+      targetElement.focus();
+
+      // Remove temporary tabindex after focus
+      if (!originalTabIndex) {
+        // Use a small timeout to allow screen readers to announce
+        setTimeout(() => {
+          targetElement.removeAttribute("tabindex");
+        }, 100);
+      }
+    }
+  }
+};
+
 const updateMobileMenu = (isOpen: boolean): boolean =>
   (isMobileMenuOpen.value = isOpen);
 const closeMobileMenu = (): boolean => (isMobileMenuOpen.value = false);
@@ -126,6 +165,12 @@ const handleDesktopDropdownLeave = () => {
   dropdownTimeout = setTimeout(() => {
     isDesktopDropdownOpen.value = false;
   }, 150);
+};
+
+const toggleDropdown = () => {
+  if (!isScrolled.value) {
+    isDesktopDropdownOpen.value = !isDesktopDropdownOpen.value;
+  }
 };
 
 const handleClickOutside = (event: Event) => {
@@ -235,6 +280,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
               :to="brandLink"
               class="navigation-section__brand-link"
               @click="onBrandClick"
+              @keydown.space.prevent="onBrandClick"
             >
               {{ brandNameParts.main
               }}<span class="text-primary"
@@ -255,9 +301,10 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                 :to="link.link"
                 :aria-label="link.title"
                 :aria-current="isActive(link.link) ? 'page' : undefined"
+                :tabindex="isScrolled ? '0' : '-1'"
                 class="navigation-section__link"
                 :data-active="isActive(link.link) ? 'true' : 'false'"
-                @keydown.space.prevent="router.push(link.link)"
+                @keydown.space.prevent="navigateToSectionWithFocus(link.link)"
               >
                 {{ link.title }}
               </NuxtLink>
@@ -274,9 +321,14 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                   @mouseleave="handleDesktopDropdownLeave"
                 >
                   <button
+                    id="desktop-menu-button"
                     class="navigation-section__desktop-burger-button"
                     :aria-expanded="isDesktopDropdownOpen"
+                    :tabindex="isScrolled ? '-1' : '0'"
                     aria-label="Navigation anzeigen"
+                    @click="toggleDropdown"
+                    @keydown.space.prevent="toggleDropdown"
+                    @focus="handleDesktopDropdownEnter"
                   >
                     <UIcon
                       name="i-lucide-menu"
@@ -310,7 +362,14 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                       class="navigation-section__dropdown-link"
                       :data-active="isActive(link.link) ? 'true' : 'false'"
                       role="menuitem"
-                      @click="isDesktopDropdownOpen = false"
+                      @click="
+                        (isDesktopDropdownOpen = false),
+                          navigateToSectionWithFocus(link.link)
+                      "
+                      @keydown.space.prevent="
+                        (isDesktopDropdownOpen = false),
+                          navigateToSectionWithFocus(link.link)
+                      "
                     >
                       {{ link.title }}
                     </NuxtLink>
@@ -347,6 +406,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
             aria-controls="mobile-primary-navigation"
             class="navigation-section__menu-button"
             @click="isMobileMenuOpen = true"
+            @keydown.space.prevent="isMobileMenuOpen = true"
           >
             <UIcon name="i-lucide-menu" class="navigation-section__menu-icon" />
           </UButton>
@@ -379,9 +439,13 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                         :aria-current="isActive(link.link) ? 'page' : undefined"
                         class="navigation-section__mobile-link"
                         :data-active="isActive(link.link) ? 'true' : 'false'"
-                        @click="isMobileMenuOpen = false"
+                        @click="
+                          (isMobileMenuOpen = false),
+                            navigateToSectionWithFocus(link.link)
+                        "
                         @keydown.space.prevent="
-                          (isMobileMenuOpen = false), router.push(link.link)
+                          (isMobileMenuOpen = false),
+                            navigateToSectionWithFocus(link.link)
                         "
                       >
                         {{ link.title }}
@@ -393,9 +457,13 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                         to="#contact"
                         aria-label="Kontakt"
                         class="navigation-section__mobile-link"
-                        @click="isMobileMenuOpen = false"
+                        @click="
+                          (isMobileMenuOpen = false),
+                            navigateToSectionWithFocus('#contact')
+                        "
                         @keydown.space.prevent="
-                          (isMobileMenuOpen = false), router.push('#contact')
+                          (isMobileMenuOpen = false),
+                            navigateToSectionWithFocus('#contact')
                         "
                       >
                         Kontakt
@@ -589,6 +657,11 @@ $block: "navigation-section";
       overflow: hidden;
       margin: 0;
       padding: 0;
+    }
+
+    // Hide on mobile/tablet - only show on desktop
+    @media (max-width: 1023px) {
+      display: none;
     }
   }
 

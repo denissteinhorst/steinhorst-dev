@@ -43,6 +43,7 @@ const toListItems = (items?: SkillItem[]): string[] =>
     :button-text="data.quickFilter?.toggle"
     :button-icon="data.quickFilter?.icon"
     :header-text="headerText"
+    :next-section="'personality'"
     @button-click="handleButtonClick"
   >
     <template #content>

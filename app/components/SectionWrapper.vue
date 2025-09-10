@@ -12,6 +12,7 @@ const props = withDefaults(
     footerText?: RichTextNodes | [];
     textAlign?: TextAlignment;
     isWrapped?: boolean;
+    nextSection?: string;
   }>(),
   {
     headerText: () => [] as unknown as RichTextNodes,
@@ -21,6 +22,7 @@ const props = withDefaults(
     buttonIcon: undefined,
     target: "_self" as NavigationLinkTarget,
     textAlign: "left" as TextAlignment,
+    nextSection: undefined,
   }
 );
 
@@ -119,6 +121,14 @@ onMounted(() => {
       { 'section-wrapper__wrapper': props.isWrapped },
     ]"
   >
+    <!-- A11y Skip Link - First focusable element in section
+    <A11yHelper
+      v-if="props.nextSection"
+      :next-section="props.nextSection"
+      :current-section-title="props.headerTitle"
+    />
+    -->
+
     <UContainer class="section-wrapper--container">
       <header
         class="section-header"
@@ -186,6 +196,7 @@ onMounted(() => {
 $block: "section-wrapper";
 
 .#{$block} {
+  position: relative;
   padding-top: var(--spacing-3xl);
   padding-bottom: var(--spacing-3xl);
 
