@@ -1,5 +1,3 @@
-<script setup lang="ts"></script>
-
 <template>
   <div class="app">
     <LeaveNotification :blind-top-offset-px="10" />
