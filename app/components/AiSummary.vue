@@ -1,8 +1,14 @@
 <script setup lang="ts">
-// Prevent unintended attributes (e.g., redundant title/target) from being
-// automatically applied to the root wrapper, which was triggering a WCAG
-// warning about a redundant title attribute ("AI Summary").
 defineOptions({ inheritAttrs: false });
+
+interface Props {
+  isIconOnly?: boolean;
+}
+
+const { isIconOnly } = withDefaults(defineProps<Props>(), {
+  isIconOnly: false,
+});
+
 const { cmsRequest, currentLocaleString } = useStrapi();
 const { $t } = useI18n();
 const { generatePdfFromMarkdown } = usePdfEasy();
@@ -237,9 +243,27 @@ onBeforeUnmount(() => {
     Failed to load summary-section.
   </div>
 
-  <!-- Root wrapper: attribute inheritance disabled to avoid redundant title -->
   <div v-else-if="data" class="ai-summary">
+    <!-- Icon-only version matching ColorSelector styling -->
     <button
+      v-if="isIconOnly"
+      type="button"
+      aria-haspopup="dialog"
+      :aria-expanded="open"
+      class="ai-summary__icon-btn"
+      :aria-label="String($t('ai_summary.open_summary'))"
+      @click="open = true"
+    >
+      <UIcon
+        name="i-heroicons-sparkles"
+        class="ai-summary__icon-only"
+        style="--color-secondary: var(--color-secondary, #8b5cf6)"
+      />
+    </button>
+
+    <!-- Full button with text and animations -->
+    <button
+      v-else
       type="button"
       aria-haspopup="dialog"
       :aria-expanded="open"
@@ -438,6 +462,48 @@ $block: "ai-summary";
   @media (min-width: 1024px) {
     display: inline-block;
     width: auto;
+  }
+
+  // Icon-only button matching ColorSelector styling
+  &__icon-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease-out;
+    outline: none;
+    width: 34px;
+    height: 34px;
+
+    &:hover {
+      .#{$block}__icon-only {
+        color: var(--color-primary) !important;
+      }
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--color-primary);
+      border-radius: 50%;
+    }
+  }
+
+  &__icon-only {
+    color: #111827;
+    cursor: pointer;
+    font-size: var(--font-size-xl);
+    transition: color 0.2s ease;
+
+    :root.dark & {
+      color: rgb(226, 232, 240);
+    }
+
+    &:hover {
+      color: var(--color-primary) !important;
+    }
   }
 
   &__btn {

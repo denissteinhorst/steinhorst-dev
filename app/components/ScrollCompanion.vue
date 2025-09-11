@@ -163,7 +163,7 @@ onUnmounted(() => {
             >
               <NuxtLink
                 to="#contact"
-                :aria-label="$t('ui.scroll_to_contact') as string"
+                :aria-label="String($t('ui.scroll_to_contact'))"
                 class="scroll-companion__contact-link"
               >
                 <UIcon
@@ -175,12 +175,15 @@ onUnmounted(() => {
           </template>
           <template v-else>
             <UTooltip
-              :text="$t('ui.ai_summary') as string"
+              :text="String($t('ui.ai_summary'))"
               :delay-duration="0"
               :content="{ side: 'top', sideOffset: 5 }"
             >
               <span class="scroll-companion__ai-wrapper">
-                <AiSummary class="scroll-companion__ai-summary" />
+                <AiSummary
+                  class="scroll-companion__ai-summary"
+                  :is-icon-only="true"
+                />
               </span>
             </UTooltip>
           </template>
