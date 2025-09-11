@@ -121,13 +121,12 @@ onMounted(() => {
       { 'section-wrapper__wrapper': props.isWrapped },
     ]"
   >
-    <!-- A11y Skip Link - First focusable element in section
+    <!-- A11y Skip Link - First focusable element in section -->
     <A11yHelper
       v-if="props.nextSection"
       :next-section="props.nextSection"
       :current-section-title="props.headerTitle"
     />
-    -->
 
     <UContainer class="section-wrapper--container">
       <header
@@ -213,7 +212,6 @@ $block: "section-wrapper";
     position: relative;
     overflow: hidden;
 
-    /* Smooth transition for clip-path changes */
     transition: clip-path 0.1s ease-out;
 
     @media (prefers-reduced-motion: reduce) {

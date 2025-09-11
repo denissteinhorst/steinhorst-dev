@@ -40,7 +40,9 @@
   },
   "personality_section": {
     "internal_self_image": "Inneres Selbstbild",
-    "external_self_image": "Äußeres Selbstbild"
+    "external_self_image": "Äußeres Selbstbild",
+    "more_info_persolog": "Mehr zum persolog Persönlichkeits-Modell",
+    "more_info_ipm": "Mehr zum IPM Motivations-Profil"
   },
   "project_section": {
     "filter": {

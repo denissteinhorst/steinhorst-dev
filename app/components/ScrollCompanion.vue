@@ -13,6 +13,15 @@ let ticking = false;
 
 const scrollToTop = (): void => {
   window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // Focus navigation section after scroll completes
+  // Use a timeout to wait for smooth scroll to finish
+  setTimeout(() => {
+    const navigationSection = document.getElementById("navigation-section");
+    if (navigationSection) {
+      navigationSection.focus();
+    }
+  }, 500); // 500ms should be enough for smooth scroll to complete
 };
 
 const updateScrollState = () => {
@@ -116,12 +125,19 @@ onUnmounted(() => {
             :delay-duration="0"
             :content="{ side: 'top', sideOffset: 12 }"
           >
-            <UIcon
-              name="i-lucide-arrow-up-circle"
-              class="scroll-companion__icon scroll-companion__icon--clickable"
+            <button
+              type="button"
+              class="scroll-companion__button"
               :aria-label="$t('ui.scroll_to_top') as string"
               @click="scrollToTop"
-            />
+              @keydown.enter="scrollToTop"
+              @keydown.space.prevent="scrollToTop"
+            >
+              <UIcon
+                name="i-lucide-arrow-up-circle"
+                class="scroll-companion__icon scroll-companion__icon--clickable"
+              />
+            </button>
           </UTooltip>
           <!-- Hidden rocket icon that appears on hover -->
           <UIcon
@@ -389,6 +405,32 @@ $block: "scroll-companion";
     }
   }
 
+  &__button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease-out;
+    outline: none;
+    width: 34px;
+    height: 34px;
+
+    &:hover {
+      .#{$block}__icon {
+        color: var(--color-primary) !important;
+      }
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--color-primary);
+      border-radius: 50%;
+    }
+  }
+
   &__rocket-icon {
     width: 1rem; // size-4
     height: 1rem;
@@ -403,6 +445,21 @@ $block: "scroll-companion";
     justify-content: center;
     height: 34px;
     width: 100%;
+    border-radius: 50%;
+    transition: all 0.3s ease-out;
+    text-decoration: none;
+    outline: none;
+
+    &:hover {
+      .#{$block}__icon {
+        color: var(--color-primary) !important;
+      }
+    }
+
+    &:focus-visible {
+      box-shadow: 0 0 0 2px var(--color-primary);
+      border-radius: 50%;
+    }
   }
 
   &__ai-wrapper {

@@ -9,6 +9,7 @@ const ambientBackground = ref<HTMLElement | null>(null);
 const showAmbient = computed(() => route.meta?.ambient !== false);
 
 useScrollHashes();
+useFocusHelper();
 
 const updateAmbientBackground = (preference: string): void => {
   if (!ambientBackground.value) return;

@@ -51,22 +51,70 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
           class="personality-section__card-wrapper"
         >
           <BaseCard :is-in-wrapper="true" class="personality-section__card">
-            <template v-if="personalityCard.variant === 'polarChart'">
-              <PolarchartCard
-                :title="personalityCard.title"
-                :subtitle="personalityCard.subtitle"
-                :text="personalityCard.text"
-                :tooltips="personalityCard.polarChartTooltips || []"
-              />
-            </template>
-            <template v-else-if="personalityCard.variant === 'barChart'">
-              <BarchartCard
-                :title="personalityCard.title"
-                :subtitle="personalityCard.subtitle"
-                :text="personalityCard.text"
-                :tooltips="personalityCard.barChartTooltips || []"
-              />
-            </template>
+            <div class="personality-section__card-content">
+              <template v-if="personalityCard.variant === 'polarChart'">
+                <PolarchartCard
+                  :title="personalityCard.title"
+                  :subtitle="personalityCard.subtitle"
+                  :text="personalityCard.text"
+                  :tooltips="personalityCard.polarChartTooltips || []"
+                />
+              </template>
+              <template v-else-if="personalityCard.variant === 'barChart'">
+                <BarchartCard
+                  :title="personalityCard.title"
+                  :subtitle="personalityCard.subtitle"
+                  :text="personalityCard.text"
+                  :tooltips="personalityCard.barChartTooltips || []"
+                />
+              </template>
+            </div>
+            <div class="personality-section__button-container">
+              <template v-if="personalityCard.variant === 'polarChart'">
+                <UButton
+                  :to="'https://persolog.com/de/persolog-persoenlichkeits-modell/'"
+                  variant="ghost"
+                  color="secondary"
+                  size="xs"
+                  class="personality-section__button"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :aria-label="`asdf (${$t('ui.opens_in_new_tab')})`"
+                >
+                  <span class="personality-section__button-text">{{
+                    $t("personality_section.more_info_persolog")
+                  }}</span>
+                  <span class="sr-only">({{ $t("ui.opens_in_new_tab") }})</span>
+                  <UIcon
+                    name="i-heroicons-arrow-top-right-on-square"
+                    class="personality-section__button-icon"
+                    aria-hidden="true"
+                  />
+                </UButton>
+              </template>
+              <template v-else-if="personalityCard.variant === 'barChart'">
+                <UButton
+                  :to="'https://ipmag.ch/de/'"
+                  variant="ghost"
+                  color="secondary"
+                  size="xs"
+                  class="personality-section__button"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  :aria-label="`asdf (${$t('ui.opens_in_new_tab')})`"
+                >
+                  <span class="personality-section__button-text">{{
+                    $t("personality_section.more_info_ipm")
+                  }}</span>
+                  <span class="sr-only">({{ $t("ui.opens_in_new_tab") }})</span>
+                  <UIcon
+                    name="i-heroicons-arrow-top-right-on-square"
+                    class="personality-section__button-icon"
+                    aria-hidden="true"
+                  />
+                </UButton>
+              </template>
+            </div>
           </BaseCard>
         </div>
       </div>
@@ -99,6 +147,45 @@ $block: "personality-section";
     display: flex;
     flex-direction: column;
     height: 100%;
+    position: relative;
+    padding-bottom: 2rem;
+  }
+
+  &__card-content {
+    flex: 1;
+  }
+
+  &__button-container {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  &__button {
+    gap: 0.25rem !important;
+
+    // Force vertical alignment with line-height
+    line-height: 1 !important;
+    vertical-align: baseline !important;
+  }
+
+  &__button-icon {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    vertical-align: middle !important;
+    transform: translateY(-1px); // Fine-tune vertical position
+  }
+
+  &__button-text {
+    font-weight: 500;
+    color: #4b5563;
+    vertical-align: middle !important;
+    line-height: 1 !important;
+
+    @at-root .dark #{&} {
+      color: #d1d5db;
+    }
   }
 }
 </style>

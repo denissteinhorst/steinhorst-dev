@@ -1,7 +1,14 @@
 <script setup lang="ts">
+interface SkipLink {
+  target: string;
+  label: string;
+  ariaLabel?: string;
+}
+
 defineProps<{
-  nextSection: string;
-  currentSectionTitle: string;
+  nextSection?: string;
+  currentSectionTitle?: string;
+  skipLinks?: SkipLink[];
 }>();
 
 // Function to handle skip link activation and focus next section
@@ -48,7 +55,24 @@ const handleKeyDown = (event: KeyboardEvent, targetId: string) => {
 </script>
 
 <template>
+  <!-- Multiple skip links mode -->
+  <div v-if="skipLinks && skipLinks.length > 0" class="a11y-helper__skip-links">
+    <a
+      v-for="link in skipLinks"
+      :key="link.target"
+      class="a11y-helper__skip-link"
+      :href="`#${link.target}`"
+      :aria-label="link.ariaLabel || link.label"
+      @click="handleSkipActivation($event, link.target)"
+      @keydown="handleKeyDown($event, link.target)"
+    >
+      {{ link.label }}
+    </a>
+  </div>
+
+  <!-- Single skip link mode (legacy support) -->
   <a
+    v-else-if="nextSection && currentSectionTitle"
     class="a11y-helper__skip-link"
     :href="`#${nextSection}`"
     :aria-label="
@@ -71,43 +95,40 @@ const handleKeyDown = (event: KeyboardEvent, targetId: string) => {
 $block: "a11y-helper";
 
 .#{$block} {
+  &__skip-links {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 60;
+  }
+
   &__skip-link {
     position: absolute;
-    top: -1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    background: var(--color-gray-900, #111827);
-    color: var(--color-white, #ffffff);
-    padding: 0.75rem 1rem;
-    border: 2px solid var(--color-primary-500, #8b5cf6);
-    border-radius: 0.375rem;
-    font-weight: 600;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: inline-block;
+    padding: 0.8rem 1.6rem;
+    line-height: 1;
     font-size: 0.875rem;
+    background-color: #9861ff;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 0.375rem;
+    margin: 0.8rem 0 0 0.8rem;
     text-decoration: none;
-    transition: all 0.2s ease;
     white-space: nowrap;
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 180ms ease, opacity 180ms ease;
 
     &:focus,
     &:focus-visible {
-      clip-path: none;
-      transform: translateY(0);
-      outline: 2px solid var(--color-primary-500, #8b5cf6);
-      outline-offset: 2px;
-    }
-
-    &:hover:focus {
-      background: var(--color-gray-800, #1f2937);
-    }
-
-    /* Ensure it doesn't interfere with other content when not focused */
-    &:not(:focus):not(:focus-visible) {
-      pointer-events: none;
-    }
-
-    &:focus,
-    &:focus-visible {
+      transform: translateX(0);
+      opacity: 1;
       pointer-events: auto;
+      outline: none;
     }
   }
 }

@@ -23,7 +23,6 @@ const isMobileMenuOpen = ref(false);
 const isDesktopDropdownOpen = ref(false);
 const menuButtonRef = ref<HTMLElement | null>(null);
 const desktopDropdownRef = ref<HTMLElement | null>(null);
-const showSkipLink = ref(true);
 
 const isScrolled = computed(() => y.value > 2);
 const brandName = computed(() => data.value?.brandName ?? "");
@@ -72,13 +71,6 @@ const isActive = (to = ""): boolean => {
   return route.path === path;
 };
 
-const skipToHero = () => {
-  const heroElement = document.getElementById("hero-heading");
-  if (!heroElement) return;
-  heroElement.scrollIntoView({ behavior: "smooth", block: "start" });
-  (heroElement as HTMLElement).focus?.();
-};
-
 const navigateToSectionWithFocus = async (to: string): Promise<void> => {
   if (!to) return;
 
@@ -101,7 +93,7 @@ const navigateToSectionWithFocus = async (to: string): Promise<void> => {
       // Add tabindex temporarily if it doesn't have one
       const originalTabIndex = targetElement.getAttribute("tabindex");
       if (!originalTabIndex) {
-        targetElement.setAttribute("tabindex", "-1");
+        targetElement.setAttribute("tabindex", "-2");
       }
 
       // Focus the section
@@ -122,7 +114,7 @@ const updateMobileMenu = (isOpen: boolean): boolean =>
   (isMobileMenuOpen.value = isOpen);
 const closeMobileMenu = (): boolean => (isMobileMenuOpen.value = false);
 
-const onBrandClick = (event: MouseEvent) => {
+const onBrandClick = (event: Event) => {
   const targetPath = brandLink.value || "/";
   if (route.path === targetPath) {
     event.preventDefault();
@@ -182,6 +174,26 @@ const handleClickOutside = (event: Event) => {
   }
 };
 
+const handleFocusOutside = (event: FocusEvent) => {
+  // Check if focus is moving outside of the dropdown container
+  if (
+    desktopDropdownRef.value &&
+    event.relatedTarget &&
+    !desktopDropdownRef.value.contains(event.relatedTarget as Node)
+  ) {
+    // Clear any existing timeout to prevent conflicts
+    if (dropdownTimeout) {
+      clearTimeout(dropdownTimeout);
+      dropdownTimeout = null;
+    }
+
+    // Close dropdown when focus leaves the dropdown area
+    dropdownTimeout = setTimeout(() => {
+      isDesktopDropdownOpen.value = false;
+    }, 100);
+  }
+};
+
 onMounted(() => {
   if (import.meta.client) {
     // Initialize current hash
@@ -190,6 +202,7 @@ onMounted(() => {
     // Listen for hash changes from ANY source (user clicks, scroll updates, etc.)
     window.addEventListener("hashchange", updateCurrentHash, { passive: true });
     document.addEventListener("click", handleClickOutside);
+    document.addEventListener("focusout", handleFocusOutside);
 
     // Also listen for history.replaceState calls (used by useScrollHashes)
     const originalReplaceState = window.history.replaceState.bind(
@@ -218,6 +231,7 @@ onMounted(() => {
     onUnmounted(() => {
       window.removeEventListener("hashchange", updateCurrentHash);
       document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("focusout", handleFocusOutside);
       clearInterval(hashCheckInterval);
       if (dropdownTimeout) {
         clearTimeout(dropdownTimeout);
@@ -256,19 +270,32 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
 
 <template>
   <div
+    id="navigation-section"
     class="navigation-section"
     :class="{ 'navigation-section--scrolled': isScrolled }"
     role="navigation"
+    tabindex="-1"
   >
-    <a
-      v-if="showSkipLink"
-      href="#hero-heading"
-      class="navigation-section__skip-link"
-      @click.prevent="skipToHero"
-      @keydown.space.prevent="skipToHero"
-    >
-      Zum Inhalt springen
-    </a>
+    <!-- Skip links for accessibility -->
+    <A11yHelper
+      :skip-links="[
+        {
+          target: 'navigation',
+          label: String($t('a11y_helper.skip_to_nav')),
+          ariaLabel: String($t('a11y_helper.skip_to_nav')),
+        },
+        {
+          target: 'skills',
+          label: String($t('a11y_helper.skip_to_main_content')),
+          ariaLabel: String($t('a11y_helper.skip_to_main_content')),
+        },
+        {
+          target: 'contact',
+          label: String($t('a11y_helper.skip_to_contact')),
+          ariaLabel: String($t('a11y_helper.skip_to_contact')),
+        },
+      ]"
+    />
 
     <div aria-hidden="true" class="navigation-section__separator"></div>
 
@@ -290,7 +317,11 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
           </slot>
         </div>
 
-        <nav aria-label="Primäre Navigation" class="navigation-section__nav">
+        <nav
+          id="navigation"
+          aria-label="Primäre Navigation"
+          class="navigation-section__nav"
+        >
           <ul class="navigation-section__list">
             <li
               v-for="link in mainLinks"
@@ -319,6 +350,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                   class="navigation-section__desktop-burger"
                   @mouseenter="handleDesktopDropdownEnter"
                   @mouseleave="handleDesktopDropdownLeave"
+                  @focusout="handleFocusOutside"
                 >
                   <button
                     id="desktop-menu-button"
@@ -504,6 +536,12 @@ $block: "navigation-section";
     box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateZ(0);
   will-change: background-color, box-shadow;
+  outline: none; // Remove default focus outline
+
+  // Custom focus styles for when programmatically focused
+  &:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--color-primary);
+  }
 
   &--scrolled {
     background: rgba(0, 0, 0, 0.8);
@@ -549,27 +587,6 @@ $block: "navigation-section";
     gap: 16px;
     height: 72px;
     transform: translateZ(0);
-  }
-
-  &__skip-link {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 60;
-    transform: translateY(-120%);
-    background: #000;
-    color: #fff;
-    padding: 12px 16px;
-    border: 2px solid var(--color-secondary, #90a1b9);
-    border-radius: 0 0 8px 0;
-    font-weight: 600;
-    text-decoration: none;
-    transition: transform 0.25s ease;
-
-    &:focus {
-      transform: translateY(0);
-      outline: none;
-    }
   }
 
   &__brand {
