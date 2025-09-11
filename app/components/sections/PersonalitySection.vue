@@ -79,7 +79,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
                   class="personality-section__button"
                   target="_blank"
                   rel="noopener noreferrer"
-                  :aria-label="`asdf (${$t('ui.opens_in_new_tab')})`"
+                  :aria-label="`persolog.com (${$t('ui.opens_in_new_tab')})`"
                 >
                   <span class="personality-section__button-text">{{
                     $t("personality_section.more_info_persolog")
@@ -101,7 +101,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
                   class="personality-section__button"
                   target="_blank"
                   rel="noopener noreferrer"
-                  :aria-label="`asdf (${$t('ui.opens_in_new_tab')})`"
+                  :aria-label="`ipmag.ch (${$t('ui.opens_in_new_tab')})`"
                 >
                   <span class="personality-section__button-text">{{
                     $t("personality_section.more_info_ipm")
