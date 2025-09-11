@@ -19,6 +19,11 @@ const showAlternativeLanguage = ref(false);
 const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 const testimonials = computed(() => data.value?.recommendationCards || []);
 
+// Calculate the number of grid rows needed for the compact cards
+const gridRows = computed(() =>
+  Math.max(1, Math.ceil(testimonials.value.length / 2))
+);
+
 const activeIndex = computed(() =>
   Math.max(
     0,
@@ -102,7 +107,12 @@ watch(page, () => {
         </div>
 
         <!-- Desktop: Three-column layout with proper tab order -->
-        <div class="testimonial-section__desktop-layout">
+        <div
+          class="testimonial-section__desktop-layout"
+          :style="{
+            '--grid-rows': gridRows,
+          }"
+        >
           <!-- All compact cards in tab order (DOM order determines tab order) -->
           <TestimonialCardCompact
             v-for="(card, index) in testimonials"
@@ -168,10 +178,7 @@ $block: "testimonial-section";
     @media (min-width: 1024px) {
       display: grid;
       grid-template-columns: 1fr 2fr 1fr;
-      grid-template-rows: repeat(
-        20,
-        min-content
-      ); // Large number to accommodate all cards
+      grid-template-rows: repeat(var(--grid-rows, 1), min-content);
       gap: 2rem;
       align-items: start;
     }
@@ -194,7 +201,7 @@ $block: "testimonial-section";
   &__center-column {
     @media (min-width: 1024px) {
       grid-column: 2;
-      grid-row: 1 / -1; // Span all rows
+      grid-row: 1 / -1; // Span all available rows
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
