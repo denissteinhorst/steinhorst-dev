@@ -247,6 +247,8 @@ $block: "project-card";
       background-color: #f5f5f7;
       border-color: #d4d4d4;
       color: #4c4c4c;
+      font-size: 11px;
+      padding: 0.25rem 0.5rem;
 
       @at-root .dark #{&} {
         background-color: #232935;

@@ -59,6 +59,8 @@
     }
   },
   "ai_summary": {
+    "open_summary": "KI Zusammenfassung öffnen",
+    "dialog_title": "Künstliche Intelligenz generierte Zusammenfassung",
     "close": "Schließen",
     "loading": "Lade Zusammenfassung…",
     "searching": "Onlinesuche läuft…",

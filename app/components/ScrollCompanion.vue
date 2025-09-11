@@ -180,12 +180,7 @@ onUnmounted(() => {
               :content="{ side: 'top', sideOffset: 5 }"
             >
               <span class="scroll-companion__ai-wrapper">
-                <AiSummary
-                  :icon-only="true"
-                  class="scroll-companion__ai-summary"
-                  :title="$t('ui.ai_summary')"
-                  target="companion"
-                />
+                <AiSummary class="scroll-companion__ai-summary" />
               </span>
             </UTooltip>
           </template>

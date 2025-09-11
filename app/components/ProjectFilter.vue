@@ -160,16 +160,16 @@ const handleFilterInputChange = (event: Event): void => {
       <!-- Project count selector -->
       <div class="project-filter__count-selector">
         <template v-if="!isFilterActive">
-          <label for="project-count-select" class="project-filter__label">
+          <span class="project-filter__label">
             {{ t("project_section.filter.projects_to_show") }}
-          </label>
+          </span>
           <USelect
-            id="project-count-select"
             v-model="visibleProjectCount"
             :items="availableProjectCountOptions"
             size="sm"
             class="project-filter__select project-filter__select--wider"
             style="min-width: 6rem; width: 6rem"
+            :aria-label="(t('project_section.filter.projects_to_show') as string)"
             aria-describedby="project-count-instructions"
           />
           <span id="project-count-instructions" class="sr-only">

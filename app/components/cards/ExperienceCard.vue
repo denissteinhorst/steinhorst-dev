@@ -154,21 +154,7 @@ const shouldShowCard = computed(() => {
   >
     <!-- Mobile: Logo above company and role -->
     <div class="experience-card__mobile-logo">
-      <a
-        v-if="logoUrl && data.link"
-        :href="data.link"
-        :target="data.target || '_blank'"
-        rel="noopener noreferrer"
-        class="experience-card__logo-link"
-      >
-        <NuxtImg
-          :src="logoUrl"
-          :alt="`Logo von ${data.company}`"
-          class="experience-card__logo-image"
-          format="webp"
-        />
-      </a>
-      <div v-else-if="logoUrl" class="experience-card__logo-link">
+      <div v-if="logoUrl" class="experience-card__logo-link">
         <NuxtImg
           :src="logoUrl"
           :alt="`Logo von ${data.company}`"
@@ -245,22 +231,8 @@ const shouldShowCard = computed(() => {
 
       <!-- Logo for Larger Screens -->
       <div class="experience-card__desktop-logo">
-        <a
-          v-if="logoUrl && data.link"
-          :href="data.link"
-          :target="data.target || '_blank'"
-          rel="noopener noreferrer"
-          class="experience-card__logo-link experience-card__logo-link--desktop"
-        >
-          <NuxtImg
-            :src="logoUrl"
-            :alt="`Logo von ${data.company}`"
-            class="experience-card__logo-image"
-            format="webp"
-          />
-        </a>
         <div
-          v-else-if="logoUrl"
+          v-if="logoUrl"
           class="experience-card__logo-link experience-card__logo-link--desktop"
         >
           <NuxtImg

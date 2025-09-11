@@ -44,9 +44,9 @@ const cardId = computed(() =>
           />
         </div>
         <div class="certificate-card__content">
-          <h6 :id="cardId" class="certificate-card__title">
+          <h3 :id="cardId" class="certificate-card__title">
             {{ data.title }}
-          </h6>
+          </h3>
         </div>
       </div>
 

@@ -27,8 +27,6 @@ const desktopDropdownRef = ref<HTMLElement | null>(null);
 const isScrolled = computed(() => y.value > 2);
 const brandName = computed(() => data.value?.brandName ?? "");
 const brandLink = computed(() => data.value?.brandLink ?? "/");
-const specialName = computed(() => data.value?.specialButton ?? "");
-const specialLink = computed(() => data.value?.specialLink ?? "/");
 const mainLinks = computed<NavigationElement[]>(
   () => data.value?.navigationElements ?? []
 );
@@ -410,11 +408,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
               </div>
 
               <div class="navigation-section__action-item">
-                <AiSummary
-                  key="desktop-ai-summary"
-                  :title="specialName"
-                  :target="specialLink"
-                />
+                <AiSummary key="desktop-ai-summary" />
               </div>
 
               <div class="navigation-section__action-item">
@@ -503,7 +497,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                     </li>
 
                     <li class="navigation-section__mobile-extra">
-                      <AiSummary :title="specialName" :target="specialLink" />
+                      <AiSummary />
                     </li>
                   </ul>
                 </nav>

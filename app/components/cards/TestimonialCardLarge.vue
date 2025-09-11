@@ -187,48 +187,8 @@ const languageToggleText = computed((): string => {
 
         <div class="testimonial-card-large__metadata">
           <span class="testimonial-card-large__date">
-            {{ formatDate(data.postDate) }}
+            {{ formatDate(data.postDate) }} via LinkedIn
           </span>
-          <template v-if="data.sourceUrl">
-            <span class="testimonial-card-large__separator" aria-hidden="true"
-              >|</span
-            >
-            <UTooltip
-              :text="String($t('experience_section.testimonial.view_original'))"
-              :delay-duration="0"
-              :content="{ side: 'bottom', sideOffset: 6 }"
-            >
-              <a
-                :href="data.sourceUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="testimonial-card-large__source-link"
-              >
-                {{ $t("experience_section.testimonial.source") }}
-                <UIcon
-                  name="i-heroicons-arrow-top-right-on-square-20-solid"
-                  class="testimonial-card-large__source-icon"
-                />
-              </a>
-            </UTooltip>
-          </template>
-          <template v-else-if="data.platform">
-            <span class="testimonial-card-large__separator" aria-hidden="true"
-              >|</span
-            >
-            <a
-              href="https://www.linkedin.com/in/denissteinhorst/"
-              target="_blank"
-              class="testimonial-card-large__platform"
-            >
-              {{ data.platform }}
-              <UIcon
-                name="i-heroicons-arrow-top-right-on-square"
-                class="certificate-card__button-icon"
-                aria-hidden="true"
-              />
-            </a>
-          </template>
         </div>
       </footer>
     </div>
@@ -493,11 +453,6 @@ $block: "testimonial-card-large";
   &__date {
     white-space: nowrap;
   }
-  &__platform {
-    white-space: nowrap;
-    color: var(--color-primary);
-    cursor: pointer;
-  }
 
   &__separator {
     color: #d1d5db;
@@ -511,15 +466,16 @@ $block: "testimonial-card-large";
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
-    color: #dc2626;
+    color: var(--color-primary);
     text-decoration: none;
+    white-space: nowrap;
 
     &:hover {
       text-decoration: underline;
     }
 
     @at-root .dark #{&} {
-      color: #fca5a5;
+      color: var(--color-primary);
     }
   }
 

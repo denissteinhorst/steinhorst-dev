@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// Prevent unintended attributes (e.g., redundant title/target) from being
+// automatically applied to the root wrapper, which was triggering a WCAG
+// warning about a redundant title attribute ("AI Summary").
+defineOptions({ inheritAttrs: false });
 const { cmsRequest, currentLocaleString } = useStrapi();
 const { $t } = useI18n();
 const { generatePdfFromMarkdown } = usePdfEasy();
@@ -233,12 +237,14 @@ onBeforeUnmount(() => {
     Failed to load summary-section.
   </div>
 
+  <!-- Root wrapper: attribute inheritance disabled to avoid redundant title -->
   <div v-else-if="data" class="ai-summary">
     <button
       type="button"
       aria-haspopup="dialog"
       :aria-expanded="open"
       class="ai-summary__btn ai-summary-btn"
+      :aria-label="String($t('ai_summary.open_summary'))"
       @click="open = true"
       @mouseenter="regenerateSparkles()"
     >
@@ -267,9 +273,7 @@ onBeforeUnmount(() => {
         </span>
       </span>
 
-      <span class="ai-summary__label ai-summary-label" data-label="AI Summary">
-        AI Summary
-      </span>
+      <span class="ai-summary__label ai-summary-label">AI Summary</span>
     </button>
 
     <USlideover
@@ -277,8 +281,8 @@ onBeforeUnmount(() => {
       :ui="slideoverUi"
       :overlay="true"
       side="right"
+      :title="String($t('ai_summary.dialog_title'))"
       class="ai-summary__slideover ai-summary-slideover"
-      title="AI Summary"
       :description="data.subtitle"
     >
       <template #title>

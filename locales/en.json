@@ -55,10 +55,13 @@
       "all": "all",
       "select_project_count": "Select number of visible project cards.",
       "filter_instructions": "Enter one or more terms. Partial matches work. Multiple filters possible. Clear all filters to return to normal view.",
-      "current_status": "Showing {showing} of {total} projects."
+      "current_status": "Showing {showing} of {total} projects.",
+      "open_summary": "Open AI summary"
     }
   },
   "ai_summary": {
+    "open_summary": "Open AI Summary",
+    "dialog_title": "Artificial Intelligence Generated Summary",
     "close": "Close",
     "loading": "Loading summary…",
     "searching": "Online search in progress…",
