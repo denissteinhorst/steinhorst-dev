@@ -4,6 +4,9 @@ const props = defineProps<{
   isDark?: boolean;
   aosDelay?: number;
   isInWrapper?: boolean;
+  ariaLabelledby?: string;
+  ariaDescribedby?: string;
+  role?: string;
 }>();
 </script>
 
@@ -15,6 +18,9 @@ const props = defineProps<{
       'base-card--dark': props.isDark,
       'base-card--in-wrapper': props.isInWrapper,
     }"
+    :aria-labelledby="props.ariaLabelledby"
+    :aria-describedby="props.ariaDescribedby"
+    :role="props.role"
   >
     <UCard variant="soft">
       <slot></slot>

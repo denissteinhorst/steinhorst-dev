@@ -10,6 +10,15 @@ const emit = defineEmits<{
 
 const { buildImageUrl } = useStrapi();
 const { $t, $getLocale } = useI18n();
+const { generateComponentId } = useIdGenerator();
+
+const cardId = computed(() =>
+  generateComponentId(
+    "testimonial",
+    props.data.author || "testimonial",
+    props.data.id || 0
+  )
+);
 
 const avatarUrl = computed<string | undefined>(() => {
   const url = buildImageUrl(props.data.avatar, "small");
@@ -90,7 +99,7 @@ const languageToggleText = computed((): string => {
   <BaseCard
     class="testimonial-card-large"
     role="listitem"
-    :aria-labelledby="`testimonial-${data.id}`"
+    :aria-labelledby="cardId"
   >
     <div class="testimonial-card-large__container">
       <!-- Header: Avatar and author info -->
@@ -115,10 +124,7 @@ const languageToggleText = computed((): string => {
         </div>
 
         <div class="testimonial-card-large__author-info">
-          <h3
-            :id="`testimonial-${data.id}`"
-            class="testimonial-card-large__author-name"
-          >
+          <h3 :id="cardId" class="testimonial-card-large__author-name">
             {{ data.author }}
           </h3>
           <p class="testimonial-card-large__author-position">

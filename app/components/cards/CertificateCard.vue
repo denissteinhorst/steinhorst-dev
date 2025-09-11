@@ -2,19 +2,24 @@
 const props = defineProps<{ data: CertificateCard }>();
 
 const { buildImageUrl } = useStrapi();
+const { generateComponentId } = useIdGenerator();
 
 const logoUrl = computed<string | undefined>(() => {
   const url = buildImageUrl(props.data.logo, "small");
   return url === null ? undefined : url;
 });
+
+const cardId = computed(() =>
+  generateComponentId(
+    "certificate",
+    props.data.title || "certificate",
+    props.data.id || 0
+  )
+);
 </script>
 
 <template>
-  <BaseCard
-    class="certificate-card"
-    role="listitem"
-    :aria-labelledby="`certificate-${data.id}`"
-  >
+  <BaseCard class="certificate-card" role="listitem" :aria-labelledby="cardId">
     <div class="certificate-card__content-wrapper">
       <div class="certificate-card__header">
         <div
@@ -39,7 +44,7 @@ const logoUrl = computed<string | undefined>(() => {
           />
         </div>
         <div class="certificate-card__content">
-          <h6 class="certificate-card__title">
+          <h6 :id="cardId" class="certificate-card__title">
             {{ data.title }}
           </h6>
         </div>

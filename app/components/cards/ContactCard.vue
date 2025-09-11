@@ -4,7 +4,24 @@ const props = defineProps<{
   aosDelay: number;
 }>();
 
+const { generateComponentId } = useIdGenerator();
+
 const textNodes = computed<RichTextNodes>(() => props.data.text ?? []);
+
+const titleId = computed(() =>
+  generateComponentId(
+    "contact-title",
+    props.data.title || "contact",
+    props.data.id || 0
+  )
+);
+const descId = computed(() =>
+  generateComponentId(
+    "contact-desc",
+    props.data.title || "contact",
+    props.data.id || 0
+  )
+);
 
 const getAriaLabel = (card: ContactCard): string => {
   const baseLabel = card.title || "";
@@ -26,8 +43,8 @@ const getAriaLabel = (card: ContactCard): string => {
       class="contact-card__inner"
       role="group"
       :is-dark="true"
-      :aria-labelledby="`contact-${data.id}-title`"
-      :aria-describedby="`contact-${data.id}-desc`"
+      :aria-labelledby="titleId"
+      :aria-describedby="descId"
     >
       <div class="contact-card__body">
         <div class="contact-card__header">
@@ -37,15 +54,12 @@ const getAriaLabel = (card: ContactCard): string => {
               class="contact-card__icon"
             />
           </div>
-          <h3 :id="`contact-${data.id}-title`" class="contact-card__title">
+          <h3 :id="titleId" class="contact-card__title">
             {{ data.title }}
           </h3>
         </div>
         <div class="contact-card__content">
-          <div
-            :id="`contact-${data.id}-desc`"
-            class="contact-card__description"
-          >
+          <div :id="descId" class="contact-card__description">
             <StrapiBlocksText :nodes="textNodes" />
           </div>
         </div>

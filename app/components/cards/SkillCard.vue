@@ -5,7 +5,11 @@ const props = defineProps<{
   index?: number;
 }>();
 
-const cardId = computed(() => `skill-${props.title}`);
+const { generateComponentId } = useIdGenerator();
+
+const cardId = computed(() =>
+  generateComponentId("skill", props.title, props.index)
+);
 const aosDelay = computed(() => (props.index ?? 0) * 100);
 </script>
 

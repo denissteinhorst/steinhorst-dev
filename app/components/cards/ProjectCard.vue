@@ -1,7 +1,16 @@
 <script setup lang="ts">
-defineProps<{ data: ProjectCard }>();
+const props = defineProps<{ data: ProjectCard }>();
 
 const { buildImageUrl } = useStrapi();
+const { generateComponentId } = useIdGenerator();
+
+const cardId = computed(() =>
+  generateComponentId(
+    "project",
+    props.data.title || "project",
+    props.data.id || 0
+  )
+);
 
 // extract Tags from RichText (one tag per line)
 const extractTextFromRichText = (block: RichTextBlock): string => {
@@ -18,11 +27,7 @@ const extractTextFromRichText = (block: RichTextBlock): string => {
 </script>
 
 <template>
-  <BaseCard
-    class="project-card"
-    role="listitem"
-    :aria-labelledby="`project-${data.id}`"
-  >
+  <BaseCard class="project-card" role="listitem" :aria-labelledby="cardId">
     <div class="project-card__body">
       <div class="project-card__header">
         <div class="project-card__image-container">
@@ -46,7 +51,7 @@ const extractTextFromRichText = (block: RichTextBlock): string => {
           </div>
         </div>
         <div class="project-card__content">
-          <h3 :id="`project-${data.id}`" class="project-card__title">
+          <h3 :id="cardId" class="project-card__title">
             {{ data.title }}
           </h3>
           <p class="project-card__text">

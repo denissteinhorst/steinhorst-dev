@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   data: RecommendationCard;
   isActive?: boolean;
 }>();
@@ -7,6 +7,16 @@ defineProps<{
 const emit = defineEmits<{
   click: [];
 }>();
+
+const { generateComponentId } = useIdGenerator();
+
+const cardId = computed(() =>
+  generateComponentId(
+    "testimonial",
+    props.data.author || "testimonial",
+    props.data.id || 0
+  )
+);
 
 const handleClick = () => {
   emit("click");
@@ -26,7 +36,7 @@ const handleKeydown = (event: KeyboardEvent) => {
     class="testimonial-card-compact"
     :class="{ 'testimonial-card-compact--active': isActive }"
     role="button"
-    :aria-labelledby="`testimonial-${data.id}`"
+    :aria-labelledby="cardId"
     :aria-pressed="isActive"
     tabindex="0"
     @click="handleClick"
@@ -38,7 +48,7 @@ const handleKeydown = (event: KeyboardEvent) => {
       </span>
       <div class="testimonial-card-compact__footer">
         <div class="testimonial-card-compact__author-info">
-          <p class="testimonial-card-compact__author-name">
+          <p :id="cardId" class="testimonial-card-compact__author-name">
             {{ data.author }}
           </p>
           <p class="testimonial-card-compact__author-position">

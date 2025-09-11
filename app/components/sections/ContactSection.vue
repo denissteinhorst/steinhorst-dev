@@ -47,12 +47,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
         </div>
       </header>
 
-      <ul
-        class="contact-section__grid"
-        role="list"
-        aria-label="Kontaktkanäle"
-        aria-describedby="contact-instructions contact-note"
-      >
+      <ul class="contact-section__grid" role="list" aria-label="Kontaktkanäle">
         <ContactCard
           v-for="(contactCard, cardIndex) in data.contactCards"
           :key="contactCard.id || cardIndex"
