@@ -362,6 +362,7 @@ $block: "section-wrapper";
       gap: var(--spacing-2xs);
       text-decoration: none;
       cursor: pointer;
+      font-weight: 600;
     }
 
     &__icon {

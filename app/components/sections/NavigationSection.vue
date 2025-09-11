@@ -684,7 +684,8 @@ $block: "navigation-section";
     padding: 0.5rem 0.875rem;
     background: transparent;
     border: none;
-    color: rgba(248, 250, 252, 0.9);
+    color: #fff;
+
     cursor: pointer;
     border-radius: 0.375rem;
     transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -696,7 +697,7 @@ $block: "navigation-section";
     }
 
     &:hover {
-      color: #fff;
+      color: rgba(248, 250, 252, 0.9);
     }
 
     &:focus-visible {
@@ -774,7 +775,7 @@ $block: "navigation-section";
       height: 0;
       border-left: 6px solid transparent;
       border-right: 6px solid transparent;
-      border-bottom: 6px solid rgba(0, 0, 0, 0.9);
+      border-bottom: 6px solid rgba(0, 0, 0, 1);
     }
 
     @supports (backdrop-filter: blur(20px)) {
@@ -905,7 +906,7 @@ $block: "navigation-section";
     font-size: 0.875rem;
     font-weight: 600;
     letter-spacing: 0.025em;
-    color: rgba(248, 250, 252, 0.9);
+    color: rgba(248, 250, 252, 1);
     text-decoration: none;
     transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     transform: translateZ(0);

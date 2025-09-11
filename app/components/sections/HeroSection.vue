@@ -281,6 +281,10 @@ $block: "hero-section";
   @media (min-width: 1024px) {
     padding: calc(2.5rem + 72px) 0 2.5rem;
   }
+
+  &-cta {
+    font-weight: 600;
+  }
 }
 
 /* Background Elements */
@@ -292,7 +296,7 @@ $block: "hero-section";
 
   &-blur {
     position: absolute;
-    inset: -20%;
+    inset: 0;
     background-image: url("/images/hero_image.webp");
     background-size: cover;
     background-position: center;
@@ -342,7 +346,7 @@ $block: "hero-section";
   &-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(29, 33, 41, 0.15);
+    background: rgba(29, 33, 41, 0.25);
   }
 }
 
