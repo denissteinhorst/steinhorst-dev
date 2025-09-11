@@ -61,12 +61,16 @@ const suppressForToday = (): void => {
 
 const shouldOpenOnMove = (mouseY: number, deltaY: number): boolean => {
   const topOffset = Math.max(0, props.blindTopOffsetPx);
+  const isAiSummaryOpen = typeof document !== 'undefined' && 
+    document.documentElement.hasAttribute('data-ai-summary-open');
+  
   return (
     Date.now() >= suppressedUntil.value &&
     hasScrolledHalfway.value &&
     mouseY <= ACTIVATION_THRESHOLD &&
     mouseY >= topOffset &&
-    deltaY < -MINIMUM_UPWARD_DELTA
+    deltaY < -MINIMUM_UPWARD_DELTA &&
+    !isAiSummaryOpen
   );
 };
 
