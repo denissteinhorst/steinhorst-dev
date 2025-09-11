@@ -59,6 +59,30 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
                   :text="personalityCard.text"
                   :tooltips="personalityCard.polarChartTooltips || []"
                 />
+                <div class="personality-section__button-container">
+                  <UButton
+                    :to="'https://persolog.com/de/persolog-persoenlichkeits-modell/'"
+                    variant="ghost"
+                    color="secondary"
+                    size="xs"
+                    class="personality-section__button"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    :aria-label="`persolog.com (${$t('ui.opens_in_new_tab')})`"
+                  >
+                    <span class="personality-section__button-text">{{
+                      $t("personality_section.more_info_persolog")
+                    }}</span>
+                    <span class="sr-only"
+                      >({{ $t("ui.opens_in_new_tab") }})</span
+                    >
+                    <UIcon
+                      name="i-heroicons-arrow-top-right-on-square"
+                      class="personality-section__button-icon"
+                      aria-hidden="true"
+                    />
+                  </UButton>
+                </div>
               </template>
               <template v-else-if="personalityCard.variant === 'barChart'">
                 <BarchartCard
@@ -67,52 +91,30 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
                   :text="personalityCard.text"
                   :tooltips="personalityCard.barChartTooltips || []"
                 />
-              </template>
-            </div>
-            <div class="personality-section__button-container">
-              <template v-if="personalityCard.variant === 'polarChart'">
-                <UButton
-                  :to="'https://persolog.com/de/persolog-persoenlichkeits-modell/'"
-                  variant="ghost"
-                  color="secondary"
-                  size="xs"
-                  class="personality-section__button"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  :aria-label="`persolog.com (${$t('ui.opens_in_new_tab')})`"
-                >
-                  <span class="personality-section__button-text">{{
-                    $t("personality_section.more_info_persolog")
-                  }}</span>
-                  <span class="sr-only">({{ $t("ui.opens_in_new_tab") }})</span>
-                  <UIcon
-                    name="i-heroicons-arrow-top-right-on-square"
-                    class="personality-section__button-icon"
-                    aria-hidden="true"
-                  />
-                </UButton>
-              </template>
-              <template v-else-if="personalityCard.variant === 'barChart'">
-                <UButton
-                  :to="'https://ipmag.ch/de/'"
-                  variant="ghost"
-                  color="secondary"
-                  size="xs"
-                  class="personality-section__button"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  :aria-label="`ipmag.ch (${$t('ui.opens_in_new_tab')})`"
-                >
-                  <span class="personality-section__button-text">{{
-                    $t("personality_section.more_info_ipm")
-                  }}</span>
-                  <span class="sr-only">({{ $t("ui.opens_in_new_tab") }})</span>
-                  <UIcon
-                    name="i-heroicons-arrow-top-right-on-square"
-                    class="personality-section__button-icon"
-                    aria-hidden="true"
-                  />
-                </UButton>
+                <div class="personality-section__button-container">
+                  <UButton
+                    :to="'https://ipmag.ch/de/'"
+                    variant="ghost"
+                    color="secondary"
+                    size="xs"
+                    class="personality-section__button"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    :aria-label="`ipmag.ch (${$t('ui.opens_in_new_tab')})`"
+                  >
+                    <span class="personality-section__button-text">{{
+                      $t("personality_section.more_info_ipm")
+                    }}</span>
+                    <span class="sr-only"
+                      >({{ $t("ui.opens_in_new_tab") }})</span
+                    >
+                    <UIcon
+                      name="i-heroicons-arrow-top-right-on-square"
+                      class="personality-section__button-icon"
+                      aria-hidden="true"
+                    />
+                  </UButton>
+                </div>
               </template>
             </div>
           </BaseCard>
