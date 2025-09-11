@@ -156,10 +156,11 @@ $block: "contact-section";
 
   &__description {
     font-size: 1rem;
-    color: #d1d5db;
     margin: 0 auto;
-    width: 75%;
-    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+    width: 85%;
+    color: var(--color-text);
+    font-weight: 500;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 1);
 
     // Force dark mode CSS variables for StrapiBlocksText content
     --color-text: #d1d5db;
