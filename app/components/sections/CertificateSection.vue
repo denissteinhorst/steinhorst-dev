@@ -50,6 +50,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
             data-aos="fade-up"
             :data-aos-delay="Math.min(cardIndex, 5) * 100"
             class="certificate-section__card-wrapper"
+            role="listitem"
           >
             <CertificateCard :data="certificateCard" />
           </div>

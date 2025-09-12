@@ -113,6 +113,7 @@ const filteredProjects = computed((): ProjectCard[] => {
           data-aos="none"
           :data-aos-delay="100"
           class="project-section__card-wrapper"
+          role="listitem"
         >
           <ProjectCard :data="card" />
         </div>
@@ -124,6 +125,7 @@ const filteredProjects = computed((): ProjectCard[] => {
             showCount >= (data.projectCards?.length || 0)
           "
           class="project-section__card-wrapper"
+          role="listitem"
         >
           <ProjectCardLast :data="data.lastProjectCard" />
         </div>

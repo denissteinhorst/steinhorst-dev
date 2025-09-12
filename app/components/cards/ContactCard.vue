@@ -41,7 +41,6 @@ const getAriaLabel = (card: ContactCard): string => {
   >
     <BaseCard
       class="contact-card__inner"
-      role="group"
       :is-dark="true"
       :aria-labelledby="titleId"
       :aria-describedby="descId"

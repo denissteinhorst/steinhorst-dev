@@ -35,28 +35,31 @@ const handleKeydown = (event: KeyboardEvent) => {
     :is-active="isActive"
     class="testimonial-card-compact"
     :class="{ 'testimonial-card-compact--active': isActive }"
-    role="button"
     :aria-labelledby="cardId"
-    :aria-pressed="isActive"
-    tabindex="0"
-    @click="handleClick"
-    @keydown="handleKeydown"
   >
-    <article class="testimonial-card-compact__article">
-      <span class="testimonial-card-compact__summary">
-        {{ data.summary }}
-      </span>
-      <div class="testimonial-card-compact__footer">
-        <div class="testimonial-card-compact__author-info">
-          <p :id="cardId" class="testimonial-card-compact__author-name">
-            {{ data.author }}
-          </p>
-          <p class="testimonial-card-compact__author-position">
-            {{ data.position }} | {{ data.company }}
-          </p>
+    <button
+      class="testimonial-card-compact__button"
+      :aria-pressed="isActive"
+      :aria-labelledby="cardId"
+      @click="handleClick"
+      @keydown="handleKeydown"
+    >
+      <div class="testimonial-card-compact__content">
+        <span class="testimonial-card-compact__summary">
+          {{ data.summary }}
+        </span>
+        <div class="testimonial-card-compact__footer">
+          <div class="testimonial-card-compact__author-info">
+            <p :id="cardId" class="testimonial-card-compact__author-name">
+              {{ data.author }}
+            </p>
+            <p class="testimonial-card-compact__author-position">
+              {{ data.position }} | {{ data.company }}
+            </p>
+          </div>
         </div>
       </div>
-    </article>
+    </button>
   </BaseCard>
 </template>
 
@@ -73,7 +76,9 @@ $block: "testimonial-card-compact";
     padding-bottom: 0;
   }
 
-  &__article {
+  &__button {
+    border: none;
+    background: none;
     border-radius: 0.5rem;
     cursor: pointer;
     transition: all 0.15s ease-in-out;
@@ -81,11 +86,25 @@ $block: "testimonial-card-compact";
     display: flex;
     flex-direction: column;
     height: 110px;
-    padding-bottom: 0;
+    padding: 0;
+    width: 100%;
+    text-align: left;
+
+    &:focus-visible {
+      outline: 2px solid var(--color-primary, #a78bfa);
+      outline-offset: 2px;
+    }
 
     @at-root .dark #{&} {
       border-color: transparent;
     }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
   }
 
   &__summary {

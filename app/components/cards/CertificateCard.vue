@@ -19,7 +19,7 @@ const cardId = computed(() =>
 </script>
 
 <template>
-  <BaseCard class="certificate-card" role="listitem" :aria-labelledby="cardId">
+  <BaseCard class="certificate-card" :aria-labelledby="cardId">
     <div class="certificate-card__content-wrapper">
       <div class="certificate-card__header">
         <div

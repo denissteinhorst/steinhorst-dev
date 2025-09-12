@@ -15,7 +15,7 @@ const aosDelay = computed(() => (props.index ?? 0) * 100);
 
 <template>
   <div data-aos="fade-up" :data-aos-delay="aosDelay" class="skill-card-wrapper">
-    <BaseCard class="skill-card" :aria-labelledby="cardId" role="group">
+    <BaseCard class="skill-card" :aria-labelledby="cardId">
       <div class="skill-card__content">
         <h3 :id="cardId" class="skill-card__title">
           {{ props.title }}

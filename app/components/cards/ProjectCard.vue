@@ -27,7 +27,7 @@ const extractTextFromRichText = (block: RichTextBlock): string => {
 </script>
 
 <template>
-  <BaseCard class="project-card" role="listitem" :aria-labelledby="cardId">
+  <BaseCard class="project-card" :aria-labelledby="cardId">
     <div class="project-card__body">
       <div class="project-card__header">
         <div class="project-card__image-container">

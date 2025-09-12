@@ -72,7 +72,12 @@ onUnmounted(() => {
 
 <template>
   <!-- Scroll down hint when at top -->
-  <div v-if="showScrollDown" class="scroll-hint">
+  <aside
+    v-if="showScrollDown"
+    class="scroll-hint"
+    role="complementary"
+    aria-label="Scroll down hint"
+  >
     <div class="scroll-hint__content">
       <div class="scroll-hint__line" role="presentation">
         <span class="scroll-hint__text-before">{{
@@ -93,10 +98,10 @@ onUnmounted(() => {
         />
       </div>
     </div>
-  </div>
+  </aside>
 
   <!-- Main scroll companion -->
-  <div
+  <aside
     v-if="isStarting"
     ref="companion"
     :class="[
@@ -106,6 +111,8 @@ onUnmounted(() => {
         'scroll-companion--bottom': isBottom,
       },
     ]"
+    role="complementary"
+    aria-label="Scroll controls and site utilities"
   >
     <!-- Glow effect as separate element -->
     <div class="scroll-companion__glow"></div>
@@ -190,7 +197,7 @@ onUnmounted(() => {
         </div>
       </div>
     </div>
-  </div>
+  </aside>
 </template>
 
 <style scoped lang="scss">
