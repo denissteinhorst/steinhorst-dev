@@ -402,6 +402,8 @@ $block: "hero-section";
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     letter-spacing: -0.025em;
 
+    background: rgba(0, 0, 0, 0.01);
+
     @media (min-width: 1024px) {
       font-size: clamp(3rem, 4vw, 5rem);
       text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
@@ -415,6 +417,7 @@ $block: "hero-section";
       letter-spacing: inherit;
       font-family: inherit;
       text-shadow: inherit;
+      background: rgba(0, 0, 0, 0.01);
     }
   }
 
@@ -427,6 +430,7 @@ $block: "hero-section";
     text-shadow: 0 1px 1px rgba(0, 0, 0, 1);
     letter-spacing: -0.01em;
 
+    background: rgba(0, 0, 0, 0.01);
     @media (min-width: 1024px) {
       font-size: 1.25rem;
       margin-bottom: 2rem;

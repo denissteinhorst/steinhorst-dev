@@ -534,6 +534,22 @@ $block: "navigation-section";
   will-change: background-color, box-shadow;
   outline: none; // Remove default focus outline
 
+  // Add minimal contrast backdrop for WCAG compliance in initial state
+  &:not(&--scrolled) {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.02) 0%,
+      transparent 100%
+    );
+
+    // Ensure all interactive elements have sufficient contrast
+    .#{$block}__brand-link,
+    .#{$block}__desktop-burger-button {
+      background: rgba(0, 0, 0, 0.01);
+      border-radius: inherit;
+    }
+  }
+
   // Custom focus styles for when programmatically focused
   &:focus-visible {
     box-shadow: inset 0 0 0 2px var(--color-primary);
