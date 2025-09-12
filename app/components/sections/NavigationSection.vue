@@ -907,14 +907,14 @@ $block: "navigation-section";
     font-size: 0.875rem;
     font-weight: 600;
     letter-spacing: 0.025em;
-    color: rgba(248, 250, 252, 1);
+    color: #ffffff;
     text-decoration: none;
     transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     transform: translateZ(0);
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 1);
 
     &:hover {
-      color: #fff;
+      color: var(--color-secondary);
     }
 
     &:focus-visible {
