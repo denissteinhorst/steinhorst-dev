@@ -84,7 +84,7 @@ watch(page, () => {
           <div
             class="testimonial-section__center-column"
             role="region"
-            aria-label="Testimonial cards"
+            aria-label="Selected testimonial details"
           >
             <TestimonialCardLarge
               v-if="currentTestimonial"
@@ -116,14 +116,13 @@ watch(page, () => {
           :style="{
             '--grid-rows': gridRows,
           }"
-          role="list"
+          role="region"
           aria-label="Testimonial navigation and details"
         >
           <!-- All compact cards in tab order (DOM order determines tab order) -->
           <div
             v-for="(card, index) in testimonials"
             :key="card.id"
-            role="listitem"
             :class="`testimonial-section__compact-card testimonial-section__compact-card--${
               index % 2 === 0 ? 'left' : 'right'
             }`"
@@ -135,10 +134,9 @@ watch(page, () => {
             />
           </div>
 
-          <!-- Large card as a list item -->
+          <!-- Selected testimonial details -->
           <div
             class="testimonial-section__center-column"
-            role="listitem"
             aria-label="Selected testimonial details"
           >
             <TestimonialCardLarge
@@ -149,10 +147,11 @@ watch(page, () => {
               @toggle-language="handleLanguageToggle"
             />
 
-            <!-- Pagination -->
-            <div
+            <!-- Pagination navigation -->
+            <nav
               v-if="testimonials.length > 1"
               class="testimonial-section__pagination"
+              aria-label="Testimonial pagination"
             >
               <UPagination
                 v-model:page="page"
@@ -161,7 +160,7 @@ watch(page, () => {
                 size="md"
                 active-color="primary"
               />
-            </div>
+            </nav>
           </div>
         </div>
       </div>
