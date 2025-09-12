@@ -205,7 +205,7 @@ $block: "testimonial-card-large";
   &__container {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto; // middle row can shrink and scroll
-    height: 765px; // ensure fixed card height even if root class height doesn't apply
+    height: 825px; // ensure fixed card height even if root class height doesn't apply
     min-height: 0; // allow inner row to shrink/scroll in Safari
     overflow: hidden; // prevent outer scroll; only center scrolls
     row-gap: 1rem;
