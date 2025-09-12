@@ -18,6 +18,18 @@ const isClientMounted = shallowRef(false);
 
 onMounted(() => {
   isClientMounted.value = true;
+
+  // Ensure canvas gets proper accessibility attributes after chart initialization
+  nextTick(() => {
+    const canvas = document.getElementById("polar-chart") as HTMLCanvasElement;
+    if (canvas) {
+      canvas.setAttribute("role", "img");
+      canvas.setAttribute(
+        "aria-label",
+        `${title}: ${$t("accessibility.polarChart.description")}`
+      );
+    }
+  });
 });
 
 const PERSONALITY_TRAITS_MAPPING = readonly({
@@ -151,6 +163,17 @@ const chartDisplayOptions = computed(() => {
   return {
     responsive: true,
     maintainAspectRatio: false,
+    onResize: (chart: unknown, _size: { width: number; height: number }) => {
+      // Ensure canvas has proper accessibility attributes after resize
+      const canvas = (chart as { canvas?: HTMLCanvasElement })?.canvas;
+      if (canvas) {
+        canvas.setAttribute("role", "img");
+        canvas.setAttribute(
+          "aria-label",
+          `${title}: ${$t("accessibility.polarChart.description")}`
+        );
+      }
+    },
     layout: {
       padding: { top: 0 },
     },

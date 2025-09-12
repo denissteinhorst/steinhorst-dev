@@ -42,6 +42,20 @@ const isClientMounted = shallowRef(false);
 
 onMounted(() => {
   isClientMounted.value = true;
+
+  // Ensure canvas gets proper accessibility attributes after chart initialization
+  nextTick(() => {
+    const canvas = document.getElementById(
+      "motivation-profile"
+    ) as HTMLCanvasElement;
+    if (canvas) {
+      canvas.setAttribute("role", "img");
+      canvas.setAttribute(
+        "aria-label",
+        `${title}: ${$t("accessibility.barChart.description")}`
+      );
+    }
+  });
 });
 
 const MOTIVATION_TRAITS_MAPPING = readonly({
@@ -257,6 +271,17 @@ const wrapTextContent = (text: string, maxLineLength = 50): string[] => {
 const chartDisplayOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
+  onResize: (chart: unknown, _size: { width: number; height: number }) => {
+    // Ensure canvas has proper accessibility attributes after resize
+    const canvas = (chart as { canvas?: HTMLCanvasElement })?.canvas;
+    if (canvas) {
+      canvas.setAttribute("role", "img");
+      canvas.setAttribute(
+        "aria-label",
+        `${title}: ${$t("accessibility.barChart.description")}`
+      );
+    }
+  },
   interaction: {
     mode: "index" as const,
     intersect: false,
@@ -419,6 +444,7 @@ const averageLinePlugin = {
         :data="chartConfiguration"
         :options="chartDisplayOptions"
         :plugins="[averageLinePlugin]"
+        role="img"
         :aria-label="`${title}: ${$t('accessibility.barChart.description')}`"
       />
     </div>

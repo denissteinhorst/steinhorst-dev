@@ -116,24 +116,30 @@ watch(page, () => {
           :style="{
             '--grid-rows': gridRows,
           }"
+          role="list"
+          aria-label="Testimonial navigation and details"
         >
           <!-- All compact cards in tab order (DOM order determines tab order) -->
-          <TestimonialCardCompact
+          <div
             v-for="(card, index) in testimonials"
             :key="card.id"
-            :data="card"
-            :is-active="index === activeIndex"
+            role="listitem"
             :class="`testimonial-section__compact-card testimonial-section__compact-card--${
               index % 2 === 0 ? 'left' : 'right'
             }`"
-            @click="handleCardClick(index)"
-          />
+          >
+            <TestimonialCardCompact
+              :data="card"
+              :is-active="index === activeIndex"
+              @click="handleCardClick(index)"
+            />
+          </div>
 
-          <!-- Large card -->
+          <!-- Large card as a list item -->
           <div
             class="testimonial-section__center-column"
-            role="region"
-            aria-label="Testimonial cards"
+            role="listitem"
+            aria-label="Selected testimonial details"
           >
             <TestimonialCardLarge
               v-if="currentTestimonial"

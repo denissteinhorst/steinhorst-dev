@@ -2,6 +2,7 @@
 const props = defineProps<{
   data: RecommendationCard;
   showAlternative?: boolean;
+  role?: string;
 }>();
 
 const emit = defineEmits<{
@@ -98,7 +99,7 @@ const languageToggleText = computed((): string => {
 <template>
   <BaseCard
     class="testimonial-card-large"
-    role="article"
+    :role="props.role || 'article'"
     :aria-labelledby="cardId"
   >
     <div class="testimonial-card-large__container">

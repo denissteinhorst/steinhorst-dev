@@ -84,7 +84,6 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
                   :href="heroLink.link ?? '#'"
                   :target="heroLink.target || '_self'"
                   size="md"
-                  color="secondary"
                   class="hero-section-cta"
                 >
                   <UIcon
@@ -195,7 +194,6 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
                 :href="heroLink.link ?? '#'"
                 :target="heroLink.target || '_self'"
                 size="md"
-                color="secondary"
                 class="hero-section-cta"
               >
                 <UIcon
@@ -266,7 +264,7 @@ $block: "hero-section";
   --color-text: #eeeeee;
   --color-bg: #1d2129;
   --color-surface: #232833;
-  --color-primary: #9861ff; /* Fallback for emphasis text */
+  --color-primary: #854dff;
 
   color: var(--color-text);
   background: black;
@@ -286,7 +284,9 @@ $block: "hero-section";
   }
 
   &-cta {
-    font-weight: 600;
+    font-weight: 700;
+    background-color: var(--color-primary);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 1);
   }
 
   /* Background Elements */
