@@ -147,7 +147,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
                   src="/images/hero_image.webp"
                   :alt="
                     data.image?.alternativeText ||
-                    'Portrait von Denis Steinhorst'
+                    'Portrait von Denis Steinhorst - Linke Bildhälfte'
                   "
                   class="hero-section-img"
                   sizes="(min-width: 1280px) 34rem, (min-width: 1024px) 28rem, 60vw"
@@ -159,7 +159,10 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
               <div class="hero-section-img-slot hero-section-img-slot--right">
                 <img
                   src="/images/hero_image.webp"
-                  alt=""
+                  :alt="
+                    data.image?.alternativeText ||
+                    'Portrait von Denis Steinhorst - Rechte Bildhälfte'
+                  "
                   class="hero-section-img"
                   sizes="(min-width: 1280px) 34rem, (min-width: 1024px) 28rem, 60vw"
                   decoding="async"
