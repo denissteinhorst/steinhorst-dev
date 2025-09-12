@@ -498,7 +498,7 @@ $block: "ai-summary";
     transition: color 0.2s ease;
 
     :root.dark & {
-      color: rgb(226, 232, 240);
+      color: #111827;
     }
 
     &:hover {
