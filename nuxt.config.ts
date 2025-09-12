@@ -55,6 +55,43 @@ export default defineNuxtConfig({
   aos: {
     once: true,
   },
+  image: {
+    quality: 80,
+    format: ['webp', 'avif'],
+    screens: {
+      xs: 320,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      xxl: 1536,
+    },
+  },
+  routeRules: {
+    // Static assets with long cache lifetime (1 year)
+    '/images/**': {
+      headers: {
+        'Cache-Control': 'public, max-age=31536000, immutable'
+      }
+    },
+    // Favicon and robots with moderate cache (1 week)
+    '/favicon.ico': {
+      headers: {
+        'Cache-Control': 'public, max-age=604800'
+      }
+    },
+    '/_robots.txt': {
+      headers: {
+        'Cache-Control': 'public, max-age=604800'
+      }
+    },
+    // General static assets (fonts, etc.) with long cache (1 year)
+    '/_nuxt/**': {
+      headers: {
+        'Cache-Control': 'public, max-age=31536000, immutable'
+      }
+    }
+  },
   i18n: {
     locales: [
       { code: 'de', iso: 'de-DE', dir: 'ltr' },

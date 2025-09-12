@@ -142,30 +142,34 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
           <figure class="hero-section-portrait">
             <div class="hero-section-img-slots">
               <div class="hero-section-img-slot hero-section-img-slot--left">
-                <img
+                <NuxtImg
                   src="/images/hero_image.webp"
                   :alt="
                     data.image?.alternativeText ||
                     'Portrait von Denis Steinhorst - Linke Bildhälfte'
                   "
                   class="hero-section-img"
-                  sizes="(min-width: 1280px) 34rem, (min-width: 1024px) 28rem, 60vw"
+                  sizes="xs:60vw sm:60vw md:60vw lg:28rem xl:34rem"
                   decoding="async"
                   fetchpriority="high"
+                  format="webp,avif"
+                  quality="80"
                 />
               </div>
 
               <div class="hero-section-img-slot hero-section-img-slot--right">
-                <img
+                <NuxtImg
                   src="/images/hero_image.webp"
                   :alt="
                     data.image?.alternativeText ||
                     'Portrait von Denis Steinhorst - Rechte Bildhälfte'
                   "
                   class="hero-section-img"
-                  sizes="(min-width: 1280px) 34rem, (min-width: 1024px) 28rem, 60vw"
+                  sizes="xs:60vw sm:60vw md:60vw lg:28rem xl:34rem"
                   decoding="async"
                   aria-hidden="true"
+                  format="webp,avif"
+                  quality="80"
                 />
               </div>
             </div>
