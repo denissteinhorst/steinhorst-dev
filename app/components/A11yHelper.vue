@@ -106,29 +106,42 @@ $block: "a11y-helper";
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 10;
     display: inline-block;
     padding: 0.8rem 1.6rem;
     line-height: 1;
-    font-size: 0.875rem;
-    background-color: #9861ff;
-    color: #fff;
+    font-size: 16px;
+    background-color: #000000 !important;
+    color: #ffffff !important;
     font-weight: bold;
     border-radius: 0.375rem;
     margin: 0.8rem 0 0 0.8rem;
-    text-decoration: none;
+    text-decoration: none !important;
     white-space: nowrap;
-    transform: translateX(-100%);
-    opacity: 0;
+    transform: translateX(-110%);
     pointer-events: none;
-    transition: transform 180ms ease, opacity 180ms ease;
+    transition: transform 180ms ease;
+    z-index: 9999;
+
+    // Override any global link styles
+    &:link,
+    &:visited,
+    &:hover,
+    &:active {
+      color: #ffffff !important;
+      background-color: #000000 !important;
+      text-decoration: none !important;
+    }
 
     &:focus,
     &:focus-visible {
       transform: translateX(0);
       opacity: 1;
       pointer-events: auto;
-      outline: none;
+      outline: 2px solid #ffffff;
+      outline-offset: 2px;
+      color: #ffffff !important;
+      background-color: #000000 !important;
+      text-decoration: none !important;
     }
   }
 }
