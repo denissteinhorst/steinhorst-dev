@@ -142,7 +142,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
           <figure class="hero-section-portrait">
             <div class="hero-section-img-slots">
               <div class="hero-section-img-slot hero-section-img-slot--left">
-                <NuxtImg
+                <img
                   src="/images/hero_image.webp"
                   :alt="
                     data.image?.alternativeText ||
@@ -152,13 +152,11 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
                   sizes="xs:60vw sm:60vw md:60vw lg:28rem xl:34rem"
                   decoding="async"
                   fetchpriority="high"
-                  format="webp,avif"
-                  quality="80"
                 />
               </div>
 
               <div class="hero-section-img-slot hero-section-img-slot--right">
-                <NuxtImg
+                <img
                   src="/images/hero_image.webp"
                   :alt="
                     data.image?.alternativeText ||
@@ -168,8 +166,6 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
                   sizes="xs:60vw sm:60vw md:60vw lg:28rem xl:34rem"
                   decoding="async"
                   aria-hidden="true"
-                  format="webp,avif"
-                  quality="80"
                 />
               </div>
             </div>
