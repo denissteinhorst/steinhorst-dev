@@ -8,11 +8,11 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/ui',
     '@vueuse/nuxt',
-    'nuxt-aos',
     '@nuxtjs/seo',
     '@nuxtjs/color-mode',
-    'nuxt-strapi-blocks-renderer',
     '@nuxtjs/mdc',
+    'nuxt-aos',
+    'nuxt-strapi-blocks-renderer',
     'nuxt-i18n-micro',
   ],
   colorMode: {
@@ -22,8 +22,6 @@ export default defineNuxtConfig({
   components: [{ path: '~/components/sections' }, { path: '~/components/cards' }, '~/components'],
   runtimeConfig: {
     api_token: '',
-    // Public values (available on client). These can be overridden at runtime via
-    // env vars NUXT_PUBLIC_API_BASE and NUXT_PUBLIC_API_URL.
     public: {
       api_base: 'https://cms.steinhorst.dev',
       api_url: 'https://cms.steinhorst.dev/api',
@@ -105,7 +103,6 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         {
           name: 'description',
-          // German description (page content is German to avoid language mismatch warnings)
           content:
             'Portfolio & Erfahrungen von Denis Steinhorst – Fullstack / Vue & Nuxt fokussierter Entwickler. Projekte, Skills, Referenzen & Kontakt.',
         },
