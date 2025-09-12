@@ -5,9 +5,7 @@ interface Props {
   isIconOnly?: boolean;
 }
 
-const { isIconOnly } = withDefaults(defineProps<Props>(), {
-  isIconOnly: false,
-});
+const { isIconOnly = false } = defineProps<Props>();
 
 const { cmsRequest, currentLocaleString } = useStrapi();
 const { $t } = useI18n();
