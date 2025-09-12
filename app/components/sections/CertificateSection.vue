@@ -39,7 +39,11 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
   >
     <template #content>
       <div class="certificate-section" aria-label="Main">
-        <div class="certificate-section__grid">
+        <div
+          class="certificate-section__grid"
+          role="list"
+          aria-label="Certificate cards"
+        >
           <div
             v-for="(certificateCard, cardIndex) in data.certificationCards"
             :key="cardIndex"

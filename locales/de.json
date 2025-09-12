@@ -17,6 +17,14 @@
     "switch_to_dark_mode": "In den Dunkel-Modus wechseln",
     "switch_to_light_mode": "In den Hell-Modus wechseln"
   },
+  "accessibility": {
+    "polarChart": {
+      "description": "Polar-Diagramm zeigt Persönlichkeitsmerkmal-Verteilung mit Prozentangaben"
+    },
+    "barChart": {
+      "description": "Balkendiagramm zeigt Motivationsprofil mit Vergleichswerten und Durchschnittslinie"
+    }
+  },
   "nuxtSiteConfig": {
     "name": "Denis Steinhorst – Fullstack Developer",
     "description": "Portfolio & Erfahrungen von Denis Steinhorst – Fullstack / Vue & Nuxt fokussierter Entwickler. Projekte, Skills, Referenzen & Kontakt."

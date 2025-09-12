@@ -17,6 +17,14 @@
     "switch_to_dark_mode": "Switch to dark mode",
     "switch_to_light_mode": "Switch to light mode"
   },
+  "accessibility": {
+    "polarChart": {
+      "description": "Polar area chart showing personality trait distribution with percentages"
+    },
+    "barChart": {
+      "description": "Bar chart showing motivation profile with comparative values and average line"
+    }
+  },
   "nuxtSiteConfig": {
     "name": "Denis Steinhorst – Fullstack Developer",
     "description": "Portfolio & experiences of Denis Steinhorst – Fullstack / Vue & Nuxt focused developer. Projects, skills, references & contact."

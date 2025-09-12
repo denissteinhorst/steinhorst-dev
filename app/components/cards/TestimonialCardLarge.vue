@@ -98,7 +98,7 @@ const languageToggleText = computed((): string => {
 <template>
   <BaseCard
     class="testimonial-card-large"
-    role="listitem"
+    role="article"
     :aria-labelledby="cardId"
   >
     <div class="testimonial-card-large__container">

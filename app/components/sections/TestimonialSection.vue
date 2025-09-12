@@ -81,7 +81,11 @@ watch(page, () => {
       <div class="testimonial-section">
         <!-- Mobile/tablet: Show only center column -->
         <div class="testimonial-section__mobile-layout">
-          <div class="testimonial-section__center-column">
+          <div
+            class="testimonial-section__center-column"
+            role="region"
+            aria-label="Testimonial cards"
+          >
             <TestimonialCardLarge
               v-if="currentTestimonial"
               :key="currentTestimonial.id || activeIndex"
@@ -126,7 +130,11 @@ watch(page, () => {
           />
 
           <!-- Large card -->
-          <div class="testimonial-section__center-column">
+          <div
+            class="testimonial-section__center-column"
+            role="region"
+            aria-label="Testimonial cards"
+          >
             <TestimonialCardLarge
               v-if="currentTestimonial"
               :key="currentTestimonial.id || activeIndex"

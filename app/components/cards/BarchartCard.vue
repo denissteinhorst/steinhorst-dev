@@ -419,6 +419,7 @@ const averageLinePlugin = {
         :data="chartConfiguration"
         :options="chartDisplayOptions"
         :plugins="[averageLinePlugin]"
+        :aria-label="`${title}: ${$t('accessibility.barChart.description')}`"
       />
     </div>
     <p

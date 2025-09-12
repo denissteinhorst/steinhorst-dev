@@ -106,7 +106,7 @@ const filteredProjects = computed((): ProjectCard[] => {
       />
 
       <!-- PROJECT CARD GRID -->
-      <div class="project-section__grid">
+      <div class="project-section__grid" role="list" aria-label="Project cards">
         <div
           v-for="(card, index) in filteredProjects"
           :key="index"

@@ -10,6 +10,7 @@ interface Props {
 
 const { title = "", subtitle = "", text = "", tooltips } = defineProps<Props>();
 
+const { $t } = useI18n();
 const colorMode = useColorMode();
 const { currentLocaleString } = useStrapi();
 
@@ -268,6 +269,7 @@ const chartDisplayOptions = computed(() => {
         id="polar-chart"
         :data="chartConfiguration"
         :options="chartDisplayOptions"
+        :aria-label="`${title}: ${$t('accessibility.polarChart.description')}`"
       />
     </div>
     <p
