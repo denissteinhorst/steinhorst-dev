@@ -56,6 +56,9 @@ $block: "language-selector";
     justify-content: center;
     border-radius: 0.375rem;
     transition: color 0.2s ease-in-out;
+    color: #ffffff;
+    font-size: 17px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 1);
 
     &:focus-visible {
       outline: 2px solid var(--color-primary, #a78bfa);

@@ -684,12 +684,12 @@ $block: "navigation-section";
     padding: 0.5rem 0.875rem;
     background: transparent;
     border: none;
-    color: #fff;
+    color: #ffffff;
 
     cursor: pointer;
     border-radius: 0.375rem;
     transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 5);
     transform: translateZ(0);
 
     @media (max-width: 1200px) {
@@ -752,6 +752,7 @@ $block: "navigation-section";
       0 10px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
     z-index: 60;
     animation: dropdown-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 1);
 
     &::before {
       content: "";
