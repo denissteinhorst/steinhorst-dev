@@ -331,6 +331,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                 :aria-label="link.title"
                 :aria-current="isActive(link.link) ? 'page' : undefined"
                 :tabindex="isScrolled ? '0' : '-1'"
+                :aria-hidden="!isScrolled"
                 class="navigation-section__link"
                 :data-active="isActive(link.link) ? 'true' : 'false'"
                 @keydown.space.prevent="navigateToSectionWithFocus(link.link)"
@@ -355,6 +356,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                     class="navigation-section__desktop-burger-button"
                     :aria-expanded="isDesktopDropdownOpen"
                     :tabindex="isScrolled ? '-1' : '0'"
+                    :aria-hidden="isScrolled"
                     aria-label="Navigation anzeigen"
                     @click="toggleDropdown"
                     @keydown.space.prevent="toggleDropdown"
@@ -668,6 +670,7 @@ $block: "navigation-section";
       overflow: hidden;
       margin: 0;
       padding: 0;
+      visibility: hidden; // Add visibility hidden for better a11y compliance
     }
 
     // Hide on mobile/tablet - only show on desktop
@@ -682,14 +685,12 @@ $block: "navigation-section";
     align-items: center;
     justify-content: center;
     padding: 0.5rem 0.875rem;
-    background: transparent;
-    border: none;
     color: #ffffff;
-
     cursor: pointer;
     border-radius: 0.375rem;
-    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 5);
+    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 1);
     transform: translateZ(0);
 
     @media (max-width: 1200px) {
@@ -698,6 +699,7 @@ $block: "navigation-section";
 
     &:hover {
       color: rgba(248, 250, 252, 0.9);
+      background: rgba(0, 0, 0, 0.5);
     }
 
     &:focus-visible {
@@ -892,6 +894,7 @@ $block: "navigation-section";
       overflow: hidden;
       margin: 0;
       padding: 0;
+      visibility: hidden; // Add visibility hidden for better a11y compliance
     }
 
     @for $i from 1 through 8 {
