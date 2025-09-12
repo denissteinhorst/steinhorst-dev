@@ -272,6 +272,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
     class="navigation-section"
     :class="{ 'navigation-section--scrolled': isScrolled }"
     role="navigation"
+    aria-label="Primary navigation"
     tabindex="-1"
   >
     <!-- Skip links for accessibility -->
