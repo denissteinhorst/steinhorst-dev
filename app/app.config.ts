@@ -3,7 +3,7 @@ export default defineAppConfig({
     colors: {
       primary: 'slate',
       secondary: 'violet',
-      neutral: 'neutral'
-    }
+      neutral: 'neutral',
+    },
   },
 })

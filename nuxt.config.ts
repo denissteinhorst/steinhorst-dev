@@ -13,17 +13,13 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
     'nuxt-strapi-blocks-renderer',
     '@nuxtjs/mdc',
-    'nuxt-i18n-micro'
+    'nuxt-i18n-micro',
   ],
   colorMode: {
     preference: 'light',
-    storageKey: 'nuxt-color-mode'
+    storageKey: 'nuxt-color-mode',
   },
-  components: [
-    { path: '~/components/sections' },
-    { path: '~/components/cards' },
-    '~/components'
-  ],
+  components: [{ path: '~/components/sections' }, { path: '~/components/cards' }, '~/components'],
   runtimeConfig: {
     api_token: '',
     // Public values (available on client). These can be overridden at runtime via
@@ -31,7 +27,7 @@ export default defineNuxtConfig({
     public: {
       api_base: 'https://cms.steinhorst.dev',
       api_url: 'https://cms.steinhorst.dev/api',
-    }
+    },
   },
   imports: {
     dirs: ['types'],
@@ -39,18 +35,18 @@ export default defineNuxtConfig({
       {
         from: '#strapi-blocks-renderer/types',
         name: 'BlockNode',
-        type: true
-      }
-    ]
+        type: true,
+      },
+    ],
   },
   vite: {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: '@use "~/assets/scss/theme.scss" as *;'
-        }
-      }
-    }
+          additionalData: '@use "~/assets/scss/theme.scss" as *;',
+        },
+      },
+    },
   },
   aos: {
     once: true,
@@ -71,26 +67,26 @@ export default defineNuxtConfig({
     // Static assets with long cache lifetime (1 year)
     '/images/**': {
       headers: {
-        'Cache-Control': 'public, max-age=31536000, immutable'
-      }
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
     },
     // Favicon and robots with moderate cache (1 week)
     '/favicon.ico': {
       headers: {
-        'Cache-Control': 'public, max-age=604800'
-      }
+        'Cache-Control': 'public, max-age=604800',
+      },
     },
     '/_robots.txt': {
       headers: {
-        'Cache-Control': 'public, max-age=604800'
-      }
+        'Cache-Control': 'public, max-age=604800',
+      },
     },
     // General static assets (fonts, etc.) with long cache (1 year)
     '/_nuxt/**': {
       headers: {
-        'Cache-Control': 'public, max-age=31536000, immutable'
-      }
-    }
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    },
   },
   i18n: {
     locales: [
@@ -125,18 +121,19 @@ export default defineNuxtConfig({
         },
         {
           property: 'og:image',
-          content:
-            'https://www.steinhorst.dev/images/og_image.png',
+          content: 'https://www.steinhorst.dev/images/og_image.png',
         },
         {
           property: 'og:url',
           content: 'https://www.steinhorst.dev',
         },
         {
-          name: 'twitter:card', content: 'summary_large_image'
+          name: 'twitter:card',
+          content: 'summary_large_image',
         },
         {
-          name: 'twitter:image', content: 'https://www.steinhorst.dev/images/og_image.png'
+          name: 'twitter:image',
+          content: 'https://www.steinhorst.dev/images/og_image.png',
         },
         {
           name: 'keywords',
@@ -148,19 +145,21 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'canonical', href: 'https://www.steinhorst.dev' },
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       ],
-      script: process.env.NODE_ENV === 'production' ? [
-        {
-          id: 'usercentrics-cmp',
-          src: 'https://web.cmp.usercentrics.eu/ui/loader.js',
-          'data-settings-id': 'h94zxBp1utgWJs',
-          async: true
-        },
-        {
-          type: 'text/plain',
-          'data-usercentrics': 'Hotjar',
-          innerHTML: `
+      script:
+        process.env.NODE_ENV === 'production'
+          ? [
+              {
+                id: 'usercentrics-cmp',
+                src: 'https://web.cmp.usercentrics.eu/ui/loader.js',
+                'data-settings-id': 'h94zxBp1utgWJs',
+                async: true,
+              },
+              {
+                type: 'text/plain',
+                'data-usercentrics': 'Hotjar',
+                innerHTML: `
             (function(h,o,t,j,a,r){
               h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
               h._hjSettings={hjid:6513298,hjsv:6};
@@ -169,9 +168,10 @@ export default defineNuxtConfig({
               r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
               a.appendChild(r);
             })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
-          `
-        }
-      ] : [],
+          `,
+              },
+            ]
+          : [],
     },
-  }
+  },
 })
