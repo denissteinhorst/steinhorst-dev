@@ -1,18 +1,18 @@
 <script setup lang="ts">
-const { cmsRequest, currentLocaleString } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi()
 
 const { data, pending, error } = await useLazyAsyncData<ContactSectionResponse>(
   `contact-${currentLocaleString.value}`,
   (): Promise<ContactSectionResponse> =>
     cmsRequest<ContactSectionResponse>(
-      "contact-section",
-      ["title", "text", "jumpmark", "contactCards"],
+      'contact-section',
+      ['title', 'text', 'jumpmark', 'contactCards'],
       false,
-      ["contactCards"]
-    )
-);
+      ['contactCards'],
+    ),
+)
 
-const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? [])
 </script>
 
 <template>
@@ -40,7 +40,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
           <JobSearchBadge />
         </div>
         <h2 id="contact-heading" class="contact-section__title">
-          {{ data.title || "Contact" }}
+          {{ data.title || 'Contact' }}
         </h2>
         <div v-if="headerText.length > 0" class="contact-section__description">
           <StrapiBlocksText :nodes="headerText" />
@@ -60,7 +60,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </template>
 
 <style scoped lang="scss">
-$block: "contact-section";
+$block: 'contact-section';
 
 .#{$block} {
   position: relative;
@@ -86,21 +86,15 @@ $block: "contact-section";
     pointer-events: none;
     width: 100%;
     height: 100%;
-    background: radial-gradient(
-        ellipse 80% 60% at 10% 20%,
-        var(--color-primary) 0%,
-        transparent 80%
-      ),
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 20%, var(--color-primary) 0%, transparent 80%),
       radial-gradient(ellipse 70% 50% at 90% 80%, #484848ff 0%, transparent 80%),
-      radial-gradient(
-        ellipse 60% 40% at 50% 60%,
-        var(--color-secondary) 0%,
-        transparent 80%
-      );
+      radial-gradient(ellipse 60% 40% at 50% 60%, var(--color-secondary) 0%, transparent 80%);
     filter: blur(48px) saturate(1.4);
     opacity: 0.95;
     transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-    animation: fluidFadeIn 1.5s ease,
+    animation:
+      fluidFadeIn 1.5s ease,
       fluidMove 10s infinite alternate ease-in-out;
   }
 

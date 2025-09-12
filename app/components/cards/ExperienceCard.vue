@@ -1,16 +1,16 @@
 <script setup lang="ts">
 const props = defineProps<{
-  data: ExperienceCard;
-  index?: number;
-  showJobsearchBadge?: boolean;
-}>();
+  data: ExperienceCard
+  index?: number
+  showJobsearchBadge?: boolean
+}>()
 
-const { buildImageUrl } = useStrapi();
-const { t } = useI18n();
+const { buildImageUrl } = useStrapi()
+const { t } = useI18n()
 
 // Helper function to compute duration from period string
 const computeDuration = (period?: string): string => {
-  if (!period) return "";
+  if (!period) return ''
 
   // Map German month names to month numbers (1-12)
   const monthMap: Record<string, number> = {
@@ -26,123 +26,123 @@ const computeDuration = (period?: string): string => {
     oktober: 10,
     november: 11,
     dezember: 12,
-  };
+  }
 
   // Split by common separators: 'bis', en-dash, em-dash, hyphen
-  const parts = period.split(/\s+(?:bis|–|—|-)\s+/i).map((p) => p.trim());
-  if (parts.length < 1) return "";
+  const parts = period.split(/\s+(?:bis|–|—|-)\s+/i).map((p) => p.trim())
+  if (parts.length < 1) return ''
 
   const parsePart = (text?: string | null): Date | null => {
-    if (!text) return null;
-    if (/heute/i.test(text)) return new Date();
-    const m = text.match(/([A-Za-zäöüÄÖÜß]+)\s+(\d{4})/);
-    if (!m) return null;
-    const monthName = (m[1] ?? "").toLowerCase();
-    const yearStr = m[2] ?? "";
-    const year = parseInt(yearStr, 10);
-    if (Number.isNaN(year)) return null;
-    const month = monthMap[monthName] ?? NaN;
-    if (Number.isNaN(month)) return null;
+    if (!text) return null
+    if (/heute/i.test(text)) return new Date()
+    const m = text.match(/([A-Za-zäöüÄÖÜß]+)\s+(\d{4})/)
+    if (!m) return null
+    const monthName = (m[1] ?? '').toLowerCase()
+    const yearStr = m[2] ?? ''
+    const year = parseInt(yearStr, 10)
+    if (Number.isNaN(year)) return null
+    const month = monthMap[monthName] ?? NaN
+    if (Number.isNaN(month)) return null
 
     // Create date representing first day of month
-    return new Date(year, month - 1, 1);
-  };
+    return new Date(year, month - 1, 1)
+  }
 
-  const startDate = parsePart(parts[0] ?? "");
-  const endDate = parts[1] ? parsePart(parts[1]) : null;
-  const effectiveEnd = endDate ?? new Date();
+  const startDate = parsePart(parts[0] ?? '')
+  const endDate = parts[1] ? parsePart(parts[1]) : null
+  const effectiveEnd = endDate ?? new Date()
 
-  if (!startDate) return "";
+  if (!startDate) return ''
 
   // Inclusive month difference (counts both start and end months)
   // Example: Februar -> Juli (same year) = 6 Monate
   const monthsRaw =
     effectiveEnd.getFullYear() * 12 +
     effectiveEnd.getMonth() -
-    (startDate.getFullYear() * 12 + startDate.getMonth());
-  const monthsDiff = monthsRaw + 1; // inclusive
-  if (monthsDiff <= 0) return "";
+    (startDate.getFullYear() * 12 + startDate.getMonth())
+  const monthsDiff = monthsRaw + 1 // inclusive
+  if (monthsDiff <= 0) return ''
 
   // Always show exact years and months (inclusive), no rounding and no tilde
-  let years = Math.floor(monthsDiff / 12);
-  const rem = monthsDiff % 12;
+  let years = Math.floor(monthsDiff / 12)
+  const rem = monthsDiff % 12
 
   // If there are no full years, only show months (inclusive total)
   if (years === 0) {
-    const monthsLabelOnly = monthsDiff === 1 ? "Monat" : "Monate";
-    return ` (${monthsDiff} ${monthsLabelOnly})`;
+    const monthsLabelOnly = monthsDiff === 1 ? 'Monat' : 'Monate'
+    return ` (${monthsDiff} ${monthsLabelOnly})`
   }
 
   // When years > 0, display months as remainder + 1 (if there's a remainder)
-  let shownMonths = rem > 0 ? rem + 1 : 0;
+  let shownMonths = rem > 0 ? rem + 1 : 0
 
   // Rollover: 12 months -> +1 year, 0 months
   if (shownMonths === 12) {
-    years += 1;
-    shownMonths = 0;
+    years += 1
+    shownMonths = 0
   }
 
-  const yearsLabel = years === 1 ? "Jahr" : "Jahre";
-  const monthsLabel = shownMonths === 1 ? "Monat" : "Monate";
-  return ` (${years} ${yearsLabel}, ${shownMonths} ${monthsLabel})`;
-};
+  const yearsLabel = years === 1 ? 'Jahr' : 'Jahre'
+  const monthsLabel = shownMonths === 1 ? 'Monat' : 'Monate'
+  return ` (${years} ${yearsLabel}, ${shownMonths} ${monthsLabel})`
+}
 
 // Helper function to render rich text blocks as plain text
 const renderRichTextAsText = (blocks?: RichTextBlock[]): string => {
-  if (!blocks) return "";
+  if (!blocks) return ''
 
   return blocks
     .map((block: RichTextBlock): string => {
-      if (block.type === "text" && block.text) {
-        return block.text;
+      if (block.type === 'text' && block.text) {
+        return block.text
       }
       if (block.children) {
-        return renderRichTextAsText(block.children);
+        return renderRichTextAsText(block.children)
       }
-      return "";
+      return ''
     })
-    .join("");
-};
+    .join('')
+}
 
 // Helper function to extract list items from rich text
 const extractListItems = (blocks?: RichTextBlock[]): string[] => {
-  if (!blocks) return [];
+  if (!blocks) return []
 
-  const items: string[] = [];
+  const items: string[] = []
 
   const traverse = (blocks: RichTextBlock[]): void => {
     blocks.forEach((block: RichTextBlock): void => {
-      if (block.type === "list-item" && block.children) {
-        const text = renderRichTextAsText(block.children);
+      if (block.type === 'list-item' && block.children) {
+        const text = renderRichTextAsText(block.children)
         if (text.trim()) {
-          items.push(text.trim());
+          items.push(text.trim())
         }
       } else if (block.children) {
-        traverse(block.children);
+        traverse(block.children)
       }
-    });
-  };
+    })
+  }
 
-  traverse(blocks);
-  return items;
-};
+  traverse(blocks)
+  return items
+}
 
-const durationDisplay = computed(() => computeDuration(props.data.period));
-const mainText = computed(() => renderRichTextAsText(props.data.text));
-const dutyItems = computed(() => extractListItems(props.data.duty));
-const learningText = computed(() => renderRichTextAsText(props.data.learning));
-const logoUrl = computed(() => buildImageUrl(props.data.logo, "small"));
-const aosDelay = computed(() => Math.min(props.index ?? 0, 5) * 100);
+const durationDisplay = computed(() => computeDuration(props.data.period))
+const mainText = computed(() => renderRichTextAsText(props.data.text))
+const dutyItems = computed(() => extractListItems(props.data.duty))
+const learningText = computed(() => renderRichTextAsText(props.data.learning))
+const logoUrl = computed(() => buildImageUrl(props.data.logo, 'small'))
+const aosDelay = computed(() => Math.min(props.index ?? 0, 5) * 100)
 
 // Determine if this card should be visible based on jobsearch logic
 const shouldShowCard = computed(() => {
   // If this card is marked as jobsearch, show it only when showJobsearchBadge is true
   if (props.data.isJobsearch === true) {
-    return props.showJobsearchBadge === true;
+    return props.showJobsearchBadge === true
   }
   // For all other cards (not marked as jobsearch), always show them
-  return true;
-});
+  return true
+})
 </script>
 
 <template>
@@ -201,14 +201,10 @@ const shouldShowCard = computed(() => {
         <!-- Responsibilities Section -->
         <div v-if="dutyItems.length" class="experience-card__responsibilities">
           <h4 class="experience-card__responsibilities-title">
-            {{ t("experience_section.responsibilities") }}
+            {{ t('experience_section.responsibilities') }}
           </h4>
           <ul class="experience-card__responsibilities-list">
-            <li
-              v-for="item in dutyItems"
-              :key="item"
-              class="experience-card__responsibility-item"
-            >
+            <li v-for="item in dutyItems" :key="item" class="experience-card__responsibility-item">
               {{ item }}
             </li>
           </ul>
@@ -217,12 +213,9 @@ const shouldShowCard = computed(() => {
         <!-- Key Learning Insight -->
         <div v-if="learningText" class="experience-card__insight">
           <div class="experience-card__insight-header">
-            <UIcon
-              name="i-heroicons-light-bulb"
-              class="experience-card__insight-icon"
-            />
+            <UIcon name="i-heroicons-light-bulb" class="experience-card__insight-icon" />
             <span class="experience-card__insight-label">{{
-              t("experience_section.key_learning")
+              t('experience_section.key_learning')
             }}</span>
           </div>
           <p class="experience-card__insight-text">{{ learningText }}</p>
@@ -231,10 +224,7 @@ const shouldShowCard = computed(() => {
 
       <!-- Logo for Larger Screens -->
       <div class="experience-card__desktop-logo">
-        <div
-          v-if="logoUrl"
-          class="experience-card__logo-link experience-card__logo-link--desktop"
-        >
+        <div v-if="logoUrl" class="experience-card__logo-link experience-card__logo-link--desktop">
           <NuxtImg
             :src="logoUrl"
             :alt="`Logo von ${data.company}`"
@@ -248,7 +238,7 @@ const shouldShowCard = computed(() => {
 </template>
 
 <style scoped lang="scss">
-$block: "experience-card";
+$block: 'experience-card';
 
 .#{$block} {
   width: 100%;
@@ -293,8 +283,9 @@ $block: "experience-card";
   &__date {
     display: inline-block;
     margin-bottom: 0.375rem;
-    font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas,
-      "Liberation Mono", "Courier New", monospace;
+    font-family:
+      ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Consolas, 'Liberation Mono', 'Courier New',
+      monospace;
     font-size: var(--font-size-xs);
     letter-spacing: -0.025em;
     color: var(--color-text-muted);
@@ -360,7 +351,7 @@ $block: "experience-card";
     }
 
     &::before {
-      content: "•";
+      content: '•';
       position: absolute;
       left: 0;
       color: var(--color-primary);
@@ -371,20 +362,12 @@ $block: "experience-card";
   &__insight {
     margin-top: var(--spacing-md);
     padding: var(--spacing-sm);
-    background: linear-gradient(
-      135deg,
-      rgba(59, 130, 246, 0.05) 0%,
-      rgba(147, 51, 234, 0.05) 100%
-    );
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 51, 234, 0.05) 100%);
     border-left: 3px solid var(--color-primary);
     border-radius: var(--radius-medium);
 
     @at-root .dark #{&} {
-      background: linear-gradient(
-        135deg,
-        rgba(59, 130, 246, 0.1) 0%,
-        rgba(147, 51, 234, 0.1) 100%
-      );
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
     }
   }
 

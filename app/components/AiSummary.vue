@@ -1,82 +1,77 @@
 <script setup lang="ts">
-defineOptions({ inheritAttrs: false });
+defineOptions({ inheritAttrs: false })
 
 interface Props {
-  isIconOnly?: boolean;
+  isIconOnly?: boolean
 }
 
-const { isIconOnly = false } = defineProps<Props>();
+const { isIconOnly = false } = defineProps<Props>()
 
-const { cmsRequest, currentLocaleString } = useStrapi();
-const { $t } = useI18n();
-const { generatePdfFromMarkdown } = usePdfEasy();
+const { cmsRequest, currentLocaleString } = useStrapi()
+const { $t } = useI18n()
+const { generatePdfFromMarkdown } = usePdfEasy()
 
 // Detect touch device capability for popover behavior
 const isTouchDevice = computed(() => {
-  if (typeof window === "undefined") return false;
-  return "ontouchstart" in window || navigator.maxTouchPoints > 0;
-});
+  if (typeof window === 'undefined') return false
+  return 'ontouchstart' in window || navigator.maxTouchPoints > 0
+})
 
-const popoverMode = computed(() => (isTouchDevice.value ? "click" : "hover"));
+const popoverMode = computed(() => (isTouchDevice.value ? 'click' : 'hover'))
 
-const WORDS_PER_SECOND = 32;
-const WORDS_PER_SECOND_FINAL = 9000;
+const WORDS_PER_SECOND = 32
+const WORDS_PER_SECOND_FINAL = 9000
 
-const open = ref(false);
-const currentText = ref("");
-const index = ref(0);
-const isComplete = ref(false);
-const hasStarted = ref(false);
-const searchPhase = ref(false);
-const searchCheckedPhase = ref(false);
-const parsedMarkdown = ref("");
+const open = ref(false)
+const currentText = ref('')
+const index = ref(0)
+const isComplete = ref(false)
+const hasStarted = ref(false)
+const searchPhase = ref(false)
+const searchCheckedPhase = ref(false)
+const parsedMarkdown = ref('')
 
-let timer: ReturnType<typeof setTimeout> | null = null;
-let searchTimer: ReturnType<typeof setTimeout> | null = null;
-let checkTimer: ReturnType<typeof setTimeout> | null = null;
-let framePending = false;
+let timer: ReturnType<typeof setTimeout> | null = null
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+let checkTimer: ReturnType<typeof setTimeout> | null = null
+let framePending = false
 
 // Data fetching
-const summaryKey = computed(() => `summary-${currentLocaleString.value}`);
+const summaryKey = computed(() => `summary-${currentLocaleString.value}`)
 const { data, pending, error, refresh } = useAsyncData<AiSummaryResponse>(
   summaryKey,
-  () => cmsRequest<AiSummaryResponse>("ai-summary", ["subtitle", "summary"]),
-  { immediate: true, server: true }
-);
+  () => cmsRequest<AiSummaryResponse>('ai-summary', ['subtitle', 'summary']),
+  { immediate: true, server: true },
+)
 
-const fullText = computed<string>(
-  () => (data.value?.summary as string | undefined)?.trim() ?? ""
-);
+const fullText = computed<string>(() => (data.value?.summary as string | undefined)?.trim() ?? '')
 
-const tokens = computed<string[]>(() => fullText.value.match(/\S+\s*/g) || []);
+const tokens = computed<string[]>(() => fullText.value.match(/\S+\s*/g) || [])
 
 const progressPercentage = computed(() =>
-  Math.min(100, Math.round((index.value / (tokens.value.length || 1)) * 100))
-);
+  Math.min(100, Math.round((index.value / (tokens.value.length || 1)) * 100)),
+)
 
-const hasContent = computed(() => tokens.value.length > 0);
-const canDownload = computed(() => isComplete.value && hasContent.value);
+const hasContent = computed(() => tokens.value.length > 0)
+const canDownload = computed(() => isComplete.value && hasContent.value)
 
 // Memoize slideoverUi to avoid object recreation on every render
 const slideoverUi = computed(() => ({
-  content: [
-    "ai-summary__panel",
-    "w-screen sm:w-[85vw] lg:w-[50vw] max-w-none",
-  ].join(" "),
-  footer: ["ai-summary__panel-footer"].join(" "),
-}));
+  content: ['ai-summary__panel', 'w-screen sm:w-[85vw] lg:w-[50vw] max-w-none'].join(' '),
+  footer: ['ai-summary__panel-footer'].join(' '),
+}))
 
 // Sparkles effect
 interface SparkleConfiguration {
-  left: number;
-  delay: number;
-  duration: number;
-  scale: number;
-  tx: number;
+  left: number
+  delay: number
+  duration: number
+  scale: number
+  tx: number
 }
 
-const sparkles = shallowRef<SparkleConfiguration[]>([]);
-const isClient = shallowRef(false);
+const sparkles = shallowRef<SparkleConfiguration[]>([])
+const isClient = shallowRef(false)
 
 const buildSparkles = (count: number = 5): SparkleConfiguration[] =>
   Array.from(
@@ -87,159 +82,155 @@ const buildSparkles = (count: number = 5): SparkleConfiguration[] =>
       duration: 0.7 + Math.random() * 0.7,
       scale: 0.4 + Math.random() * 0.5,
       tx: (Math.random() - 0.5) * 8,
-    })
-  );
+    }),
+  )
 
 const clearAllTimers = (): void => {
-  if (timer) clearTimeout(timer);
-  if (searchTimer) clearTimeout(searchTimer);
-  if (checkTimer) clearTimeout(checkTimer);
-  if (sparkleThrottleTimer) clearTimeout(sparkleThrottleTimer);
-  timer = null;
-  searchTimer = null;
-  checkTimer = null;
-  sparkleThrottleTimer = null;
-};
+  if (timer) clearTimeout(timer)
+  if (searchTimer) clearTimeout(searchTimer)
+  if (checkTimer) clearTimeout(checkTimer)
+  if (sparkleThrottleTimer) clearTimeout(sparkleThrottleTimer)
+  timer = null
+  searchTimer = null
+  checkTimer = null
+  sparkleThrottleTimer = null
+}
 
 const resetTypingState = (): void => {
-  clearAllTimers();
-  index.value = 0;
-  currentText.value = "";
-  isComplete.value = false;
-  hasStarted.value = false;
-  searchPhase.value = false;
-  searchCheckedPhase.value = false;
-};
+  clearAllTimers()
+  index.value = 0
+  currentText.value = ''
+  isComplete.value = false
+  hasStarted.value = false
+  searchPhase.value = false
+  searchCheckedPhase.value = false
+}
 
 const computeCurrentDelay = (): number => {
-  if (tokens.value.length === 0) return 0;
-  const progress = index.value / tokens.value.length;
-  const eased = Math.min(1, Math.pow(progress, 2));
+  if (tokens.value.length === 0) return 0
+  const progress = index.value / tokens.value.length
+  const eased = Math.min(1, Math.pow(progress, 2))
   const currentWordPerSecond =
-    WORDS_PER_SECOND + (WORDS_PER_SECOND_FINAL - WORDS_PER_SECOND) * eased;
-  return 1000 / currentWordPerSecond;
-};
+    WORDS_PER_SECOND + (WORDS_PER_SECOND_FINAL - WORDS_PER_SECOND) * eased
+  return 1000 / currentWordPerSecond
+}
 
 const scheduleNext = (): void => {
   if (index.value >= tokens.value.length) {
-    isComplete.value = true;
-    timer = null;
-    return;
+    isComplete.value = true
+    timer = null
+    return
   }
-  currentText.value += tokens.value[index.value++];
-  const delay = computeCurrentDelay();
-  timer = setTimeout(scheduleNext, delay);
-};
+  currentText.value += tokens.value[index.value++]
+  const delay = computeCurrentDelay()
+  timer = setTimeout(scheduleNext, delay)
+}
 
 const startTyping = (): void => {
-  if (timer || isComplete.value) return;
+  if (timer || isComplete.value) return
   if (tokens.value.length === 0) {
-    hasStarted.value = true;
-    isComplete.value = true;
-    return;
+    hasStarted.value = true
+    isComplete.value = true
+    return
   }
-  hasStarted.value = true;
-  scheduleNext();
-};
+  hasStarted.value = true
+  scheduleNext()
+}
 
 const scheduleFrame = (callback: () => void): number | NodeJS.Timeout =>
-  typeof window !== "undefined"
-    ? window.requestAnimationFrame(callback)
-    : setTimeout(callback, 16);
+  typeof window !== 'undefined' ? window.requestAnimationFrame(callback) : setTimeout(callback, 16)
 
 // Throttle sparkle regeneration to avoid excessive DOM updates
-let sparkleThrottleTimer: ReturnType<typeof setTimeout> | null = null;
+let sparkleThrottleTimer: ReturnType<typeof setTimeout> | null = null
 
 const regenerateSparkles = (): void => {
-  if (!isClient.value) return;
-  if (sparkleThrottleTimer) return; // Throttle sparkle updates
+  if (!isClient.value) return
+  if (sparkleThrottleTimer) return // Throttle sparkle updates
 
-  sparkles.value = buildSparkles();
+  sparkles.value = buildSparkles()
 
   sparkleThrottleTimer = setTimeout(() => {
-    sparkleThrottleTimer = null;
-  }, 100); // 100ms throttle
-};
+    sparkleThrottleTimer = null
+  }, 100) // 100ms throttle
+}
 
 const downloadPdf = async (): Promise<void> => {
-  if (!canDownload.value) return;
+  if (!canDownload.value) return
   try {
-    const markdownContent = data.value?.summary as string | undefined;
-    if (!markdownContent || markdownContent.trim().length === 0) return;
+    const markdownContent = data.value?.summary as string | undefined
+    if (!markdownContent || markdownContent.trim().length === 0) return
     await generatePdfFromMarkdown(markdownContent, {
-      clientEmit: "save",
-      size: "a4",
-    });
+      clientEmit: 'save',
+      size: 'a4',
+    })
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
-};
+}
 
 watch(currentLocaleString, async () => {
   try {
-    await refresh();
+    await refresh()
   } catch {
     // Ignore refresh errors; UI will show error state if needed
   }
-  resetTypingState();
-  open.value = false;
-});
+  resetTypingState()
+  open.value = false
+})
 
 watch(open, async (isOpen) => {
-  if (typeof document !== "undefined") {
+  if (typeof document !== 'undefined') {
     if (isOpen) {
-      document.documentElement.setAttribute("data-ai-summary-open", "true");
+      document.documentElement.setAttribute('data-ai-summary-open', 'true')
     } else {
-      document.documentElement.removeAttribute("data-ai-summary-open");
+      document.documentElement.removeAttribute('data-ai-summary-open')
     }
   }
 
-  if (!isOpen) return;
+  if (!isOpen) return
 
-  await nextTick();
-  clearAllTimers();
-  searchPhase.value = true;
-  searchCheckedPhase.value = false;
+  await nextTick()
+  clearAllTimers()
+  searchPhase.value = true
+  searchCheckedPhase.value = false
 
   // Staged animation phases
   searchTimer = setTimeout(() => {
-    searchCheckedPhase.value = true;
+    searchCheckedPhase.value = true
     checkTimer = setTimeout(() => {
-      searchPhase.value = false;
-      searchCheckedPhase.value = false;
-      startTyping();
-    }, 500);
-  }, 1500);
-});
+      searchPhase.value = false
+      searchCheckedPhase.value = false
+      startTyping()
+    }, 500)
+  }, 1500)
+})
 
 watch(currentText, (): void => {
-  if (framePending) return;
-  framePending = true;
+  if (framePending) return
+  framePending = true
   scheduleFrame((): void => {
-    parsedMarkdown.value = currentText.value;
-    framePending = false;
-  });
-});
+    parsedMarkdown.value = currentText.value
+    framePending = false
+  })
+})
 
 onMounted((): void => {
-  isClient.value = true;
-  regenerateSparkles();
-});
+  isClient.value = true
+  regenerateSparkles()
+})
 
 onBeforeUnmount(() => {
-  clearAllTimers();
-  if (typeof document !== "undefined") {
-    document.documentElement.removeAttribute("data-ai-summary-open");
+  clearAllTimers()
+  if (typeof document !== 'undefined') {
+    document.documentElement.removeAttribute('data-ai-summary-open')
   }
-});
+})
 </script>
 
 <template>
   <div v-if="pending" class="summary-section">Loading summary-section...</div>
 
-  <div v-else-if="error" class="summary-section">
-    Failed to load summary-section.
-  </div>
+  <div v-else-if="error" class="summary-section">Failed to load summary-section.</div>
 
   <div v-else-if="data" class="ai-summary">
     <!-- Icon-only version matching ColorSelector styling -->
@@ -271,15 +262,9 @@ onBeforeUnmount(() => {
       @mouseenter="regenerateSparkles()"
     >
       <span class="ai-summary__icon-wrapper">
-        <UIcon
-          name="i-heroicons-sparkles"
-          class="ai-summary__icon bell-ring-icon"
-        />
+        <UIcon name="i-heroicons-sparkles" class="ai-summary__icon bell-ring-icon" />
         <!-- Sparkle particles (only animate on hover) -->
-        <span
-          v-if="isClient"
-          class="ai-summary__sparkle-wrapper sparkle-wrapper"
-        >
+        <span v-if="isClient" class="ai-summary__sparkle-wrapper sparkle-wrapper">
           <span
             v-for="(s, i) in sparkles"
             :key="i"
@@ -324,20 +309,14 @@ onBeforeUnmount(() => {
             />
             <template #fallback>
               <div class="ai-summary__loading">
-                {{ $t("ai_summary.loading") }}
+                {{ $t('ai_summary.loading') }}
               </div>
             </template>
           </ClientOnly>
           <!-- Phase 1 & 2: Initial search and check confirmation -->
-          <div
-            v-if="open && (searchPhase || searchCheckedPhase)"
-            class="ai-summary__progress"
-          >
-            <UIcon
-              name="i-heroicons-cpu-chip"
-              class="ai-summary__progress-icon"
-            />
-            <span>{{ $t("ai_summary.searching") }}</span>
+          <div v-if="open && (searchPhase || searchCheckedPhase)" class="ai-summary__progress">
+            <UIcon name="i-heroicons-cpu-chip" class="ai-summary__progress-icon" />
+            <span>{{ $t('ai_summary.searching') }}</span>
             <UIcon
               v-if="searchCheckedPhase"
               name="i-heroicons-check"
@@ -345,17 +324,9 @@ onBeforeUnmount(() => {
             />
           </div>
           <!-- Phase 3: Typing begins -->
-          <div
-            v-else-if="open && hasStarted && !isComplete"
-            class="ai-summary__progress"
-          >
-            <UIcon
-              name="i-heroicons-cpu-chip"
-              class="ai-summary__progress-icon"
-            />
-            <span>{{
-              $t("ai_summary.writing", { percentage: progressPercentage })
-            }}</span>
+          <div v-else-if="open && hasStarted && !isComplete" class="ai-summary__progress">
+            <UIcon name="i-heroicons-cpu-chip" class="ai-summary__progress-icon" />
+            <span>{{ $t('ai_summary.writing', { percentage: progressPercentage }) }}</span>
           </div>
         </div>
       </template>
@@ -378,15 +349,12 @@ onBeforeUnmount(() => {
                 }"
                 aria-label="Information about AI generation"
               >
-                <UIcon
-                  name="i-lucide:help-circle"
-                  class="h-3.5 w-3.5 faq-section__question-icon"
-                />
+                <UIcon name="i-lucide:help-circle" class="h-3.5 w-3.5 faq-section__question-icon" />
               </UButton>
 
               <template #content>
                 <p class="ai-summary__popover-text text-2xs leading-relaxed">
-                  {{ $t("ai_summary.chatgpt_tooltip") }}
+                  {{ $t('ai_summary.chatgpt_tooltip') }}
                 </p>
               </template>
             </UPopover>
@@ -402,15 +370,10 @@ onBeforeUnmount(() => {
               rel="noopener noreferrer"
             >
               <UIcon name="i-lucide-calendar" class="ai-summary__footer-icon" />
-              <span class="ai-summary__footer-text">{{
-                $t("ai_summary.book_appointment")
-              }}</span>
+              <span class="ai-summary__footer-text">{{ $t('ai_summary.book_appointment') }}</span>
             </UButton>
             <template v-if="!canDownload">
-              <UTooltip
-                :text="String($t('ai_summary.pdf_tooltip'))"
-                :open-delay="150"
-              >
+              <UTooltip :text="String($t('ai_summary.pdf_tooltip'))" :open-delay="150">
                 <UButton
                   label="PDF Download"
                   color="primary"
@@ -438,7 +401,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped lang="scss">
-$block: "ai-summary";
+$block: 'ai-summary';
 
 :deep(h1) {
   font-size: 2rem;
@@ -836,8 +799,7 @@ $block: "ai-summary";
       opacity: 0.9;
     }
     100% {
-      transform: translate3d(var(--tx), -18px, 0)
-        scale(calc(var(--scale) * 0.85));
+      transform: translate3d(var(--tx), -18px, 0) scale(calc(var(--scale) * 0.85));
       opacity: 0;
     }
   }
@@ -912,13 +874,9 @@ $block: "ai-summary";
     height: 3px;
     margin-top: -1.5px;
     border-radius: 50%;
-    background: radial-gradient(
-      circle at 35% 30%,
-      #fff9c2,
-      #fde68a 60%,
-      #facc15 85%
-    );
-    box-shadow: 0 0 3px 1px rgba(250, 240, 180, 0.9),
+    background: radial-gradient(circle at 35% 30%, #fff9c2, #fde68a 60%, #facc15 85%);
+    box-shadow:
+      0 0 3px 1px rgba(250, 240, 180, 0.9),
       0 0 6px 2px rgba(250, 204, 21, 0.35);
     pointer-events: none;
     opacity: 0;
@@ -1118,12 +1076,7 @@ $block: "ai-summary";
   hr {
     border: 0;
     height: 1px;
-    background: linear-gradient(
-      to right,
-      transparent,
-      rgba(148, 163, 184, 0.4),
-      transparent
-    );
+    background: linear-gradient(to right, transparent, rgba(148, 163, 184, 0.4), transparent);
     margin: 2.5em 0;
   }
 
@@ -1133,7 +1086,7 @@ $block: "ai-summary";
     position: relative;
 
     &::before {
-      content: "";
+      content: '';
       position: absolute;
       width: 100%;
       height: 1px;
@@ -1167,7 +1120,7 @@ $block: "ai-summary";
   }
 
   :global(.ai-summary__slideover h2),
-  :global(.ai-summary__slideover [id*="dialog-title"]) {
+  :global(.ai-summary__slideover [id*='dialog-title']) {
     font-size: 1.5rem !important;
   }
 

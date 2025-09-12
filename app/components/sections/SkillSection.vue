@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import type { SkillItem } from "~/types/types";
+import type { SkillItem } from '~/types/types'
 
-const { cmsRequest, currentLocaleString } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi()
 
 const { data, pending, error } = await useLazyAsyncData<SkillSectionResponse>(
   `skills-${currentLocaleString.value}`,
   () =>
     cmsRequest<SkillSectionResponse>(
-      "skill-section",
-      ["title", "text", "jumpmark", "quickFilter", "skillCards"],
+      'skill-section',
+      ['title', 'text', 'jumpmark', 'quickFilter', 'skillCards'],
       false,
-      ["quickFilter", "skillCards.skillItems"]
-    )
-);
+      ['quickFilter', 'skillCards.skillItems'],
+    ),
+)
 
-const modalOpen = ref(false);
+const modalOpen = ref(false)
 
-const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? [])
 
 const handleButtonClick = () => {
-  modalOpen.value = true;
-};
+  modalOpen.value = true
+}
 
 const toListItems = (items?: SkillItem[]): string[] =>
-  items?.map((skillItem) => skillItem.title || "") ?? [];
+  items?.map((skillItem) => skillItem.title || '') ?? []
 </script>
 
 <template>
@@ -70,7 +70,7 @@ const toListItems = (items?: SkillItem[]): string[] =>
 </template>
 
 <style scoped lang="scss">
-$block: "skill-section";
+$block: 'skill-section';
 
 .#{$block} {
   // Grid styles

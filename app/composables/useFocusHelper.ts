@@ -8,7 +8,7 @@
  * the destination section (or its first focusable) is focused.
  */
 export const useFocusHelper = () => {
-  if (!import.meta.client) return { focusCurrentHash: () => { }, focusById: (_: string) => { } }
+  if (!import.meta.client) return { focusCurrentHash: () => {}, focusById: (_: string) => {} }
 
   let lastUserHash: string | null = null
   let lastUserHashTimestamp = 0
@@ -23,7 +23,7 @@ export const useFocusHelper = () => {
     'details summary',
     'audio[controls]',
     'video[controls]',
-    '[tabindex]:not([tabindex="-1"]):not(.a11y-helper__skip-link)'
+    '[tabindex]:not([tabindex="-1"]):not(.a11y-helper__skip-link)',
   ].join(',')
 
   const isElementVisible = (el: HTMLElement): boolean => {
@@ -51,7 +51,13 @@ export const useFocusHelper = () => {
 
   const focusElement = (el: HTMLElement): void => {
     if (!isNaturallyFocusable(el)) el.setAttribute('tabindex', '-1')
-    requestAnimationFrame(() => { try { el.focus({ preventScroll: true }) } catch { /* ignore */ } })
+    requestAnimationFrame(() => {
+      try {
+        el.focus({ preventScroll: true })
+      } catch {
+        /* ignore */
+      }
+    })
   }
 
   const focusById = (id: string): void => {
@@ -80,14 +86,16 @@ export const useFocusHelper = () => {
     const target = e.target as HTMLElement | null
     if (!target) return
     // Anchor navigation
-    const anchor = target.closest('a:not(.a11y-helper__skip-link), a[href^="#"], area[href^="#"]') as (HTMLAnchorElement | HTMLAreaElement) | null
+    const anchor = target.closest(
+      'a:not(.a11y-helper__skip-link), a[href^="#"], area[href^="#"]',
+    ) as (HTMLAnchorElement | HTMLAreaElement) | null
     if (anchor?.hash && anchor.hash !== '#') {
       handleUserAnchorActivation(anchor.hash)
       return
     }
     // Section blank-area click
     const focusableAncestor = target.closest(
-      'a:not(.a11y-helper__skip-link),button,input,select,textarea,[tabindex]:not([tabindex="-1"]):not(.a11y-helper__skip-link)'
+      'a:not(.a11y-helper__skip-link),button,input,select,textarea,[tabindex]:not([tabindex="-1"]):not(.a11y-helper__skip-link)',
     )
     if (focusableAncestor) return // Let native focus happen
     const section = target.closest('section[id], [data-scroll-hash]') as HTMLElement | null

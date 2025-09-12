@@ -1,99 +1,81 @@
 <script setup lang="ts">
 const props = defineProps<{
-  data: RecommendationCard;
-  showAlternative?: boolean;
-  role?: string;
-}>();
+  data: RecommendationCard
+  showAlternative?: boolean
+  role?: string
+}>()
 
 const emit = defineEmits<{
-  toggleLanguage: [];
-}>();
+  toggleLanguage: []
+}>()
 
-const { buildImageUrl } = useStrapi();
-const { $t, $getLocale } = useI18n();
-const { generateComponentId } = useIdGenerator();
+const { buildImageUrl } = useStrapi()
+const { $t, $getLocale } = useI18n()
+const { generateComponentId } = useIdGenerator()
 
 const cardId = computed(() =>
-  generateComponentId(
-    "testimonial",
-    props.data.author || "testimonial",
-    props.data.id || 0
-  )
-);
+  generateComponentId('testimonial', props.data.author || 'testimonial', props.data.id || 0),
+)
 
 const avatarUrl = computed<string | undefined>(() => {
-  const url = buildImageUrl(props.data.avatar, "small");
-  return url === null ? undefined : url;
-});
+  const url = buildImageUrl(props.data.avatar, 'small')
+  return url === null ? undefined : url
+})
 
-const recommendationText = computed<RichTextNodes>(
-  () => props.data.recommendation ?? []
-);
+const recommendationText = computed<RichTextNodes>(() => props.data.recommendation ?? [])
 
 const hasAlternativeLanguage = computed((): boolean => {
-  return false;
-});
+  return false
+})
 
 const displayText = computed((): RichTextNodes => {
-  return recommendationText.value;
-});
+  return recommendationText.value
+})
 
 const formatDate = (dateString: string | undefined): string => {
-  if (!dateString) return "";
+  if (!dateString) return ''
 
-  const date = new Date(dateString);
-  if (isNaN(date.getTime())) return dateString;
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) return dateString
 
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}.${month}.${year}`;
-};
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}.${month}.${year}`
+}
 
 const handleLanguageToggle = (): void => {
-  emit("toggleLanguage");
-};
+  emit('toggleLanguage')
+}
 
 // Translation indicator logic based on current locale and isTranslated flag
 const translationIndicatorText = computed((): string => {
-  const currentLocale = $getLocale();
-  const isGerman = currentLocale === "de";
-  const isTranslated = props.data.isTranslated;
+  const currentLocale = $getLocale()
+  const isGerman = currentLocale === 'de'
+  const isTranslated = props.data.isTranslated
 
   if (isGerman && isTranslated) {
     // German locale + translated = true: Originally English, translated to German
     return String(
-      $t(
-        "experience_section.testimonial.translation_indicator.translated_from_english"
-      )
-    );
+      $t('experience_section.testimonial.translation_indicator.translated_from_english'),
+    )
   } else if (isGerman && !isTranslated) {
     // German locale + translated = false: Original German comment
-    return String(
-      $t("experience_section.testimonial.translation_indicator.original_german")
-    );
+    return String($t('experience_section.testimonial.translation_indicator.original_german'))
   } else if (!isGerman && isTranslated) {
     // English locale + translated = true: Originally German, translated to English
-    return String(
-      $t(
-        "experience_section.testimonial.translation_indicator.translated_from_german"
-      )
-    );
+    return String($t('experience_section.testimonial.translation_indicator.translated_from_german'))
   } else {
     // English locale + translated = false: Original English comment
-    return String(
-      $t(
-        "experience_section.testimonial.translation_indicator.original_english"
-      )
-    );
+    return String($t('experience_section.testimonial.translation_indicator.original_english'))
   }
-});
+})
 
 const languageToggleText = computed((): string => {
   return props.showAlternative
-    ? String($t("experience_section.testimonial.show_german"))
-    : String($t("experience_section.testimonial.show_english"));
-});
+    ? String($t('experience_section.testimonial.show_german'))
+    : String($t('experience_section.testimonial.show_english'))
+})
 </script>
 
 <template>
@@ -117,10 +99,7 @@ const languageToggleText = computed((): string => {
             class="testimonial-card-large__avatar testimonial-card-large__avatar--placeholder"
             :aria-label="`Avatar placeholder for ${data.author}`"
           >
-            <UIcon
-              name="i-heroicons-user-circle"
-              class="testimonial-card-large__avatar-icon"
-            />
+            <UIcon name="i-heroicons-user-circle" class="testimonial-card-large__avatar-icon" />
           </div>
         </div>
 
@@ -145,9 +124,7 @@ const languageToggleText = computed((): string => {
         class="testimonial-card-large__content"
         tabindex="0"
         role="region"
-        :aria-label="
-          String($t('experience_section.testimonial.scroll_area_label'))
-        "
+        :aria-label="String($t('experience_section.testimonial.scroll_area_label'))"
       >
         <div class="testimonial-card-large__text-wrapper">
           <StrapiBlocksText
@@ -197,7 +174,7 @@ const languageToggleText = computed((): string => {
 </template>
 
 <style scoped lang="scss">
-$block: "testimonial-card-large";
+$block: 'testimonial-card-large';
 
 .#{$block} {
   height: 872px;

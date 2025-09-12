@@ -1,13 +1,13 @@
 <script setup lang="ts">
 const props = defineProps<{
-  isActive?: boolean;
-  isDark?: boolean;
-  aosDelay?: number;
-  isInWrapper?: boolean;
-  ariaLabelledby?: string;
-  ariaDescribedby?: string;
-  role?: string;
-}>();
+  isActive?: boolean
+  isDark?: boolean
+  aosDelay?: number
+  isInWrapper?: boolean
+  ariaLabelledby?: string
+  ariaDescribedby?: string
+  role?: string
+}>()
 </script>
 
 <template>
@@ -29,7 +29,7 @@ const props = defineProps<{
 </template>
 
 <style scoped lang="scss">
-$block: "base-card";
+$block: 'base-card';
 
 .#{$block} {
   height: 100%;
@@ -39,12 +39,14 @@ $block: "base-card";
   border: 1px solid var(--color-border-light);
   border-radius: var(--radius-default);
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.3s ease, border-color 0.3s ease,
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease,
     background-color 0.3s ease;
 
   :deep(*) {
-    &[class*="body"],
-    &[class*="card-body"] {
+    &[class*='body'],
+    &[class*='card-body'] {
       padding: 0 !important;
       height: 100%;
       display: flex;
@@ -80,8 +82,8 @@ $block: "base-card";
     box-shadow: var(--shadow-dark-sm);
 
     :deep(*) {
-      &[class*="body"],
-      &[class*="card-body"] {
+      &[class*='body'],
+      &[class*='card-body'] {
         background-color: transparent !important;
       }
     }

@@ -1,73 +1,73 @@
 <script setup lang="ts">
-const { $t } = useI18n();
+const { $t } = useI18n()
 
-const isActive = ref(false);
-const isStarting = ref(false);
-const isBottom = ref(false);
-const isContactInView = ref(false);
-const showContactIcon = ref(true);
-const showScrollDown = ref(true);
+const isActive = ref(false)
+const isStarting = ref(false)
+const isBottom = ref(false)
+const isContactInView = ref(false)
+const showContactIcon = ref(true)
+const showScrollDown = ref(true)
 
-let contactObserver: IntersectionObserver | null = null;
-let ticking = false;
+let contactObserver: IntersectionObserver | null = null
+let ticking = false
 
 const scrollToTop = (): void => {
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 
   // Focus navigation section after scroll completes
   // Use a timeout to wait for smooth scroll to finish
   setTimeout(() => {
-    const navigationSection = document.getElementById("navigation-section");
+    const navigationSection = document.getElementById('navigation-section')
     if (navigationSection) {
-      navigationSection.focus();
+      navigationSection.focus()
     }
-  }, 500); // 500ms should be enough for smooth scroll to complete
-};
+  }, 500) // 500ms should be enough for smooth scroll to complete
+}
 
 const updateScrollState = () => {
   if (!ticking) {
     requestAnimationFrame(() => {
-      const scrollY = window.scrollY || window.pageYOffset;
-      const windowHeight = window.innerHeight;
-      showScrollDown.value = scrollY < windowHeight / 8;
-      isStarting.value = scrollY > windowHeight / 4;
-      isActive.value = scrollY > windowHeight / 4.2;
-      isBottom.value = false;
-      showContactIcon.value = !isContactInView.value;
-      ticking = false;
-    });
-    ticking = true;
+      const scrollY = window.scrollY || window.pageYOffset
+      const windowHeight = window.innerHeight
+      showScrollDown.value = scrollY < windowHeight / 8
+      isStarting.value = scrollY > windowHeight / 4
+      isActive.value = scrollY > windowHeight / 4.2
+      isBottom.value = false
+      showContactIcon.value = !isContactInView.value
+      ticking = false
+    })
+    ticking = true
   }
-};
+}
 
 onMounted(() => {
-  window.addEventListener("scroll", updateScrollState);
-  updateScrollState();
+  window.addEventListener('scroll', updateScrollState)
+  updateScrollState()
 
-  const contactEl = document.getElementById("contact");
+  const contactEl = document.getElementById('contact')
   if (contactEl) {
     contactObserver = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.target === contactEl) {
-            isContactInView.value = entry.isIntersecting;
-            showContactIcon.value = !isContactInView.value;
+            isContactInView.value = entry.isIntersecting
+            showContactIcon.value = !isContactInView.value
           }
         }
       },
-      { root: null, threshold: [0.1, 0.25, 0.5] }
-    );
-    contactObserver.observe(contactEl);
+      { root: null, threshold: [0.1, 0.25, 0.5] },
+    )
+    contactObserver.observe(contactEl)
   }
-});
+})
 
 onUnmounted(() => {
-  window.removeEventListener("scroll", updateScrollState);
+  window.removeEventListener('scroll', updateScrollState)
   if (contactObserver) {
-    contactObserver.disconnect();
-    contactObserver = null;
+    contactObserver.disconnect()
+    contactObserver = null
   }
-});
+})
 </script>
 
 <template>
@@ -80,22 +80,10 @@ onUnmounted(() => {
   >
     <div class="scroll-hint__content">
       <div class="scroll-hint__line" role="presentation">
-        <span class="scroll-hint__text-before">{{
-          $t("ui.scroll_down_first")
-        }}</span>
-        <UIcon
-          name="i-lucide-mouse"
-          class="scroll-hint__icon"
-          aria-hidden="true"
-        />
-        <span class="scroll-hint__text-after">{{
-          $t("ui.scroll_down_second")
-        }}</span>
-        <UIcon
-          name="i-lucide-chevron-down"
-          class="scroll-hint__chevron"
-          aria-hidden="true"
-        />
+        <span class="scroll-hint__text-before">{{ $t('ui.scroll_down_first') }}</span>
+        <UIcon name="i-lucide-mouse" class="scroll-hint__icon" aria-hidden="true" />
+        <span class="scroll-hint__text-after">{{ $t('ui.scroll_down_second') }}</span>
+        <UIcon name="i-lucide-chevron-down" class="scroll-hint__chevron" aria-hidden="true" />
       </div>
     </div>
   </aside>
@@ -187,10 +175,7 @@ onUnmounted(() => {
               :content="{ side: 'top', sideOffset: 5 }"
             >
               <span class="scroll-companion__ai-wrapper">
-                <AiSummary
-                  class="scroll-companion__ai-summary"
-                  :is-icon-only="true"
-                />
+                <AiSummary class="scroll-companion__ai-summary" :is-icon-only="true" />
               </span>
             </UTooltip>
           </template>
@@ -201,7 +186,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped lang="scss">
-$block: "scroll-companion";
+$block: 'scroll-companion';
 
 // Scroll down hint styles
 .scroll-hint {
@@ -288,7 +273,9 @@ $block: "scroll-companion";
   bottom: -10rem; // Start hidden below viewport
 
   &--starting {
-    animation: slide 0.4s ease-out, fade 0.6s ease-out;
+    animation:
+      slide 0.4s ease-out,
+      fade 0.6s ease-out;
     bottom: 1rem;
   }
 
@@ -505,7 +492,7 @@ $block: "scroll-companion";
       color: var(--color-primary) !important;
     }
 
-    :deep(button[aria-haspopup="dialog"]) {
+    :deep(button[aria-haspopup='dialog']) {
       outline: none;
 
       &:focus-visible {

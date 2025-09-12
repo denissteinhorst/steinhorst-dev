@@ -1,176 +1,168 @@
 <script setup lang="ts">
-import type { NavigationElement, NavigationResponse } from "~/types/types";
+import type { NavigationElement, NavigationResponse } from '~/types/types'
 
-const route = useRoute();
-const router = useRouter();
-const { cmsRequest, currentLocaleString } = useStrapi();
-const { y } = useWindowScroll();
+const route = useRoute()
+const router = useRouter()
+const { cmsRequest, currentLocaleString } = useStrapi()
+const { y } = useWindowScroll()
 
 const { data, pending, error } = await useLazyAsyncData<NavigationResponse>(
   `nav-${currentLocaleString.value}`,
   () =>
-    cmsRequest<NavigationResponse>("navigation", [
-      "brandName",
-      "navigationElements",
-      "specialButton",
-      "specialLink",
-      "brandLink",
-    ])
-);
+    cmsRequest<NavigationResponse>('navigation', [
+      'brandName',
+      'navigationElements',
+      'specialButton',
+      'specialLink',
+      'brandLink',
+    ]),
+)
 
-const currentHash = ref("");
-const isMobileMenuOpen = ref(false);
-const isDesktopDropdownOpen = ref(false);
-const menuButtonRef = ref<HTMLElement | null>(null);
-const desktopDropdownRef = ref<HTMLElement | null>(null);
+const currentHash = ref('')
+const isMobileMenuOpen = ref(false)
+const isDesktopDropdownOpen = ref(false)
+const menuButtonRef = ref<HTMLElement | null>(null)
+const desktopDropdownRef = ref<HTMLElement | null>(null)
 
-const isScrolled = computed(() => y.value > 2);
-const brandName = computed(() => data.value?.brandName ?? "");
-const brandLink = computed(() => data.value?.brandLink ?? "/");
-const mainLinks = computed<NavigationElement[]>(
-  () => data.value?.navigationElements ?? []
-);
+const isScrolled = computed(() => y.value > 2)
+const brandName = computed(() => data.value?.brandName ?? '')
+const brandLink = computed(() => data.value?.brandLink ?? '/')
+const mainLinks = computed<NavigationElement[]>(() => data.value?.navigationElements ?? [])
 
 const brandNameParts = computed(() => {
-  const [main = "", secondary = ""] = (brandName.value || "").split(".");
-  return { main, secondary };
-});
+  const [main = '', secondary = ''] = (brandName.value || '').split('.')
+  return { main, secondary }
+})
 
 const updateCurrentHash = () => {
   if (import.meta.client) {
-    const hash = window.location.hash;
+    const hash = window.location.hash
     // Don't update if it's hero or empty (hero should not be active)
-    currentHash.value = hash === "#hero" ? "" : hash;
+    currentHash.value = hash === '#hero' ? '' : hash
   }
-};
+}
 
-const isActive = (to = ""): boolean => {
-  if (!to) return false;
+const isActive = (to = ''): boolean => {
+  if (!to) return false
 
   // Handle hash-only links (e.g., "#about")
-  if (to.startsWith("#")) {
+  if (to.startsWith('#')) {
     // Special case: if link is #hero or we're at root with no hash, don't make it active
-    if (to === "#hero" || to === "#") {
-      return route.path === "/" && !currentHash.value;
+    if (to === '#hero' || to === '#') {
+      return route.path === '/' && !currentHash.value
     }
-    return currentHash.value === to;
+    return currentHash.value === to
   }
 
   // Handle full URLs with path and hash (e.g., "/#about")
-  const [path, hash] = to.split("#");
+  const [path, hash] = to.split('#')
   if (hash) {
-    if (hash === "hero") {
-      return route.path === path && !currentHash.value;
+    if (hash === 'hero') {
+      return route.path === path && !currentHash.value
     }
-    return route.path === path && currentHash.value === `#${hash}`;
+    return route.path === path && currentHash.value === `#${hash}`
   }
 
   // Handle path-only links (e.g., "/imprint")
-  return route.path === path;
-};
+  return route.path === path
+}
 
 const navigateToSectionWithFocus = async (to: string): Promise<void> => {
-  if (!to) return;
+  if (!to) return
 
   // Navigate to the target
-  await router.push(to);
+  await router.push(to)
 
   // Wait for next tick to ensure DOM is updated
-  await nextTick();
+  await nextTick()
 
   // Focus management for hash links (sections)
-  if (to.startsWith("#")) {
-    const sectionId = to.substring(1); // Remove the #
-    const targetElement = document.getElementById(sectionId);
+  if (to.startsWith('#')) {
+    const sectionId = to.substring(1) // Remove the #
+    const targetElement = document.getElementById(sectionId)
 
     if (targetElement) {
       // Scroll to the element first
-      targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
       // Set focus to the section for keyboard navigation
       // Add tabindex temporarily if it doesn't have one
-      const originalTabIndex = targetElement.getAttribute("tabindex");
+      const originalTabIndex = targetElement.getAttribute('tabindex')
       if (!originalTabIndex) {
-        targetElement.setAttribute("tabindex", "-2");
+        targetElement.setAttribute('tabindex', '-2')
       }
 
       // Focus the section
-      targetElement.focus();
+      targetElement.focus()
 
       // Remove temporary tabindex after focus
       if (!originalTabIndex) {
         // Use a small timeout to allow screen readers to announce
         setTimeout(() => {
-          targetElement.removeAttribute("tabindex");
-        }, 100);
+          targetElement.removeAttribute('tabindex')
+        }, 100)
       }
     }
   }
-};
+}
 
-const updateMobileMenu = (isOpen: boolean): boolean =>
-  (isMobileMenuOpen.value = isOpen);
-const closeMobileMenu = (): boolean => (isMobileMenuOpen.value = false);
+const updateMobileMenu = (isOpen: boolean): boolean => (isMobileMenuOpen.value = isOpen)
+const closeMobileMenu = (): boolean => (isMobileMenuOpen.value = false)
 
 const onBrandClick = (event: Event) => {
-  const targetPath = brandLink.value || "/";
+  const targetPath = brandLink.value || '/'
   if (route.path === targetPath) {
-    event.preventDefault();
+    event.preventDefault()
     if (import.meta.client) {
-      const baseUrl = `${window.location.pathname}${window.location.search}`;
+      const baseUrl = `${window.location.pathname}${window.location.search}`
       try {
-        window.history.replaceState(window.history.state, "", baseUrl);
+        window.history.replaceState(window.history.state, '', baseUrl)
       } catch {
         // Fallback if replaceState fails
       }
     }
-    const heroElement =
-      document.getElementById("hero-heading") ||
-      document.getElementById("hero");
+    const heroElement = document.getElementById('hero-heading') || document.getElementById('hero')
     if (heroElement) {
-      heroElement.scrollIntoView({ behavior: "smooth", block: "start" });
-      (heroElement as HTMLElement).focus?.();
+      heroElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      ;(heroElement as HTMLElement).focus?.()
     } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
-    return;
+    return
   }
-  event.preventDefault();
-  router.push(targetPath);
-};
+  event.preventDefault()
+  router.push(targetPath)
+}
 
-let dropdownTimeout: NodeJS.Timeout | null = null;
+let dropdownTimeout: NodeJS.Timeout | null = null
 
 const handleDesktopDropdownEnter = () => {
   if (!isScrolled.value) {
     if (dropdownTimeout) {
-      clearTimeout(dropdownTimeout);
-      dropdownTimeout = null;
+      clearTimeout(dropdownTimeout)
+      dropdownTimeout = null
     }
-    isDesktopDropdownOpen.value = true;
+    isDesktopDropdownOpen.value = true
   }
-};
+}
 
 const handleDesktopDropdownLeave = () => {
   dropdownTimeout = setTimeout(() => {
-    isDesktopDropdownOpen.value = false;
-  }, 150);
-};
+    isDesktopDropdownOpen.value = false
+  }, 150)
+}
 
 const toggleDropdown = () => {
   if (!isScrolled.value) {
-    isDesktopDropdownOpen.value = !isDesktopDropdownOpen.value;
+    isDesktopDropdownOpen.value = !isDesktopDropdownOpen.value
   }
-};
+}
 
 const handleClickOutside = (event: Event) => {
-  if (
-    desktopDropdownRef.value &&
-    !desktopDropdownRef.value.contains(event.target as Node)
-  ) {
-    isDesktopDropdownOpen.value = false;
+  if (desktopDropdownRef.value && !desktopDropdownRef.value.contains(event.target as Node)) {
+    isDesktopDropdownOpen.value = false
   }
-};
+}
 
 const handleFocusOutside = (event: FocusEvent) => {
   // Check if focus is moving outside of the dropdown container
@@ -181,89 +173,82 @@ const handleFocusOutside = (event: FocusEvent) => {
   ) {
     // Clear any existing timeout to prevent conflicts
     if (dropdownTimeout) {
-      clearTimeout(dropdownTimeout);
-      dropdownTimeout = null;
+      clearTimeout(dropdownTimeout)
+      dropdownTimeout = null
     }
 
     // Close dropdown when focus leaves the dropdown area
     dropdownTimeout = setTimeout(() => {
-      isDesktopDropdownOpen.value = false;
-    }, 100);
+      isDesktopDropdownOpen.value = false
+    }, 100)
   }
-};
+}
 
 onMounted(() => {
   if (import.meta.client) {
     // Initialize current hash
-    updateCurrentHash();
+    updateCurrentHash()
 
     // Listen for hash changes from ANY source (user clicks, scroll updates, etc.)
-    window.addEventListener("hashchange", updateCurrentHash, { passive: true });
-    document.addEventListener("click", handleClickOutside);
-    document.addEventListener("focusout", handleFocusOutside);
+    window.addEventListener('hashchange', updateCurrentHash, { passive: true })
+    document.addEventListener('click', handleClickOutside)
+    document.addEventListener('focusout', handleFocusOutside)
 
     // Also listen for history.replaceState calls (used by useScrollHashes)
-    const originalReplaceState = window.history.replaceState.bind(
-      window.history
-    );
+    const originalReplaceState = window.history.replaceState.bind(window.history)
 
-    window.history.replaceState = ((
-      data: unknown,
-      title: string,
-      url?: string | URL | null
-    ) => {
-      originalReplaceState(data, title, url);
+    window.history.replaceState = ((data: unknown, title: string, url?: string | URL | null) => {
+      originalReplaceState(data, title, url)
       // Update navigation state after history changes
-      nextTick(() => updateCurrentHash());
-    }) as History["replaceState"];
+      nextTick(() => updateCurrentHash())
+    }) as History['replaceState']
 
     // Polling fallback to catch any missed URL changes
     const hashCheckInterval = setInterval(() => {
-      const newHash =
-        window.location.hash === "#hero" ? "" : window.location.hash;
+      const newHash = window.location.hash === '#hero' ? '' : window.location.hash
       if (newHash !== currentHash.value) {
-        updateCurrentHash();
+        updateCurrentHash()
       }
-    }, 100);
+    }, 100)
 
     onUnmounted(() => {
-      window.removeEventListener("hashchange", updateCurrentHash);
-      document.removeEventListener("click", handleClickOutside);
-      document.removeEventListener("focusout", handleFocusOutside);
-      clearInterval(hashCheckInterval);
+      window.removeEventListener('hashchange', updateCurrentHash)
+      document.removeEventListener('click', handleClickOutside)
+      document.removeEventListener('focusout', handleFocusOutside)
+      clearInterval(hashCheckInterval)
       if (dropdownTimeout) {
-        clearTimeout(dropdownTimeout);
+        clearTimeout(dropdownTimeout)
       }
       // Restore original replaceState
       try {
-        window.history.replaceState = originalReplaceState;
+        window.history.replaceState = originalReplaceState
       } catch {
         // Ignore restoration errors
       }
-    });
+    })
   }
-});
+})
 
 // Watch route changes to update hash state
 watch(
   () => route.fullPath,
   () => {
     if (import.meta.client) {
-      nextTick(() => updateCurrentHash());
+      nextTick(() => updateCurrentHash())
     }
   },
-  { immediate: true }
-);
+  { immediate: true },
+)
 
 watch(isMobileMenuOpen, (isOpen: boolean): void => {
   if (!isOpen) {
     const menuElement =
       menuButtonRef.value instanceof HTMLElement
         ? menuButtonRef.value
-        : document.querySelector(".navigation-section__menu-button");
-    (menuElement as HTMLElement | null)?.focus?.();
+        : document.querySelector('.navigation-section__menu-button')
+    ;(menuElement as HTMLElement | null)?.focus?.()
   }
-});
+})
 </script>
 
 <template>
@@ -309,18 +294,12 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
               @keydown.space.prevent="onBrandClick"
             >
               {{ brandNameParts.main
-              }}<span class="text-primary"
-                >.{{ brandNameParts.secondary }}</span
-              >
+              }}<span class="text-primary">.{{ brandNameParts.secondary }}</span>
             </NuxtLink>
           </slot>
         </div>
 
-        <nav
-          id="navigation"
-          aria-label="Primäre Navigation"
-          class="navigation-section__nav"
-        >
+        <nav id="navigation" aria-label="Primäre Navigation" class="navigation-section__nav">
           <ul class="navigation-section__list">
             <li
               v-for="link in mainLinks"
@@ -342,9 +321,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
             </li>
 
             <li class="navigation-section__actions">
-              <div
-                class="navigation-section__action-item navigation-section__burger-item"
-              >
+              <div class="navigation-section__action-item navigation-section__burger-item">
                 <div
                   ref="desktopDropdownRef"
                   class="navigation-section__desktop-burger"
@@ -367,16 +344,14 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                       name="i-lucide-menu"
                       class="navigation-section__burger-icon"
                       :class="{
-                        'navigation-section__burger-icon--hovering':
-                          isDesktopDropdownOpen,
+                        'navigation-section__burger-icon--hovering': isDesktopDropdownOpen,
                       }"
                     />
                     <UIcon
                       name="i-lucide-chevron-down"
                       class="navigation-section__chevron-icon"
                       :class="{
-                        'navigation-section__chevron-icon--hovering':
-                          isDesktopDropdownOpen,
+                        'navigation-section__chevron-icon--hovering': isDesktopDropdownOpen,
                       }"
                     />
                   </button>
@@ -396,12 +371,10 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                       :data-active="isActive(link.link) ? 'true' : 'false'"
                       role="menuitem"
                       @click="
-                        (isDesktopDropdownOpen = false),
-                          navigateToSectionWithFocus(link.link)
+                        ((isDesktopDropdownOpen = false), navigateToSectionWithFocus(link.link))
                       "
                       @keydown.space.prevent="
-                        (isDesktopDropdownOpen = false),
-                          navigateToSectionWithFocus(link.link)
+                        ((isDesktopDropdownOpen = false), navigateToSectionWithFocus(link.link))
                       "
                     >
                       {{ link.title }}
@@ -452,10 +425,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
           >
             <template #body>
               <div class="navigation-section__mobile-wrapper">
-                <nav
-                  aria-label="Mobile Navigation"
-                  class="navigation-section__mobile-nav"
-                >
+                <nav aria-label="Mobile Navigation" class="navigation-section__mobile-nav">
                   <ul class="navigation-section__mobile-list">
                     <li
                       v-for="link in mainLinks"
@@ -468,13 +438,9 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                         :aria-current="isActive(link.link) ? 'page' : undefined"
                         class="navigation-section__mobile-link"
                         :data-active="isActive(link.link) ? 'true' : 'false'"
-                        @click="
-                          (isMobileMenuOpen = false),
-                            navigateToSectionWithFocus(link.link)
-                        "
+                        @click="((isMobileMenuOpen = false), navigateToSectionWithFocus(link.link))"
                         @keydown.space.prevent="
-                          (isMobileMenuOpen = false),
-                            navigateToSectionWithFocus(link.link)
+                          ((isMobileMenuOpen = false), navigateToSectionWithFocus(link.link))
                         "
                       >
                         {{ link.title }}
@@ -487,12 +453,10 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
                         aria-label="Kontakt"
                         class="navigation-section__mobile-link"
                         @click="
-                          (isMobileMenuOpen = false),
-                            navigateToSectionWithFocus('#contact')
+                          ((isMobileMenuOpen = false), navigateToSectionWithFocus('#contact'))
                         "
                         @keydown.space.prevent="
-                          (isMobileMenuOpen = false),
-                            navigateToSectionWithFocus('#contact')
+                          ((isMobileMenuOpen = false), navigateToSectionWithFocus('#contact'))
                         "
                       >
                         Kontakt
@@ -519,7 +483,7 @@ watch(isMobileMenuOpen, (isOpen: boolean): void => {
 </template>
 
 <style scoped lang="scss">
-$block: "navigation-section";
+$block: 'navigation-section';
 
 .#{$block} {
   position: sticky;
@@ -529,7 +493,8 @@ $block: "navigation-section";
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
-  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateZ(0);
   will-change: background-color, box-shadow;
@@ -537,11 +502,7 @@ $block: "navigation-section";
 
   // Add minimal contrast backdrop for WCAG compliance in initial state
   &:not(&--scrolled) {
-    background: linear-gradient(
-      180deg,
-      rgba(0, 0, 0, 0.02) 0%,
-      transparent 100%
-    );
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.02) 0%, transparent 100%);
 
     // Ensure all interactive elements have sufficient contrast
     .#{$block}__brand-link,
@@ -558,7 +519,8 @@ $block: "navigation-section";
 
   &--scrolled {
     background: rgba(0, 0, 0, 0.8);
-    box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.15),
+    box-shadow:
+      0 4px 24px -2px rgba(0, 0, 0, 0.15),
       0 0 0 1px rgba(255, 255, 255, 0.05);
     backdrop-filter: saturate(180%) blur(20px);
 
@@ -618,7 +580,8 @@ $block: "navigation-section";
     padding: 0.25rem 0.5rem;
     margin: -0.25rem -0.5rem;
     white-space: nowrap;
-    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transition:
+      color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
       font-size 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     transform: translateZ(0);
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -671,7 +634,8 @@ $block: "navigation-section";
   &__burger-item {
     display: flex;
     align-items: center;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transition:
+      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     transform: translateX(0) translateZ(0);
     opacity: 1;
@@ -705,7 +669,8 @@ $block: "navigation-section";
     color: #ffffff;
     cursor: pointer;
     border-radius: 0.375rem;
-    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transition:
+      color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
       background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-shadow: 0 1px 4px rgba(0, 0, 0, 1);
     transform: translateZ(0);
@@ -730,7 +695,8 @@ $block: "navigation-section";
     width: 20px;
     height: 20px;
     position: absolute;
-    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    transition:
+      opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
       transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     backface-visibility: hidden;
     will-change: opacity, transform;
@@ -767,14 +733,16 @@ $block: "navigation-section";
     border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: var(--radius-default);
     padding: 0.75rem;
-    box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.5),
-      0 10px 40px -15px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    box-shadow:
+      0 20px 60px -10px rgba(0, 0, 0, 0.5),
+      0 10px 40px -15px rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
     z-index: 60;
     animation: dropdown-appear 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     text-shadow: 0 1px 4px rgba(0, 0, 0, 1);
 
     &::before {
-      content: "";
+      content: '';
       position: absolute;
       top: -12px;
       left: 50%;
@@ -786,7 +754,7 @@ $block: "navigation-section";
     }
 
     &::after {
-      content: "";
+      content: '';
       position: absolute;
       top: -6px;
       left: 50%;
@@ -816,7 +784,8 @@ $block: "navigation-section";
     color: rgba(248, 250, 252, 0.95);
     text-decoration: none;
     border-radius: 0.5rem;
-    transition: color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transition:
+      color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
       background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
       transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
@@ -839,12 +808,12 @@ $block: "navigation-section";
       outline-offset: 2px;
     }
 
-    &[data-active="true"] {
+    &[data-active='true'] {
       color: var(--color-primary, #a78bfa);
       background: rgba(167, 139, 250, 0.15);
 
       &::before {
-        content: "";
+        content: '';
         position: absolute;
         left: 0;
         top: 50%;
@@ -882,7 +851,8 @@ $block: "navigation-section";
   &__item {
     display: flex;
     align-items: center;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transition:
+      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -891,7 +861,8 @@ $block: "navigation-section";
     opacity: 1;
     width: auto;
     overflow: visible;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transition:
+      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
       opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     will-change: transform, opacity;
 
@@ -942,7 +913,7 @@ $block: "navigation-section";
       outline-offset: 2px;
     }
 
-    &[data-active="true"] {
+    &[data-active='true'] {
       color: var(--color-primary, #a78bfa);
     }
   }
@@ -1103,12 +1074,12 @@ $block: "navigation-section";
       color: var(--color-primary, #9861ff);
     }
 
-    &[data-active="true"] {
+    &[data-active='true'] {
       color: var(--color-secondary, #90a1b9);
     }
 
     &::after {
-      content: "";
+      content: '';
       position: absolute;
       inset: 0;
       min-height: 44px;

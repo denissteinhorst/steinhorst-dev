@@ -1,25 +1,21 @@
 <script setup lang="ts">
-const { cmsRequest, currentLocaleString } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi()
 
 const { data, pending, error } = await useLazyAsyncData<FaqSectionResponse>(
   `faq-${currentLocaleString.value}`,
-  () => cmsRequest<FaqSectionResponse>("faq-section", [])
-);
+  () => cmsRequest<FaqSectionResponse>('faq-section', []),
+)
 
-const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? [])
 </script>
 
 <template>
   <template v-if="pending">
-    <section class="faq-section faq-section--loading">
-      Loading faq-section...
-    </section>
+    <section class="faq-section faq-section--loading">Loading faq-section...</section>
   </template>
 
   <template v-else-if="error">
-    <section class="faq-section faq-section--error">
-      Failed to load faq-section.
-    </section>
+    <section class="faq-section faq-section--error">Failed to load faq-section.</section>
   </template>
 
   <SectionWrapper
@@ -80,7 +76,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </template>
 
 <style scoped lang="scss">
-$block: "faq-section";
+$block: 'faq-section';
 
 .#{$block} {
   &--loading,
@@ -106,12 +102,7 @@ $block: "faq-section";
     left: calc(50% - 40rem);
     width: 1px;
     height: 100%;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      var(--color-primary),
-      transparent
-    );
+    background: linear-gradient(to bottom, transparent, var(--color-primary), transparent);
     opacity: 0.7;
   }
 
@@ -197,11 +188,11 @@ $block: "faq-section";
   overflow: hidden;
   transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  &[data-state="open"] {
+  &[data-state='open'] {
     animation: accordion-slide-down 300ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  &[data-state="closed"] {
+  &[data-state='closed'] {
     animation: accordion-slide-up 300ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -216,19 +207,20 @@ $block: "faq-section";
   color: rgb(var(--color-gray-700));
   transform: translateY(0);
   opacity: 1;
-  transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1),
+  transition:
+    opacity 300ms cubic-bezier(0.4, 0, 0.2, 1),
     transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
   @media (prefers-color-scheme: dark) {
     color: rgb(var(--color-gray-300));
   }
 
-  [data-state="closed"] & {
+  [data-state='closed'] & {
     opacity: 0;
     transform: translateY(-10px);
   }
 
-  [data-state="open"] & {
+  [data-state='open'] & {
     opacity: 1;
     transform: translateY(0);
   }
@@ -247,7 +239,7 @@ $block: "faq-section";
   margin-left: auto;
   transition: transform 200ms;
 
-  [data-state="open"] & {
+  [data-state='open'] & {
     transform: rotate(180deg);
   }
 }

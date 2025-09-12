@@ -18,13 +18,13 @@ export const useIdGenerator = () => {
       .replace(/[&()]/g, '') // Remove &, (, ) characters
       .replace(/[^a-z0-9]/g, '-') // Replace non-alphanumeric with hyphens
       .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-      .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+      .replace(/^-|-$/g, '') // Remove leading/trailing hyphens
 
-    const prefixPart = prefix ? `${prefix}-` : '';
-    const indexPart = index !== undefined ? `-${index}` : '';
+    const prefixPart = prefix ? `${prefix}-` : ''
+    const indexPart = index !== undefined ? `-${index}` : ''
 
-    return `${prefixPart}${baseId}${indexPart}`;
-  };
+    return `${prefixPart}${baseId}${indexPart}`
+  }
 
   /**
    * Generates a unique ID based on component name and content
@@ -35,11 +35,11 @@ export const useIdGenerator = () => {
    * @returns A unique component ID
    */
   const generateComponentId = (componentName: string, content: string, index?: number): string => {
-    return createSafeId(content, componentName, index);
-  };
+    return createSafeId(content, componentName, index)
+  }
 
   return {
     createSafeId,
     generateComponentId,
-  };
-};
+  }
+}

@@ -1,15 +1,15 @@
-import type { StrapiImage } from '~/types/types';
+import type { StrapiImage } from '~/types/types'
 
 interface StrapiResponseData {
-  [key: string]: unknown;
+  [key: string]: unknown
 }
 
 interface CmsQueryParams {
-  endpoint: string;
-  isCollection: boolean;
-  fields?: string[];
-  populates?: string[];
-  locale: string;
+  endpoint: string
+  isCollection: boolean
+  fields?: string[]
+  populates?: string[]
+  locale: string
 }
 
 /**
@@ -30,21 +30,21 @@ interface CmsQueryParams {
  * @returns Object containing CMS request functions and utilities
  */
 export const useStrapi = () => {
-  const { $getLocale } = useI18n();
-  const route = useRoute();
-  const config = useRuntimeConfig();
+  const { $getLocale } = useI18n()
+  const route = useRoute()
+  const config = useRuntimeConfig()
 
   /**
    * Computed locale value based on i18n or route path
    * Falls back to route-based detection if i18n locale is unavailable
    */
   const currentLocale = computed((): string => {
-    const locale = $getLocale();
-    if (locale) return locale;
+    const locale = $getLocale()
+    if (locale) return locale
 
     // Fallback: detect locale from route path
-    return route.path.startsWith('/en') ? 'en' : 'de';
-  });
+    return route.path.startsWith('/en') ? 'en' : 'de'
+  })
 
   /**
    * Filters object to include only specified fields
@@ -54,15 +54,18 @@ export const useStrapi = () => {
    * @returns Filtered object with only requested fields
    */
   const filterFields = <T>(data: Record<string, unknown>, fields: string[]): T => {
-    if (fields.length === 0) return data as T;
+    if (fields.length === 0) return data as T
 
-    return fields.reduce((filtered, field) => {
-      if (data[field] !== undefined) {
-        filtered[field] = data[field];
-      }
-      return filtered;
-    }, {} as Record<string, unknown>) as T;
-  };
+    return fields.reduce(
+      (filtered, field) => {
+        if (data[field] !== undefined) {
+          filtered[field] = data[field]
+        }
+        return filtered
+      },
+      {} as Record<string, unknown>,
+    ) as T
+  }
 
   /**
    * Fetches content from Strapi CMS via server proxy
@@ -84,47 +87,50 @@ export const useStrapi = () => {
     endpoint: string,
     fields: string[] = [],
     isCollection: boolean = false,
-    populates: string[] = []
+    populates: string[] = [],
   ): Promise<T> => {
     if (!endpoint) {
-      throw new Error('Invalid endpoint provided');
+      throw new Error('Invalid endpoint provided')
     }
 
     // Build query parameters for server proxy
     const queryParams: CmsQueryParams = {
       endpoint,
       isCollection,
-      locale: currentLocale.value
-    };
+      locale: currentLocale.value,
+    }
 
     // Add optional parameters if provided
-    if (fields.length > 0) queryParams.fields = fields;
-    if (populates.length > 0) queryParams.populates = populates;
+    if (fields.length > 0) queryParams.fields = fields
+    if (populates.length > 0) queryParams.populates = populates
 
     try {
       const response = await $fetch<StrapiResponseData>('/api/request', {
         method: 'GET',
         query: queryParams,
-        timeout: 8000
-      });
+        timeout: 8000,
+      })
 
       if (isCollection) {
-        if (!Array.isArray(response)) return [] as unknown as T;
+        if (!Array.isArray(response)) return [] as unknown as T
 
         // Apply field filtering to each item in collection if requested
-        return (fields.length > 0
-          ? response.map(item => filterFields<Record<string, unknown>>(item as Record<string, unknown>, fields))
-          : response
-        ) as T;
+        return (
+          fields.length > 0
+            ? response.map((item) =>
+                filterFields<Record<string, unknown>>(item as Record<string, unknown>, fields),
+              )
+            : response
+        ) as T
       }
 
       // Apply field filtering for single content type
-      return filterFields<T>(response as Record<string, unknown>, fields);
+      return filterFields<T>(response as Record<string, unknown>, fields)
     } catch (error) {
-      console.error(`CMS request failed for endpoint "${endpoint}":`, error);
-      throw error;
+      console.error(`CMS request failed for endpoint "${endpoint}":`, error)
+      throw error
     }
-  };
+  }
 
   /**
    * Builds optimized image URL from Strapi image object
@@ -138,29 +144,29 @@ export const useStrapi = () => {
    * const thumbnailUrl = buildImageUrl(strapiImage, 'thumbnail')
    */
   const buildImageUrl = (image?: StrapiImage | null, format: string = 'small'): string | null => {
-    if (!image) return null;
+    if (!image) return null
 
-    const baseUrl = config.public?.api_base || config.public?.api_url || '';
-    const formats = image.formats as Record<string, { url?: string }> | undefined;
+    const baseUrl = config.public?.api_base || config.public?.api_url || ''
+    const formats = image.formats as Record<string, { url?: string }> | undefined
 
     // Try to get specific format, fallback to original URL
-    const imageUrl = formats?.[format]?.url || image.url;
+    const imageUrl = formats?.[format]?.url || image.url
 
-    if (!imageUrl) return null;
+    if (!imageUrl) return null
 
     // Return absolute URLs as-is
-    if (/^https?:\/\//.test(imageUrl) || imageUrl.startsWith('//')) return imageUrl;
+    if (/^https?:\/\//.test(imageUrl) || imageUrl.startsWith('//')) return imageUrl
 
     // Build full URL for relative paths
-    const cleanBase = baseUrl.replace(/\/+$/, '');
-    const cleanUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+    const cleanBase = baseUrl.replace(/\/+$/, '')
+    const cleanUrl = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`
 
-    return cleanBase ? `${cleanBase}${cleanUrl}` : cleanUrl;
-  };
+    return cleanBase ? `${cleanBase}${cleanUrl}` : cleanUrl
+  }
 
   return {
     cmsRequest,
     buildImageUrl,
-    currentLocaleString: currentLocale
-  };
-};
+    currentLocaleString: currentLocale,
+  }
+}

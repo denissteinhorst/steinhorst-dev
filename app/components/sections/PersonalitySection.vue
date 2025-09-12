@@ -1,35 +1,27 @@
 <script setup lang="ts">
-const { cmsRequest, currentLocaleString } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi()
 
-const { data, pending, error } =
-  await useLazyAsyncData<PersonalitySectionResponse>(
-    `personality-${currentLocaleString.value}`,
-    () =>
-      cmsRequest<PersonalitySectionResponse>(
-        "personality-section",
-        ["title", "text", "jumpmark", "personalityCards"],
-        false,
-        [
-          "personalityCards.polarChartTooltips",
-          "personalityCards.barChartTooltips",
-        ]
-      )
-  );
+const { data, pending, error } = await useLazyAsyncData<PersonalitySectionResponse>(
+  `personality-${currentLocaleString.value}`,
+  () =>
+    cmsRequest<PersonalitySectionResponse>(
+      'personality-section',
+      ['title', 'text', 'jumpmark', 'personalityCards'],
+      false,
+      ['personalityCards.polarChartTooltips', 'personalityCards.barChartTooltips'],
+    ),
+)
 
-const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? [])
 </script>
 
 <template>
   <template v-if="pending">
-    <section class="personality-section">
-      Loading personality-section...
-    </section>
+    <section class="personality-section">Loading personality-section...</section>
   </template>
 
   <template v-else-if="error">
-    <section class="personality-section">
-      Failed to load personality-section.
-    </section>
+    <section class="personality-section">Failed to load personality-section.</section>
   </template>
 
   <SectionWrapper
@@ -71,11 +63,9 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
                     :aria-label="`persolog.com (${$t('ui.opens_in_new_tab')})`"
                   >
                     <span class="personality-section__button-text">{{
-                      $t("personality_section.more_info_persolog")
+                      $t('personality_section.more_info_persolog')
                     }}</span>
-                    <span class="sr-only"
-                      >({{ $t("ui.opens_in_new_tab") }})</span
-                    >
+                    <span class="sr-only">({{ $t('ui.opens_in_new_tab') }})</span>
                     <UIcon
                       name="i-heroicons-arrow-top-right-on-square"
                       class="personality-section__button-icon"
@@ -103,11 +93,9 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
                     :aria-label="`ipmag.ch (${$t('ui.opens_in_new_tab')})`"
                   >
                     <span class="personality-section__button-text">{{
-                      $t("personality_section.more_info_ipm")
+                      $t('personality_section.more_info_ipm')
                     }}</span>
-                    <span class="sr-only"
-                      >({{ $t("ui.opens_in_new_tab") }})</span
-                    >
+                    <span class="sr-only">({{ $t('ui.opens_in_new_tab') }})</span>
                     <UIcon
                       name="i-heroicons-arrow-top-right-on-square"
                       class="personality-section__button-icon"
@@ -125,7 +113,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </template>
 
 <style scoped lang="scss">
-$block: "personality-section";
+$block: 'personality-section';
 
 .#{$block} {
   &__grid {

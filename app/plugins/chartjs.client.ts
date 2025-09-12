@@ -69,6 +69,6 @@ export default defineNuxtPlugin(() => {
     RadialLinearScale,
     PointElement,
     LineElement,
-    Filler
+    Filler,
   )
 })

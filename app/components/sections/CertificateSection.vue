@@ -1,32 +1,27 @@
 <script setup lang="ts">
-const { cmsRequest, currentLocaleString } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi()
 
-const { data, pending, error } =
-  await useLazyAsyncData<CertificateSectionResponse>(
-    `certificates-${currentLocaleString.value}`,
-    () =>
-      cmsRequest<CertificateSectionResponse>(
-        "certificate-section",
-        ["title", "text", "jumpmark", "certificationCards"],
-        false,
-        ["certificationCards.logo"]
-      )
-  );
+const { data, pending, error } = await useLazyAsyncData<CertificateSectionResponse>(
+  `certificates-${currentLocaleString.value}`,
+  () =>
+    cmsRequest<CertificateSectionResponse>(
+      'certificate-section',
+      ['title', 'text', 'jumpmark', 'certificationCards'],
+      false,
+      ['certificationCards.logo'],
+    ),
+)
 
-const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? [])
 </script>
 
 <template>
   <template v-if="pending">
-    <section class="certificate-section">
-      Loading certificate-section...
-    </section>
+    <section class="certificate-section">Loading certificate-section...</section>
   </template>
 
   <template v-else-if="error">
-    <section class="certificate-section">
-      Failed to load certificate-section.
-    </section>
+    <section class="certificate-section">Failed to load certificate-section.</section>
   </template>
 
   <SectionWrapper
@@ -39,11 +34,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
   >
     <template #content>
       <div class="certificate-section" aria-label="Main">
-        <div
-          class="certificate-section__grid"
-          role="list"
-          aria-label="Certificate cards"
-        >
+        <div class="certificate-section__grid" role="list" aria-label="Certificate cards">
           <div
             v-for="(certificateCard, cardIndex) in data.certificationCards"
             :key="cardIndex"
@@ -61,7 +52,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </template>
 
 <style scoped lang="scss">
-$block: "certificate-section";
+$block: 'certificate-section';
 
 .#{$block} {
   &__grid {

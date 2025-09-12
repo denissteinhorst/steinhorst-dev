@@ -1,79 +1,67 @@
 <script setup lang="ts">
-const { cmsRequest, currentLocaleString } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi()
 
 const { data, pending, error } = await useLazyAsyncData<ProjectSectionResponse>(
   `project-${currentLocaleString.value}`,
   (): Promise<ProjectSectionResponse> =>
     cmsRequest<ProjectSectionResponse>(
-      "project-section",
-      [
-        "title",
-        "text",
-        "jumpmark",
-        "lastProjectCard",
-        "projectCards",
-        "footnote",
-      ],
+      'project-section',
+      ['title', 'text', 'jumpmark', 'lastProjectCard', 'projectCards', 'footnote'],
       false,
-      ["projectCards.logo", "lastProjectCard"]
-    )
-);
+      ['projectCards.logo', 'lastProjectCard'],
+    ),
+)
 
-const showCount = ref<number>(4);
-const selectedTags = ref<string[]>([]);
-const isFiltering = ref<boolean>(false);
+const showCount = ref<number>(4)
+const selectedTags = ref<string[]>([])
+const isFiltering = ref<boolean>(false)
 
-const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
-const footerText = computed<RichTextNodes>(() => data.value?.footnote ?? []);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? [])
+const footerText = computed<RichTextNodes>(() => data.value?.footnote ?? [])
 
 const allTags = computed<string[]>(() => {
-  if (!data.value?.projectCards) return [];
+  if (!data.value?.projectCards) return []
 
-  const tags = new Set<string>();
+  const tags = new Set<string>()
   data.value.projectCards.forEach((projectCard) => {
     projectCard.tagList?.forEach((tag) => {
-      const tagText = extractTextFromRichText(tag);
-      if (tagText) tags.add(tagText);
-    });
-  });
+      const tagText = extractTextFromRichText(tag)
+      if (tagText) tags.add(tagText)
+    })
+  })
 
-  return Array.from(tags);
-});
+  return Array.from(tags)
+})
 
 const extractTextFromRichText = (block: RichTextBlock): string => {
   if (block.text) {
-    return block.text;
+    return block.text
   }
   if (block.children?.length) {
     return block.children
       .map((child: RichTextBlock): string => extractTextFromRichText(child))
-      .join("");
+      .join('')
   }
-  return "";
-};
+  return ''
+}
 
 // Filter projects by tags
 const filteredProjects = computed((): ProjectCard[] => {
-  if (!data.value?.projectCards) return [];
+  if (!data.value?.projectCards) return []
   if (selectedTags.value.length === 0) {
-    return data.value.projectCards.slice(
-      0,
-      isFiltering.value ? undefined : showCount.value
-    );
+    return data.value.projectCards.slice(0, isFiltering.value ? undefined : showCount.value)
   }
 
   return data.value.projectCards.filter((card: ProjectCard): boolean => {
     const cardTags =
       card.tagList?.map((tag: RichTextBlock): string =>
-        extractTextFromRichText(tag).toLowerCase()
-      ) || [];
+        extractTextFromRichText(tag).toLowerCase(),
+      ) || []
     return selectedTags.value.some((tag: string): boolean =>
-      cardTags.some((cardTag: string): boolean =>
-        cardTag.includes(tag.toLowerCase())
-      )
-    );
-  });
-});
+      cardTags.some((cardTag: string): boolean => cardTag.includes(tag.toLowerCase())),
+    )
+  })
+})
 </script>
 
 <template>
@@ -120,9 +108,7 @@ const filteredProjects = computed((): ProjectCard[] => {
 
         <div
           v-if="
-            data.lastProjectCard &&
-            !isFiltering &&
-            showCount >= (data.projectCards?.length || 0)
+            data.lastProjectCard && !isFiltering && showCount >= (data.projectCards?.length || 0)
           "
           class="project-section__card-wrapper"
           role="listitem"
@@ -135,7 +121,7 @@ const filteredProjects = computed((): ProjectCard[] => {
 </template>
 
 <style scoped lang="scss">
-$block: "project-section";
+$block: 'project-section';
 
 .#{$block} {
   // Grid styles

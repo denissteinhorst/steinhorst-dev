@@ -1,21 +1,17 @@
 <script setup lang="ts">
-const props = defineProps<{ data: CertificateCard }>();
+const props = defineProps<{ data: CertificateCard }>()
 
-const { buildImageUrl } = useStrapi();
-const { generateComponentId } = useIdGenerator();
+const { buildImageUrl } = useStrapi()
+const { generateComponentId } = useIdGenerator()
 
 const logoUrl = computed<string | undefined>(() => {
-  const url = buildImageUrl(props.data.logo, "small");
-  return url === null ? undefined : url;
-});
+  const url = buildImageUrl(props.data.logo, 'small')
+  return url === null ? undefined : url
+})
 
 const cardId = computed(() =>
-  generateComponentId(
-    "certificate",
-    props.data.title || "certificate",
-    props.data.id || 0
-  )
-);
+  generateComponentId('certificate', props.data.title || 'certificate', props.data.id || 0),
+)
 </script>
 
 <template>
@@ -73,7 +69,7 @@ const cardId = computed(() =>
           :aria-label="`${data.link} (${$t('ui.opens_in_new_tab')})`"
         >
           <span class="certificate-card__button-text">{{ data.linkText }}</span>
-          <span class="sr-only">({{ $t("ui.opens_in_new_tab") }})</span>
+          <span class="sr-only">({{ $t('ui.opens_in_new_tab') }})</span>
           <UIcon
             name="i-heroicons-arrow-top-right-on-square"
             class="certificate-card__button-icon"
@@ -98,7 +94,7 @@ const cardId = computed(() =>
           aria-hidden="true"
         />
         <span class="certificate-card__button-text">Anzeigen</span>
-        <span class="sr-only">({{ $t("ui.opens_in_new_tab") }})</span>
+        <span class="sr-only">({{ $t('ui.opens_in_new_tab') }})</span>
       </UButton>
     </div>
 
@@ -107,7 +103,7 @@ const cardId = computed(() =>
 </template>
 
 <style scoped lang="scss">
-$block: "certificate-card";
+$block: 'certificate-card';
 
 .#{$block} {
   position: relative;
@@ -234,12 +230,7 @@ $block: "certificate-card";
     right: 0;
     bottom: 0;
     height: 1px;
-    background: linear-gradient(
-      to right,
-      transparent,
-      rgb(37 99 235 / 0.4),
-      transparent
-    );
+    background: linear-gradient(to right, transparent, rgb(37 99 235 / 0.4), transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
 

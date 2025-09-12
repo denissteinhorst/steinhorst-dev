@@ -1,16 +1,14 @@
 <script setup lang="ts">
 const props = defineProps<{
-  title: string;
-  listItems: string[];
-  index?: number;
-}>();
+  title: string
+  listItems: string[]
+  index?: number
+}>()
 
-const { generateComponentId } = useIdGenerator();
+const { generateComponentId } = useIdGenerator()
 
-const cardId = computed(() =>
-  generateComponentId("skill", props.title, props.index)
-);
-const aosDelay = computed(() => (props.index ?? 0) * 100);
+const cardId = computed(() => generateComponentId('skill', props.title, props.index))
+const aosDelay = computed(() => (props.index ?? 0) * 100)
 </script>
 
 <template>
@@ -26,15 +24,9 @@ const aosDelay = computed(() => (props.index ?? 0) * 100);
             :key="itemIndex"
             class="skill-card__list-item"
           >
-            <span
-              class="skill-card__list-item-marker"
-              aria-hidden="true"
-            ></span>
+            <span class="skill-card__list-item-marker" aria-hidden="true"></span>
             <span class="skill-card__list-item-text">
-              <span
-                v-for="(part, partIndex) in item.split('|')"
-                :key="partIndex"
-              >
+              <span v-for="(part, partIndex) in item.split('|')" :key="partIndex">
                 {{ part }}
                 <span
                   v-if="partIndex < item.split('|').length - 1"
@@ -51,7 +43,7 @@ const aosDelay = computed(() => (props.index ?? 0) * 100);
 </template>
 
 <style scoped lang="scss">
-$block: "skill-card";
+$block: 'skill-card';
 
 .skill-card-wrapper {
   height: 100%;

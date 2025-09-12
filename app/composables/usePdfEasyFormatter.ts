@@ -32,14 +32,11 @@ type PdfEasyContent = TextContent | StackContent | LineBreak
  * @returns Object containing markdown conversion and text utilities
  */
 export const usePdfEasyFormatter = () => {
-
   /**
    * Normalizes markdown symbols and removes unsupported characters
    */
   const normalizeSymbols = (text: string): string =>
-    text
-      .replace(/`/g, '')
-      .replace(/[⭐🌟✨★☆✦✧✪✫✬✭✮✯]/gu, '•')
+    text.replace(/`/g, '').replace(/[⭐🌟✨★☆✦✧✪✫✬✭✮✯]/gu, '•')
 
   /**
    * Creates safe filename from text
@@ -68,12 +65,18 @@ export const usePdfEasyFormatter = () => {
     const isTableDivider = (line: string): boolean => {
       const trimmed = line.trim()
       if (!trimmed.includes('|')) return false
-      const parts = trimmed.split('|').map(p => p.trim()).filter(p => p.length > 0)
-      return parts.length > 0 && parts.every(part => /^:?-{3,}:?$/.test(part))
+      const parts = trimmed
+        .split('|')
+        .map((p) => p.trim())
+        .filter((p) => p.length > 0)
+      return parts.length > 0 && parts.every((part) => /^:?-{3,}:?$/.test(part))
     }
 
     const splitTableRow = (line: string): string[] => {
-      const rawParts = line.trim().split('|').map(p => p.trim())
+      const rawParts = line
+        .trim()
+        .split('|')
+        .map((p) => p.trim())
       return rawParts.filter((_, index) => {
         if (index === 0 && rawParts[0] === '') return false
         if (index === rawParts.length - 1 && rawParts[rawParts.length - 1] === '') return false
@@ -89,7 +92,11 @@ export const usePdfEasyFormatter = () => {
         .replace(/[⭐🌟✨★☆✦✧✪✫✬✭✮✯]/gu, '•')
     }
 
-    const padText = (text: string, width: number, align: 'left' | 'center' | 'right' = 'left'): string => {
+    const padText = (
+      text: string,
+      width: number,
+      align: 'left' | 'center' | 'right' = 'left',
+    ): string => {
       const length = [...text].length
       if (length >= width) return text
       const spaces = ' '.repeat(width - length)
@@ -102,7 +109,9 @@ export const usePdfEasyFormatter = () => {
       return text + spaces
     }
 
-    const parseTableBlock = (startIndex: number): { content: PdfEasyContent[]; nextIndex: number } => {
+    const parseTableBlock = (
+      startIndex: number,
+    ): { content: PdfEasyContent[]; nextIndex: number } => {
       const headerCells = splitTableRow(lines[startIndex] ?? '')
       const dividerLine = lines[startIndex + 1] ?? ''
 
@@ -139,33 +148,44 @@ export const usePdfEasyFormatter = () => {
       const columnWidths = new Array(columnCount).fill(0).map((_, columnIndex) => {
         const headerCell = header[columnIndex] ?? ''
         const headerLength = [...headerCell].length
-        const maxDataLength = Math.max(0, ...data.map((row) => ([...(row[columnIndex] ?? '')].length)))
+        const maxDataLength = Math.max(
+          0,
+          ...data.map((row) => [...(row[columnIndex] ?? '')].length),
+        )
         return Math.max(headerLength, maxDataLength)
       })
 
       const createTableLine = (cells: string[], isBold = false): TextContent[] => {
         const tableRow = cells
-          .map((cell, index) => padText(cell, columnWidths[index] ?? cell.length, alignments[index] ?? 'left'))
+          .map((cell, index) =>
+            padText(cell, columnWidths[index] ?? cell.length, alignments[index] ?? 'left'),
+          )
           .join(' | ')
 
-        return [{
-          raw: tableRow + '\n',
-          text: {
-            font: 'Courier',
-            fontSize: 12,
-            align: 'left',
-            ...(isBold ? { bold: true } : {})
-          }
-        }]
+        return [
+          {
+            raw: tableRow + '\n',
+            text: {
+              font: 'Courier',
+              fontSize: 12,
+              align: 'left',
+              ...(isBold ? { bold: true } : {}),
+            },
+          },
+        ]
       }
 
-      const separatorLength = columnWidths.reduce((acc, width) => acc + width, 0) + (columnCount - 1) * 3
+      const separatorLength =
+        columnWidths.reduce((acc, width) => acc + width, 0) + (columnCount - 1) * 3
       const separator = '-'.repeat(Math.max(3, separatorLength))
 
       const content: PdfEasyContent[] = []
       content.push({ lineBreak: {} })
       content.push(...createTableLine(header, true))
-      content.push({ raw: separator + '\n', text: { font: 'Courier', fontSize: 12, align: 'left' } })
+      content.push({
+        raw: separator + '\n',
+        text: { font: 'Courier', fontSize: 12, align: 'left' },
+      })
       for (const row of data) {
         content.push(...createTableLine(row))
       }
@@ -190,7 +210,14 @@ export const usePdfEasyFormatter = () => {
       const blockquote = /^>\s+(.*)$/.exec(trimmed)
       if (blockquote) {
         const text = normalizeSymbols((blockquote[1] ?? '').trim())
-        if (text) output.push({ raw: text, text: { fontSize: 12, color: '#6b7280', align: 'left', font: 'Helvetica' } }, { lineBreak: {} })
+        if (text)
+          output.push(
+            {
+              raw: text,
+              text: { fontSize: 12, color: '#6b7280', align: 'left', font: 'Helvetica' },
+            },
+            { lineBreak: {} },
+          )
         else output.push({ lineBreak: {} })
         continue
       }
@@ -202,7 +229,11 @@ export const usePdfEasyFormatter = () => {
       const h3 = /^#{3}\s+(.*)$/.exec(trimmed)
       if (h3) {
         const title = normalizeSymbols((h3[1] ?? '').trim())
-        if (title) output.push({ raw: `\n${title}\n`, text: { bold: true, fontSize: 18, align: 'left', font: 'Helvetica' } })
+        if (title)
+          output.push({
+            raw: `\n${title}\n`,
+            text: { bold: true, fontSize: 18, align: 'left', font: 'Helvetica' },
+          })
         else output.push({ lineBreak: {} })
         continue
       }
@@ -210,7 +241,11 @@ export const usePdfEasyFormatter = () => {
       const h2 = /^#{2}\s+(.*)$/.exec(trimmed)
       if (h2) {
         const title = normalizeSymbols((h2[1] ?? '').trim())
-        if (title) output.push({ raw: `${title}\n`, text: { bold: true, fontSize: 20, align: 'left', font: 'Helvetica' } })
+        if (title)
+          output.push({
+            raw: `${title}\n`,
+            text: { bold: true, fontSize: 20, align: 'left', font: 'Helvetica' },
+          })
         else output.push({ lineBreak: {} })
         continue
       }
@@ -218,7 +253,11 @@ export const usePdfEasyFormatter = () => {
       const h1 = /^#{1}\s+(.*)$/.exec(trimmed)
       if (h1) {
         const title = normalizeSymbols((h1[1] ?? '').trim())
-        if (title) output.push({ raw: `${title}\n`, text: { bold: true, fontSize: 24, align: 'left', font: 'Helvetica' } })
+        if (title)
+          output.push({
+            raw: `${title}\n`,
+            text: { bold: true, fontSize: 24, align: 'left', font: 'Helvetica' },
+          })
         else output.push({ lineBreak: {} })
         continue
       }
@@ -244,7 +283,8 @@ export const usePdfEasyFormatter = () => {
       const boldRegex = /\*\*([^*]+?)\*\*/g
       let match: RegExpExecArray | null
       while ((match = boldRegex.exec(text)) !== null) {
-        if (match.index > lastIndex) segments.push({ text: text.slice(lastIndex, match.index), bold: false })
+        if (match.index > lastIndex)
+          segments.push({ text: text.slice(lastIndex, match.index), bold: false })
         segments.push({ text: match[1] ?? '', bold: true })
         lastIndex = match.index + match[0].length
       }
@@ -256,10 +296,12 @@ export const usePdfEasyFormatter = () => {
         const lastSegment = segments[segments.length - 1]
         if (lastSegment) lastSegment.text += '\n'
         output.push({
-          stack: segments.map(seg => ({
+          stack: segments.map((seg) => ({
             raw: seg.text,
-            text: seg.bold ? { bold: true, align: 'left', font: 'Helvetica', fontSize: 14 } : { align: 'left', font: 'Helvetica', fontSize: 14 }
-          }))
+            text: seg.bold
+              ? { bold: true, align: 'left', font: 'Helvetica', fontSize: 14 }
+              : { align: 'left', font: 'Helvetica', fontSize: 14 },
+          })),
         })
       }
     }
@@ -271,6 +313,6 @@ export const usePdfEasyFormatter = () => {
     normalizeSymbols,
     createSafeFilename,
     ensurePdfExtension,
-    convertMarkdownToPdfEasy
+    convertMarkdownToPdfEasy,
   }
 }

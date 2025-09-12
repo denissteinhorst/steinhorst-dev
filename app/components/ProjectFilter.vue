@@ -5,154 +5,146 @@
  * Option type for project count dropdown
  */
 type ProjectFilterOptions = {
-  label: string; // Display label for the option
-  value: number; // Number of projects to show
-};
+  label: string // Display label for the option
+  value: number // Number of projects to show
+}
 
 /**
  * Component props interface
  */
 interface Props {
-  projectCount?: number; // Total number of projects available
-  allTags?: string[]; // All available tags for filtering
-  filteredCount?: number; // Count of projects after filtering
+  projectCount?: number // Total number of projects available
+  allTags?: string[] // All available tags for filtering
+  filteredCount?: number // Count of projects after filtering
 }
 
 const props = withDefaults(defineProps<Props>(), {
   projectCount: 0,
   allTags: () => [],
   filteredCount: 0,
-});
+})
 
 /**
  * Event emitters for two-way binding
  */
 const emit = defineEmits<{
-  "update:show-count": [value: number]; // Number of projects to display
-  "update:selected-tags": [value: string[]]; // Active filter tags
-  "update:is-filtering": [value: boolean]; // Whether filtering is active
-}>();
+  'update:show-count': [value: number] // Number of projects to display
+  'update:selected-tags': [value: string[]] // Active filter tags
+  'update:is-filtering': [value: boolean] // Whether filtering is active
+}>()
 
-const { t } = useI18n();
-const { $sanitizeHtml } = useNuxtApp();
+const { t } = useI18n()
+const { $sanitizeHtml } = useNuxtApp()
 
 // Controls whether all projects are shown
-const isShowingAllProjects = ref(false);
+const isShowingAllProjects = ref(false)
 
 /**
  * Generates dropdown options for project count selector
  * Creates increments of 2 up to the total project count
  */
 const availableProjectCountOptions = computed<ProjectFilterOptions[]>(() => {
-  return Array.from(
-    { length: Math.ceil(props.projectCount / 2) },
-    (_, index) => {
-      const displayCount = (index + 1) * 2;
-      const isMaxCount = displayCount >= props.projectCount;
+  return Array.from({ length: Math.ceil(props.projectCount / 2) }, (_, index) => {
+    const displayCount = (index + 1) * 2
+    const isMaxCount = displayCount >= props.projectCount
 
-      return {
-        label: isMaxCount
-          ? (t("project_section.filter.all") as string)
-          : displayCount.toString(),
-        value: isMaxCount ? props.projectCount : displayCount,
-      };
+    return {
+      label: isMaxCount ? (t('project_section.filter.all') as string) : displayCount.toString(),
+      value: isMaxCount ? props.projectCount : displayCount,
     }
-  );
-});
+  })
+})
 
 // Currently selected number of projects to display
-const visibleProjectCount = ref<number>(4);
+const visibleProjectCount = ref<number>(4)
 
 // Update visibility when project count changes
 watch(visibleProjectCount, (newCount: number): void => {
-  isShowingAllProjects.value = newCount === props.projectCount;
-  emit("update:show-count", newCount);
-});
+  isShowingAllProjects.value = newCount === props.projectCount
+  emit('update:show-count', newCount)
+})
 
 // User-selected filter tags
-const selectedFilterTags = ref<string[]>([]);
+const selectedFilterTags = ref<string[]>([])
 
 // Current input value that hasn't been committed as a tag
-const currentFilterInput = ref("");
+const currentFilterInput = ref('')
 
 /**
  * Normalized version of selected tags (trimmed, lowercase)
  */
 const normalizedFilterTags = computed<string[]>(() => {
-  return selectedFilterTags.value
-    .map((tag) => tag.trim().toLowerCase())
-    .filter(Boolean);
-});
+  return selectedFilterTags.value.map((tag) => tag.trim().toLowerCase()).filter(Boolean)
+})
 
 /**
  * All active filters - both committed tags and current input
  */
 const activeFilterTerms = computed(() => {
-  const currentInputNormalized = currentFilterInput.value.trim().toLowerCase();
+  const currentInputNormalized = currentFilterInput.value.trim().toLowerCase()
   return currentInputNormalized
     ? [...normalizedFilterTags.value, currentInputNormalized]
-    : [...normalizedFilterTags.value];
-});
+    : [...normalizedFilterTags.value]
+})
 
 /**
  * Whether any filters are currently active
  */
-const isFilterActive = computed(() => activeFilterTerms.value.length > 0);
+const isFilterActive = computed(() => activeFilterTerms.value.length > 0)
 
 // Handle filter state changes
 watch(isFilterActive, (filteringIsActive: boolean): void => {
-  emit("update:is-filtering", filteringIsActive);
+  emit('update:is-filtering', filteringIsActive)
 
   if (filteringIsActive) {
     // When filtering, show all projects
-    isShowingAllProjects.value = true;
+    isShowingAllProjects.value = true
   } else {
     // When clearing filters, revert to default count
-    visibleProjectCount.value = getDefaultVisibleCount();
-    isShowingAllProjects.value =
-      visibleProjectCount.value === props.projectCount;
-    emit("update:show-count", visibleProjectCount.value);
+    visibleProjectCount.value = getDefaultVisibleCount()
+    isShowingAllProjects.value = visibleProjectCount.value === props.projectCount
+    emit('update:show-count', visibleProjectCount.value)
   }
-});
+})
 
 // Update parent when filters change
 watch([normalizedFilterTags, currentFilterInput], () => {
-  emit("update:selected-tags", activeFilterTerms.value);
-});
+  emit('update:selected-tags', activeFilterTerms.value)
+})
 
 /**
  * Determines default number of visible projects based on screen size
  */
 const getDefaultVisibleCount = (): number => {
-  if (typeof window !== "undefined" && window.innerWidth <= 640) {
-    return 2; // Show fewer projects on mobile
+  if (typeof window !== 'undefined' && window.innerWidth <= 640) {
+    return 2 // Show fewer projects on mobile
   }
-  return 4; // Default for larger screens
-};
+  return 4 // Default for larger screens
+}
 
 // Initialize with appropriate count for current device
 onMounted((): void => {
-  visibleProjectCount.value = getDefaultVisibleCount();
-  emit("update:show-count", visibleProjectCount.value);
-});
+  visibleProjectCount.value = getDefaultVisibleCount()
+  emit('update:show-count', visibleProjectCount.value)
+})
 
 /**
  * Clears all active filters
  */
 const clearAllFilters = (): void => {
-  selectedFilterTags.value = [];
-  currentFilterInput.value = "";
-};
+  selectedFilterTags.value = []
+  currentFilterInput.value = ''
+}
 
 /**
  * Handles input changes in the filter field
  */
 const handleFilterInputChange = (event: Event): void => {
-  const target = event.target as HTMLInputElement | null;
-  if (target && typeof target.value === "string") {
-    currentFilterInput.value = target.value;
+  const target = event.target as HTMLInputElement | null
+  if (target && typeof target.value === 'string') {
+    currentFilterInput.value = target.value
   }
-};
+}
 </script>
 
 <template>
@@ -163,7 +155,7 @@ const handleFilterInputChange = (event: Event): void => {
       <div class="project-filter__count-selector">
         <template v-if="!isFilterActive">
           <span class="project-filter__label">
-            {{ t("project_section.filter.projects_to_show") }}
+            {{ t('project_section.filter.projects_to_show') }}
           </span>
           <USelect
             v-model="visibleProjectCount"
@@ -171,11 +163,11 @@ const handleFilterInputChange = (event: Event): void => {
             size="sm"
             class="project-filter__select project-filter__select--wider"
             style="min-width: 6rem; width: 6rem"
-            :aria-label="(t('project_section.filter.projects_to_show') as string)"
+            :aria-label="t('project_section.filter.projects_to_show') as string"
             aria-describedby="project-count-instructions"
           />
           <span id="project-count-instructions" class="sr-only">
-            {{ t("project_section.filter.select_project_count") }}
+            {{ t('project_section.filter.select_project_count') }}
           </span>
         </template>
         <template v-else>
@@ -186,22 +178,14 @@ const handleFilterInputChange = (event: Event): void => {
                 t('project_section.filter.showing_count', {
                   filtered: props.filteredCount,
                   total: props.projectCount,
-                }) as string
+                }) as string,
               )
             "
           >
           </span>
-          <button
-            type="button"
-            class="project-filter__reset-button"
-            @click="clearAllFilters"
-          >
-            {{ t("project_section.filter.reset_filters") }}
-            <UIcon
-              name="i-lucide-x"
-              class="project-filter__reset-icon"
-              aria-hidden="true"
-            />
+          <button type="button" class="project-filter__reset-button" @click="clearAllFilters">
+            {{ t('project_section.filter.reset_filters') }}
+            <UIcon name="i-lucide-x" class="project-filter__reset-icon" aria-hidden="true" />
           </button>
         </template>
       </div>
@@ -209,13 +193,13 @@ const handleFilterInputChange = (event: Event): void => {
       <!-- Tag filter -->
       <div class="project-filter__tag-container">
         <label for="project-tags-filter" class="project-filter__label">
-          {{ t("project_section.filter.filter_projects") }}
+          {{ t('project_section.filter.filter_projects') }}
         </label>
         <UInputTags
           id="project-tags-filter"
           v-model="selectedFilterTags"
           :items="props.allTags"
-          :placeholder="(t('project_section.filter.placeholder') as string)"
+          :placeholder="t('project_section.filter.placeholder') as string"
           :add-on-tab="true"
           :add-on-enter="true"
           :add-on-blur="true"
@@ -232,30 +216,27 @@ const handleFilterInputChange = (event: Event): void => {
           aria-describedby="project-tags-instructions project-status"
           @input="handleFilterInputChange"
         >
-          <template
-            v-if="selectedFilterTags.length || currentFilterInput"
-            #trailing
-          >
+          <template v-if="selectedFilterTags.length || currentFilterInput" #trailing>
             <UButton
               color="neutral"
               variant="link"
               size="sm"
               icon="i-lucide-circle-x"
-              :aria-label="(t('project_section.filter.clear_filters') as string)"
+              :aria-label="t('project_section.filter.clear_filters') as string"
               @click="clearAllFilters"
             />
           </template>
         </UInputTags>
       </div>
       <p id="project-tags-instructions" class="sr-only">
-        {{ t("project_section.filter.filter_instructions") }}
+        {{ t('project_section.filter.filter_instructions') }}
       </p>
     </div>
 
     <!-- Screen reader status -->
     <p id="project-status" class="sr-only" aria-live="polite">
       {{
-        t("project_section.filter.current_status", {
+        t('project_section.filter.current_status', {
           showing: isFilterActive ? props.filteredCount : visibleProjectCount,
           total: props.projectCount,
         })
@@ -265,7 +246,7 @@ const handleFilterInputChange = (event: Event): void => {
 </template>
 
 <style scoped lang="scss">
-$block: "project-filter";
+$block: 'project-filter';
 
 .#{$block} {
   width: 100%;

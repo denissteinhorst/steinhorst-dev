@@ -1,37 +1,37 @@
 <script setup lang="ts">
-import "~/assets/scss/app.scss";
+import '~/assets/scss/app.scss'
 
-const colorMode = useColorMode();
-const route = useRoute();
+const colorMode = useColorMode()
+const route = useRoute()
 
-const ambientBackground = ref<HTMLElement | null>(null);
+const ambientBackground = ref<HTMLElement | null>(null)
 
-const showAmbient = computed(() => route.meta?.ambient !== false);
+const showAmbient = computed(() => route.meta?.ambient !== false)
 
-useScrollHashes();
-useFocusHelper();
+useScrollHashes()
+useFocusHelper()
 
 const updateAmbientBackground = (preference: string): void => {
-  if (!ambientBackground.value) return;
+  if (!ambientBackground.value) return
 
-  if (preference === "light") {
-    ambientBackground.value.classList.add("ambient-background-light");
+  if (preference === 'light') {
+    ambientBackground.value.classList.add('ambient-background-light')
   } else {
-    ambientBackground.value.classList.remove("ambient-background-light");
+    ambientBackground.value.classList.remove('ambient-background-light')
   }
-};
+}
 
 onMounted(() => {
-  updateAmbientBackground(colorMode.preference);
-});
+  updateAmbientBackground(colorMode.preference)
+})
 
-watch(() => colorMode.preference, updateAmbientBackground);
+watch(() => colorMode.preference, updateAmbientBackground)
 watch(
   () => ambientBackground.value,
   (element) => {
-    if (element) updateAmbientBackground(colorMode.preference);
-  }
-);
+    if (element) updateAmbientBackground(colorMode.preference)
+  },
+)
 </script>
 
 <template>
@@ -56,8 +56,8 @@ watch(
 </template>
 
 <style>
-@import "tailwindcss";
-@import "@nuxt/ui";
+@import 'tailwindcss';
+@import '@nuxt/ui';
 
 /* Sticky footer layout */
 .layout-root {
@@ -103,7 +103,7 @@ watch(
 /* Use pseudo elements so we can layer glows + subtle noise separately for compositing control */
 .ambient-background::before,
 .ambient-background::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -112,26 +112,11 @@ watch(
 /* Soft multi‑glow layer (very low opacity). Large blurred radial gradients animated slowly. */
 .ambient-background::before {
   /* Multiple radial gradients with transparent falloff */
-  background: radial-gradient(
-      circle at 20% 35%,
-      rgba(96, 140, 255, 0.12),
-      transparent 60%
-    ),
-    radial-gradient(
-      circle at 78% 65%,
-      rgba(255, 110, 150, 0.1),
-      transparent 65%
-    ),
-    radial-gradient(
-      circle at 55% 80%,
-      rgba(120, 255, 210, 0.08),
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at 35% 60%,
-      rgba(255, 230, 140, 0.05),
-      transparent 60%
-    );
+  background:
+    radial-gradient(circle at 20% 35%, rgba(96, 140, 255, 0.12), transparent 60%),
+    radial-gradient(circle at 78% 65%, rgba(255, 110, 150, 0.1), transparent 65%),
+    radial-gradient(circle at 55% 80%, rgba(120, 255, 210, 0.08), transparent 55%),
+    radial-gradient(circle at 35% 60%, rgba(255, 230, 140, 0.05), transparent 60%);
   filter: blur(60px) saturate(140%);
   mix-blend-mode: screen; /* Keeps it subtle over dark base */
   animation: ambient-shift-1 110s linear infinite alternate;
@@ -140,21 +125,10 @@ watch(
 
 /* Subtle secondary motion / parallax using another gentle gradient veil + dither noise */
 .ambient-background::after {
-  background: radial-gradient(
-      circle at 60% 40%,
-      rgba(255, 255, 255, 0.04),
-      transparent 70%
-    ),
-    radial-gradient(
-      circle at 30% 75%,
-      rgba(180, 220, 255, 0.035),
-      transparent 75%
-    ),
-    repeating-linear-gradient(
-      45deg,
-      rgba(255, 255, 255, 0.015) 0 4px,
-      rgba(0, 0, 0, 0) 4px 8px
-    );
+  background:
+    radial-gradient(circle at 60% 40%, rgba(255, 255, 255, 0.04), transparent 70%),
+    radial-gradient(circle at 30% 75%, rgba(180, 220, 255, 0.035), transparent 75%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.015) 0 4px, rgba(0, 0, 0, 0) 4px 8px);
   background-blend-mode: overlay, overlay, normal;
   filter: blur(40px) contrast(110%) brightness(105%);
   mix-blend-mode: plus-lighter;
@@ -177,26 +151,11 @@ watch(
 }
 
 .ambient-background-light::before {
-  background: radial-gradient(
-      circle at 20% 35%,
-      rgba(255, 200, 140, 0.12),
-      transparent 60%
-    ),
-    radial-gradient(
-      circle at 78% 65%,
-      rgba(255, 150, 110, 0.1),
-      transparent 65%
-    ),
-    radial-gradient(
-      circle at 55% 80%,
-      rgba(255, 255, 210, 0.08),
-      transparent 55%
-    ),
-    radial-gradient(
-      circle at 35% 60%,
-      rgba(255, 255, 255, 0.05),
-      transparent 60%
-    );
+  background:
+    radial-gradient(circle at 20% 35%, rgba(255, 200, 140, 0.12), transparent 60%),
+    radial-gradient(circle at 78% 65%, rgba(255, 150, 110, 0.1), transparent 65%),
+    radial-gradient(circle at 55% 80%, rgba(255, 255, 210, 0.08), transparent 55%),
+    radial-gradient(circle at 35% 60%, rgba(255, 255, 255, 0.05), transparent 60%);
   filter: blur(60px) saturate(140%);
   mix-blend-mode: screen;
   animation: ambient-shift-1 110s linear infinite alternate;
@@ -204,21 +163,10 @@ watch(
 }
 
 .ambient-background-light::after {
-  background: radial-gradient(
-      circle at 60% 40%,
-      rgba(255, 255, 255, 0.04),
-      transparent 70%
-    ),
-    radial-gradient(
-      circle at 30% 75%,
-      rgba(255, 255, 255, 0.035),
-      transparent 75%
-    ),
-    repeating-linear-gradient(
-      45deg,
-      rgba(255, 255, 255, 0.015) 0 4px,
-      rgba(0, 0, 0, 0) 4px 8px
-    );
+  background:
+    radial-gradient(circle at 60% 40%, rgba(255, 255, 255, 0.04), transparent 70%),
+    radial-gradient(circle at 30% 75%, rgba(255, 255, 255, 0.035), transparent 75%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.015) 0 4px, rgba(0, 0, 0, 0) 4px 8px);
   background-blend-mode: overlay, overlay, normal;
   filter: blur(40px) contrast(110%) brightness(105%);
   mix-blend-mode: plus-lighter;

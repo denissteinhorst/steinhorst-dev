@@ -1,69 +1,60 @@
 <script setup lang="ts">
-import { useBreakpoints, useEventListener, useStorage } from "@vueuse/core";
+import { useBreakpoints, useEventListener, useStorage } from '@vueuse/core'
 
 const props = withDefaults(
   defineProps<{
-    blindTopOffsetPx?: number;
+    blindTopOffsetPx?: number
   }>(),
   {
     blindTopOffsetPx: 0,
-  }
-);
+  },
+)
 
-const { cmsRequest, buildImageUrl, currentLocaleString } = useStrapi();
+const { cmsRequest, buildImageUrl, currentLocaleString } = useStrapi()
 
-const { data, pending, error } =
-  await useLazyAsyncData<LeaveNotificationResponse>(
-    `leaveNotification-${currentLocaleString.value}`,
-    () =>
-      cmsRequest<LeaveNotificationResponse>("leave-notification", [
-        "title",
-        "text",
-        "qrcode",
-        "openWhatsapp",
-        "directMessage",
-        "disclaimer",
-      ])
-  );
-const breakpoints = useBreakpoints({ lg: 1024 });
-const isDesktop = breakpoints.greaterOrEqual("lg");
+const { data, pending, error } = await useLazyAsyncData<LeaveNotificationResponse>(
+  `leaveNotification-${currentLocaleString.value}`,
+  () =>
+    cmsRequest<LeaveNotificationResponse>('leave-notification', [
+      'title',
+      'text',
+      'qrcode',
+      'openWhatsapp',
+      'directMessage',
+      'disclaimer',
+    ]),
+)
+const breakpoints = useBreakpoints({ lg: 1024 })
+const isDesktop = breakpoints.greaterOrEqual('lg')
 
 const qrCodeUrl = computed<string | undefined>(() => {
-  const qrcode = Array.isArray(data.value?.qrcode)
-    ? data.value?.qrcode[0]
-    : data.value?.qrcode;
-  const url = buildImageUrl(qrcode, "small");
-  return url === null ? undefined : url;
-});
+  const qrcode = Array.isArray(data.value?.qrcode) ? data.value?.qrcode[0] : data.value?.qrcode
+  const url = buildImageUrl(qrcode, 'small')
+  return url === null ? undefined : url
+})
 
-const isOpen = ref(false);
-const lastMouseY = ref<number | null>(null);
-const hasScrolledHalfway = ref(false);
-const showIndicator = ref(true);
+const isOpen = ref(false)
+const lastMouseY = ref<number | null>(null)
+const hasScrolledHalfway = ref(false)
+const showIndicator = ref(true)
 
-const suppressedUntil = useStorage(
-  "leave-notification:suppress-until",
-  0,
-  undefined,
-  {
-    serializer: { read: Number, write: String },
-  }
-);
+const suppressedUntil = useStorage('leave-notification:suppress-until', 0, undefined, {
+  serializer: { read: Number, write: String },
+})
 
-const ACTIVATION_THRESHOLD = 60;
-const MINIMUM_UPWARD_DELTA = 6;
+const ACTIVATION_THRESHOLD = 60
+const MINIMUM_UPWARD_DELTA = 6
 
 const suppressForToday = (): void => {
-  const nextDayStart = new Date();
-  nextDayStart.setHours(24, 0, 0, 0);
-  suppressedUntil.value = nextDayStart.getTime();
-};
+  const nextDayStart = new Date()
+  nextDayStart.setHours(24, 0, 0, 0)
+  suppressedUntil.value = nextDayStart.getTime()
+}
 
 const shouldOpenOnMove = (mouseY: number, deltaY: number): boolean => {
-  const topOffset = Math.max(0, props.blindTopOffsetPx);
+  const topOffset = Math.max(0, props.blindTopOffsetPx)
   const isAiSummaryOpen =
-    typeof document !== "undefined" &&
-    document.documentElement.hasAttribute("data-ai-summary-open");
+    typeof document !== 'undefined' && document.documentElement.hasAttribute('data-ai-summary-open')
 
   return (
     Date.now() >= suppressedUntil.value &&
@@ -72,53 +63,47 @@ const shouldOpenOnMove = (mouseY: number, deltaY: number): boolean => {
     mouseY >= topOffset &&
     deltaY < -MINIMUM_UPWARD_DELTA &&
     !isAiSummaryOpen
-  );
-};
+  )
+}
 
 const handleMouseMove = (event: MouseEvent): void => {
-  const mouseY = event.clientY;
-  const deltaY = lastMouseY.value === null ? 0 : mouseY - lastMouseY.value;
-  lastMouseY.value = mouseY;
+  const mouseY = event.clientY
+  const deltaY = lastMouseY.value === null ? 0 : mouseY - lastMouseY.value
+  lastMouseY.value = mouseY
 
   if (shouldOpenOnMove(mouseY, deltaY)) {
-    isOpen.value = true;
+    isOpen.value = true
   }
-};
+}
 
 const handleScroll = (): void => {
-  if (hasScrolledHalfway.value) return;
+  if (hasScrolledHalfway.value) return
 
   const scrollPercentage =
-    window.scrollY /
-    (document.documentElement.scrollHeight -
-      document.documentElement.clientHeight);
+    window.scrollY / (document.documentElement.scrollHeight - document.documentElement.clientHeight)
 
   if (scrollPercentage >= 0.5) {
-    hasScrolledHalfway.value = true;
-    setTimeout(() => (showIndicator.value = false), 3000);
+    hasScrolledHalfway.value = true
+    setTimeout(() => (showIndicator.value = false), 3000)
   }
-};
+}
 
 onMounted(() => {
   if (isDesktop.value) {
-    useEventListener("mousemove", handleMouseMove, { passive: true });
-    useEventListener("scroll", handleScroll, { passive: true });
+    useEventListener('mousemove', handleMouseMove, { passive: true })
+    useEventListener('scroll', handleScroll, { passive: true })
   }
-});
+})
 
 watch(isOpen, (newValue: boolean, oldValue: boolean) => {
-  if (oldValue && !newValue) suppressForToday();
-});
+  if (oldValue && !newValue) suppressForToday()
+})
 </script>
 
 <template>
-  <div v-if="pending" class="leave-notification">
-    Loading leave-notification...
-  </div>
+  <div v-if="pending" class="leave-notification">Loading leave-notification...</div>
 
-  <div v-else-if="error" class="leave-notification">
-    Failed to load leave-notification.
-  </div>
+  <div v-else-if="error" class="leave-notification">Failed to load leave-notification.</div>
 
   <div v-else-if="data" class="leave-notification">
     <ClientOnly>
@@ -136,17 +121,10 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
               class="leave-notification__qr-section"
               aria-labelledby="leave-notification-qr-title"
             >
-              <h3
-                id="leave-notification-qr-title"
-                class="leave-notification__section-title"
-              >
-                {{ data.directMessage || "Direkt Nachricht per WhatsApp:" }}
+              <h3 id="leave-notification-qr-title" class="leave-notification__section-title">
+                {{ data.directMessage || 'Direkt Nachricht per WhatsApp:' }}
               </h3>
-              <img
-                :src="qrCodeUrl"
-                alt="WhatsApp QR Code"
-                class="leave-notification__qr-image"
-              />
+              <img :src="qrCodeUrl" alt="WhatsApp QR Code" class="leave-notification__qr-image" />
               <a
                 href="https://wa.me/4915908639395"
                 target="_blank"
@@ -154,22 +132,16 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                 aria-label="WhatsApp Nachricht"
                 class="leave-notification__contact-link leave-notification__contact-link--whatsapp"
               >
-                <UIcon
-                  name="i-simple-icons-whatsapp"
-                  class="leave-notification__icon"
-                />
-                <span>{{ data.openWhatsapp || "WhatsApp öffnen" }}</span>
+                <UIcon name="i-simple-icons-whatsapp" class="leave-notification__icon" />
+                <span>{{ data.openWhatsapp || 'WhatsApp öffnen' }}</span>
               </a>
             </section>
 
             <div class="leave-notification__separator" aria-hidden="true">
-              <span>{{ $t("leave_notification.separator") }}</span>
+              <span>{{ $t('leave_notification.separator') }}</span>
             </div>
 
-            <section
-              class="leave-notification__links"
-              aria-label="Kontaktmöglichkeiten"
-            >
+            <section class="leave-notification__links" aria-label="Kontaktmöglichkeiten">
               <a
                 href="https://calendly.com/denis-steinhorst"
                 target="_blank"
@@ -177,11 +149,8 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                 aria-label="Termin buchen"
                 class="leave-notification__contact-link"
               >
-                <UIcon
-                  name="i-lucide-calendar"
-                  class="leave-notification__icon"
-                />
-                <span>{{ $t("leave_notification.appointment") }}</span>
+                <UIcon name="i-lucide-calendar" class="leave-notification__icon" />
+                <span>{{ $t('leave_notification.appointment') }}</span>
               </a>
 
               <a
@@ -191,7 +160,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                 class="leave-notification__contact-link"
               >
                 <UIcon name="i-lucide-mail" class="leave-notification__icon" />
-                <span>{{ $t("leave_notification.email") }}</span>
+                <span>{{ $t('leave_notification.email') }}</span>
               </a>
 
               <a
@@ -201,11 +170,8 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                 aria-label="LinkedIn Profil"
                 class="leave-notification__contact-link"
               >
-                <UIcon
-                  name="i-simple-icons-linkedin"
-                  class="leave-notification__icon"
-                />
-                <span>{{ $t("leave_notification.linkedin") }}</span>
+                <UIcon name="i-simple-icons-linkedin" class="leave-notification__icon" />
+                <span>{{ $t('leave_notification.linkedin') }}</span>
               </a>
 
               <a
@@ -215,18 +181,13 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
                 aria-label="Xing Profil"
                 class="leave-notification__contact-link"
               >
-                <UIcon
-                  name="i-simple-icons-xing"
-                  class="leave-notification__icon"
-                />
-                <span>{{ $t("leave_notification.xing") }}</span>
+                <UIcon name="i-simple-icons-xing" class="leave-notification__icon" />
+                <span>{{ $t('leave_notification.xing') }}</span>
               </a>
             </section>
 
             <p class="leave-notification__footnote" aria-hidden="true">
-              {{
-                data.disclaimer || "* Unverbindlich. Keine Vorbereitung nötig."
-              }}
+              {{ data.disclaimer || '* Unverbindlich. Keine Vorbereitung nötig.' }}
             </p>
           </div>
         </template>
@@ -236,7 +197,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
 </template>
 
 <style scoped lang="scss">
-$block: "leave-notification";
+$block: 'leave-notification';
 
 .#{$block} {
   &__body {
@@ -272,7 +233,9 @@ $block: "leave-notification";
     width: 128px;
     height: 128px;
     border-radius: 0.5rem;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 1px 1px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.08),
+      0 1px 1px rgba(0, 0, 0, 0.04);
   }
 
   &__icon {
@@ -290,7 +253,7 @@ $block: "leave-notification";
 
     &::before,
     &::after {
-      content: "";
+      content: '';
       height: 1px;
       background-color: currentColor;
       opacity: 0.25;
@@ -352,7 +315,7 @@ $block: "leave-notification";
 
 // Global fallback for any modal title
 :global(.leave-modal-custom h2),
-:global(.leave-modal-custom [id*="dialog-title"]) {
+:global(.leave-modal-custom [id*='dialog-title']) {
   font-size: 1.5rem !important;
 }
 

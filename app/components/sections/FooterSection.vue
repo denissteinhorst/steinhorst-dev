@@ -1,7 +1,7 @@
 <script setup lang="ts">
-const { t } = useI18n();
+const { t } = useI18n()
 
-const currentYear = new Date().getFullYear();
+const currentYear = new Date().getFullYear()
 </script>
 
 <template>
@@ -10,11 +10,11 @@ const currentYear = new Date().getFullYear();
       <div class="footer-section__grid">
         <p class="footer-section__text">
           &copy; {{ currentYear }} Denis Steinhorst.
-          {{ t("footer_section.copyright") }}
+          {{ t('footer_section.copyright') }}
         </p>
         <div class="footer-section__links">
           <NuxtLink to="/imprint" class="footer-section__link">
-            {{ t("footer_section.imprint") }}
+            {{ t('footer_section.imprint') }}
           </NuxtLink>
         </div>
       </div>
@@ -23,7 +23,7 @@ const currentYear = new Date().getFullYear();
 </template>
 
 <style scoped lang="scss">
-$block: "footer-section";
+$block: 'footer-section';
 
 .#{$block} {
   background-color: #000000;

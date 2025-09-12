@@ -1,45 +1,44 @@
 <script setup lang="ts">
-const { cmsRequest, currentLocaleString } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi()
 
-const { data, pending, error } =
-  await useLazyAsyncData<ExperienceSectionResponse>(
-    `experience-${currentLocaleString.value}`,
-    () =>
-      cmsRequest<ExperienceSectionResponse>(
-        "experience-section",
-        [
-          "title",
-          "text",
-          "contactToggle",
-          "expandToggle",
-          "collapseToggle",
-          "jumpmark",
-          "experienceCards",
-        ],
-        false,
-        ["experienceCards.logo"]
-      )
-  );
+const { data, pending, error } = await useLazyAsyncData<ExperienceSectionResponse>(
+  `experience-${currentLocaleString.value}`,
+  () =>
+    cmsRequest<ExperienceSectionResponse>(
+      'experience-section',
+      [
+        'title',
+        'text',
+        'contactToggle',
+        'expandToggle',
+        'collapseToggle',
+        'jumpmark',
+        'experienceCards',
+      ],
+      false,
+      ['experienceCards.logo'],
+    ),
+)
 
 // Fetch job badge data server-first (non-lazy) so SSR & client markup stay identical
 const { data: jobSearchData } = await useAsyncData<JobBadgeResponse>(
   () => `job-badge-${currentLocaleString.value}`,
-  () => cmsRequest<JobBadgeResponse>("job-badge", ["isEnabled"], false, [])
-);
+  () => cmsRequest<JobBadgeResponse>('job-badge', ['isEnabled'], false, []),
+)
 
-const visibleStationsBase = ref(3);
-const isMobile = ref(false);
+const visibleStationsBase = ref(3)
+const isMobile = ref(false)
 
-const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
-const visibleStations = computed(() => visibleStationsBase.value);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? [])
+const visibleStations = computed(() => visibleStationsBase.value)
 const timelineStatus = computed(() => {
-  const total = data.value?.experienceCards?.length || 0;
-  return `Zeige ${visibleStations.value} von ${total} Stationen`;
-});
+  const total = data.value?.experienceCards?.length || 0
+  return `Zeige ${visibleStations.value} von ${total} Stationen`
+})
 
 const timelineItems = computed(() => {
-  const cards = data.value?.experienceCards ?? [];
-  let filteredCards = cards;
+  const cards = data.value?.experienceCards ?? []
+  let filteredCards = cards
 
   // Skip first card if it's jobsearch-only and badge is disabled
   if (
@@ -47,59 +46,59 @@ const timelineItems = computed(() => {
     cards.length > 0 &&
     cards[0]?.isJobsearch === true
   ) {
-    filteredCards = cards.slice(1);
+    filteredCards = cards.slice(1)
   }
 
   return filteredCards.map((card, cardIndex) => ({
-    date: "",
-    title: "",
-    description: "",
-    icon: cardIndex === 0 ? "i-lucide-rocket" : "i-lucide-code",
+    date: '',
+    title: '',
+    description: '',
+    icon: cardIndex === 0 ? 'i-lucide-rocket' : 'i-lucide-code',
     card,
     isFirst: cardIndex === 0,
     index: cardIndex,
-  }));
-});
+  }))
+})
 
 const visibleTimelineItems = computed(() => {
-  return timelineItems.value.slice(0, visibleStations.value);
-});
+  return timelineItems.value.slice(0, visibleStations.value)
+})
 
 const checkMobile = () => {
-  isMobile.value = window.innerWidth < 640;
-};
+  isMobile.value = window.innerWidth < 640
+}
 
 const toggleStations = () => {
-  const totalCards = data.value?.experienceCards?.length || 0;
+  const totalCards = data.value?.experienceCards?.length || 0
   if (visibleStationsBase.value < totalCards) {
-    visibleStationsBase.value += 1;
+    visibleStationsBase.value += 1
   } else {
-    visibleStationsBase.value = isMobile.value ? 2 : 3;
+    visibleStationsBase.value = isMobile.value ? 2 : 3
   }
-};
+}
 
 onMounted(() => {
-  checkMobile();
-  visibleStationsBase.value = isMobile.value ? 2 : 3;
-  window.addEventListener("resize", checkMobile);
-});
+  checkMobile()
+  visibleStationsBase.value = isMobile.value ? 2 : 3
+  window.addEventListener('resize', checkMobile)
+})
 
 onUnmounted(() => {
-  window.removeEventListener("resize", checkMobile);
-});
+  window.removeEventListener('resize', checkMobile)
+})
 
 watch(visibleStationsBase, (newValue, oldValue) => {
   if (newValue > oldValue && data.value?.experienceCards) {
     nextTick(() => {
-      const lastCard = data.value?.experienceCards?.[newValue - 1];
+      const lastCard = data.value?.experienceCards?.[newValue - 1]
       if (lastCard) {
-        const lastId = `exp-${lastCard.id}`;
-        const element = document.getElementById(lastId);
-        element?.focus();
+        const lastId = `exp-${lastCard.id}`
+        const element = document.getElementById(lastId)
+        element?.focus()
       }
-    });
+    })
   }
-});
+})
 </script>
 
 <template>
@@ -108,9 +107,7 @@ watch(visibleStationsBase, (newValue, oldValue) => {
   </template>
 
   <template v-else-if="error">
-    <section class="experience-section">
-      Failed to load experience-section.
-    </section>
+    <section class="experience-section">Failed to load experience-section.</section>
   </template>
 
   <SectionWrapper
@@ -130,11 +127,7 @@ watch(visibleStationsBase, (newValue, oldValue) => {
         </div>
 
         <!-- Live status for screen reader users -->
-        <p
-          id="experience-status"
-          class="experience-section__sr-only"
-          aria-live="polite"
-        >
+        <p id="experience-status" class="experience-section__sr-only" aria-live="polite">
           {{ timelineStatus }}
         </p>
 
@@ -156,13 +149,8 @@ watch(visibleStationsBase, (newValue, oldValue) => {
               v-if="item.index === 0 && jobSearchData?.isEnabled"
               class="experience-section__contact-cta"
             >
-              <UButton
-                to="#contact"
-                variant="outline"
-                color="secondary"
-                size="sm"
-              >
-                {{ $t("ui.contact_me") }}
+              <UButton to="#contact" variant="outline" color="secondary" size="sm">
+                {{ $t('ui.contact_me') }}
               </UButton>
             </div>
           </template>
@@ -180,23 +168,19 @@ watch(visibleStationsBase, (newValue, oldValue) => {
             color="secondary"
             size="lg"
             :aria-controls="'experience-timeline'"
-            :aria-expanded="
-              (
-                visibleStations >= (data.experienceCards?.length || 0)
-              ).toString()
-            "
+            :aria-expanded="(visibleStations >= (data.experienceCards?.length || 0)).toString()"
             aria-describedby="experience-status experience-instructions"
             @click="toggleStations"
           >
             {{
               visibleStations < (data.experienceCards?.length || 0)
-                ? data.expandToggle || "Eine weitere Station anzeigen"
-                : data.collapseToggle || "Berufserfahrungen einklappen"
+                ? data.expandToggle || 'Eine weitere Station anzeigen'
+                : data.collapseToggle || 'Berufserfahrungen einklappen'
             }}
           </UButton>
           <p id="experience-instructions" class="experience-section__sr-only">
-            Schaltfläche zeigt nacheinander weitere Stationen an oder klappt zur
-            Ausgangsansicht zurück.
+            Schaltfläche zeigt nacheinander weitere Stationen an oder klappt zur Ausgangsansicht
+            zurück.
           </p>
         </div>
       </div>
@@ -205,7 +189,7 @@ watch(visibleStationsBase, (newValue, oldValue) => {
 </template>
 
 <style scoped lang="scss">
-$block: "experience-section";
+$block: 'experience-section';
 
 .#{$block} {
   position: relative;
@@ -263,8 +247,8 @@ $block: "experience-section";
     :deep(.utimeline-item),
     :deep(.utimeline-item-content),
     :deep(.utimeline-description),
-    :deep([class*="timeline"]),
-    :deep([class*="utimeline"]) {
+    :deep([class*='timeline']),
+    :deep([class*='utimeline']) {
       transform: none !important;
       scale: none !important;
       transition: none !important;

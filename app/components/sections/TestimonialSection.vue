@@ -1,72 +1,60 @@
 <script setup lang="ts">
-const { cmsRequest, currentLocaleString } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi()
 
-const { data, pending, error } =
-  await useLazyAsyncData<TestimonialSectionResponse>(
-    `testimonials-${currentLocaleString.value}`,
-    () =>
-      cmsRequest<TestimonialSectionResponse>(
-        "testimonial-section",
-        ["title", "text", "jumpmark", "recommendationCards"],
-        false,
-        ["recommendationCards.avatar"]
-      )
-  );
+const { data, pending, error } = await useLazyAsyncData<TestimonialSectionResponse>(
+  `testimonials-${currentLocaleString.value}`,
+  () =>
+    cmsRequest<TestimonialSectionResponse>(
+      'testimonial-section',
+      ['title', 'text', 'jumpmark', 'recommendationCards'],
+      false,
+      ['recommendationCards.avatar'],
+    ),
+)
 
-const page = ref(1);
-const showAlternativeLanguage = ref(false);
+const page = ref(1)
+const showAlternativeLanguage = ref(false)
 
-const headerText = computed<RichTextNodes>(() => data.value?.text ?? []);
-const testimonials = computed(() => data.value?.recommendationCards || []);
+const headerText = computed<RichTextNodes>(() => data.value?.text ?? [])
+const testimonials = computed(() => data.value?.recommendationCards || [])
 
 // Calculate the number of grid rows needed for the compact cards
-const gridRows = computed(() =>
-  Math.max(1, Math.ceil(testimonials.value.length / 2))
-);
+const gridRows = computed(() => Math.max(1, Math.ceil(testimonials.value.length / 2)))
 
 const activeIndex = computed(() =>
-  Math.max(
-    0,
-    Math.min(page.value - 1, Math.max(0, testimonials.value.length - 1))
-  )
-);
+  Math.max(0, Math.min(page.value - 1, Math.max(0, testimonials.value.length - 1))),
+)
 
-const currentTestimonial = computed(
-  () => testimonials.value[activeIndex.value]
-);
+const currentTestimonial = computed(() => testimonials.value[activeIndex.value])
 
 const handleCardClick = (cardIndex: number) => {
-  const newPage = cardIndex + 1;
+  const newPage = cardIndex + 1
   if (newPage !== page.value) {
-    page.value = newPage;
-    showAlternativeLanguage.value = false;
+    page.value = newPage
+    showAlternativeLanguage.value = false
   }
-};
+}
 
 const handleLanguageToggle = () => {
-  showAlternativeLanguage.value = !showAlternativeLanguage.value;
-};
+  showAlternativeLanguage.value = !showAlternativeLanguage.value
+}
 
 onMounted(() => {
-  if (testimonials.value.length > 0) page.value = 1;
-});
+  if (testimonials.value.length > 0) page.value = 1
+})
 
 watch(page, () => {
-  showAlternativeLanguage.value = false;
-});
+  showAlternativeLanguage.value = false
+})
 </script>
 
 <template>
   <template v-if="pending">
-    <section class="testimonial-section">
-      Loading testimonial-section...
-    </section>
+    <section class="testimonial-section">Loading testimonial-section...</section>
   </template>
 
   <template v-else-if="error">
-    <section class="testimonial-section">
-      Failed to load testimonial-section.
-    </section>
+    <section class="testimonial-section">Failed to load testimonial-section.</section>
   </template>
 
   <SectionWrapper
@@ -95,10 +83,7 @@ watch(page, () => {
             />
 
             <!-- Pagination -->
-            <div
-              v-if="testimonials.length > 1"
-              class="testimonial-section__pagination"
-            >
+            <div v-if="testimonials.length > 1" class="testimonial-section__pagination">
               <UPagination
                 v-model:page="page"
                 :total="testimonials.length"
@@ -135,10 +120,7 @@ watch(page, () => {
           </div>
 
           <!-- Selected testimonial details -->
-          <div
-            class="testimonial-section__center-column"
-            aria-label="Selected testimonial details"
-          >
+          <div class="testimonial-section__center-column" aria-label="Selected testimonial details">
             <TestimonialCardLarge
               v-if="currentTestimonial"
               :key="currentTestimonial.id || activeIndex"
@@ -169,7 +151,7 @@ watch(page, () => {
 </template>
 
 <style scoped lang="scss">
-$block: "testimonial-section";
+$block: 'testimonial-section';
 
 .#{$block} {
   display: grid;
@@ -236,7 +218,7 @@ $block: "testimonial-section";
       background-color: var(--color-primary) !important;
     }
 
-    :deep([data-state="active"]) {
+    :deep([data-state='active']) {
       background-color: var(--color-primary) !important;
       border-color: var(--color-primary) !important;
     }

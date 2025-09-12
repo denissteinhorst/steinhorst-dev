@@ -201,8 +201,9 @@ hr {
 code,
 kbd,
 samp {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    "Liberation Mono", "Courier New", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+    monospace;
   font-size: 0.875em;
 }
 
@@ -278,7 +279,7 @@ table {
     padding-left: 16px;
 
     &::before {
-      content: "";
+      content: '';
       position: absolute;
       left: 0;
       top: 0.6em;

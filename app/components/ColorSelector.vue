@@ -1,10 +1,10 @@
 <script setup lang="ts">
-const { $t } = useI18n();
-const colorMode = useColorMode();
+const { $t } = useI18n()
+const colorMode = useColorMode()
 
 const setPreference = (preference: string): void => {
-  colorMode.preference = preference;
-};
+  colorMode.preference = preference
+}
 </script>
 
 <template>
@@ -55,7 +55,7 @@ const setPreference = (preference: string): void => {
 </template>
 
 <style lang="scss" scoped>
-$block: "color-selector";
+$block: 'color-selector';
 
 .#{$block} {
   display: flex;

@@ -1,44 +1,31 @@
 <script setup lang="ts">
 const props = defineProps<{
-  data: ContactCard;
-  aosDelay: number;
-}>();
+  data: ContactCard
+  aosDelay: number
+}>()
 
-const { generateComponentId } = useIdGenerator();
+const { generateComponentId } = useIdGenerator()
 
-const textNodes = computed<RichTextNodes>(() => props.data.text ?? []);
+const textNodes = computed<RichTextNodes>(() => props.data.text ?? [])
 
 const titleId = computed(() =>
-  generateComponentId(
-    "contact-title",
-    props.data.title || "contact",
-    props.data.id || 0
-  )
-);
+  generateComponentId('contact-title', props.data.title || 'contact', props.data.id || 0),
+)
 const descId = computed(() =>
-  generateComponentId(
-    "contact-desc",
-    props.data.title || "contact",
-    props.data.id || 0
-  )
-);
+  generateComponentId('contact-desc', props.data.title || 'contact', props.data.id || 0),
+)
 
 const getAriaLabel = (card: ContactCard): string => {
-  const baseLabel = card.title || "";
-  if (card.target === "_blank") {
-    return `${baseLabel} (öffnet in neuem Tab)`;
+  const baseLabel = card.title || ''
+  if (card.target === '_blank') {
+    return `${baseLabel} (öffnet in neuem Tab)`
   }
-  return baseLabel;
-};
+  return baseLabel
+}
 </script>
 
 <template>
-  <li
-    data-aos="fade-up"
-    :data-aos-delay="aosDelay"
-    role="listitem"
-    class="contact-card"
-  >
+  <li data-aos="fade-up" :data-aos-delay="aosDelay" role="listitem" class="contact-card">
     <BaseCard
       class="contact-card__inner"
       :is-dark="true"
@@ -48,10 +35,7 @@ const getAriaLabel = (card: ContactCard): string => {
       <div class="contact-card__body">
         <div class="contact-card__header">
           <div class="contact-card__icon-wrapper" aria-hidden="true">
-            <UIcon
-              :name="data.icon || 'i-lucide-help-circle'"
-              class="contact-card__icon"
-            />
+            <UIcon :name="data.icon || 'i-lucide-help-circle'" class="contact-card__icon" />
           </div>
           <h3 :id="titleId" class="contact-card__title">
             {{ data.title }}
@@ -75,18 +59,14 @@ const getAriaLabel = (card: ContactCard): string => {
             :aria-label="getAriaLabel(data)"
             class="contact-card__button"
           >
-            <span class="contact-card__button-text">{{
-              data.buttonText || data.title
-            }}</span>
+            <span class="contact-card__button-text">{{ data.buttonText || data.title }}</span>
             <UIcon
               v-if="data.target === '_blank'"
               name="i-lucide-external-link"
               class="contact-card__button-external-icon"
               aria-hidden="true"
             />
-            <span v-if="data.target === '_blank'" class="sr-only"
-              >(öffnet in neuem Tab)</span
-            >
+            <span v-if="data.target === '_blank'" class="sr-only">(öffnet in neuem Tab)</span>
           </UButton>
         </div>
       </div>
@@ -95,7 +75,7 @@ const getAriaLabel = (card: ContactCard): string => {
 </template>
 
 <style scoped lang="scss">
-$block: "contact-card";
+$block: 'contact-card';
 
 .#{$block} {
   height: 332px;
@@ -122,7 +102,9 @@ $block: "contact-card";
     overflow: hidden;
     border: 1px solid rgba(75, 85, 99, 0.6);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    transition:
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
 
     --color-text: #d1d5db;
     --color-heading: #ffffff;

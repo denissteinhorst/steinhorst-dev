@@ -1,22 +1,22 @@
 <script setup lang="ts">
-const { cmsRequest, currentLocaleString } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi()
 
 const { data, pending, error } = await useLazyAsyncData<HeroSectionResponse>(
   `hero-section-${currentLocaleString.value}`,
   () =>
-    cmsRequest<HeroSectionResponse>("hero-section", [
-      "titleBefore",
-      "emphasis",
-      "titleAfter",
-      "text",
-      "jumpmark",
-      "image",
-      "heroTags",
-      "heroLinks",
-    ])
-);
+    cmsRequest<HeroSectionResponse>('hero-section', [
+      'titleBefore',
+      'emphasis',
+      'titleAfter',
+      'text',
+      'jumpmark',
+      'image',
+      'heroTags',
+      'heroLinks',
+    ]),
+)
 
-const text = computed<RichTextNodes>(() => data.value?.text ?? []);
+const text = computed<RichTextNodes>(() => data.value?.text ?? [])
 </script>
 
 <template>
@@ -28,12 +28,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
     <section class="hero-section">Failed to load hero-section.</section>
   </template>
 
-  <section
-    v-else-if="data"
-    :id="data.jumpmark"
-    class="hero-section"
-    aria-labelledby="hero-heading"
-  >
+  <section v-else-if="data" :id="data.jumpmark" class="hero-section" aria-labelledby="hero-heading">
     <!-- Background Elements -->
     <div class="hero-section-bg" aria-hidden="true">
       <div class="hero-section-bg-blur" :class="{ loaded: !pending }"></div>
@@ -65,11 +60,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
           <!-- Desktop Actions -->
           <div class="hero-section-actions desktop-only">
             <ul class="hero-section-tags" aria-label="Highlights">
-              <li
-                v-for="heroTag in data.heroTags || []"
-                :key="heroTag.id"
-                class="hero-section-tag"
-              >
+              <li v-for="heroTag in data.heroTags || []" :key="heroTag.id" class="hero-section-tag">
                 <span>{{ heroTag.text }}</span>
               </li>
             </ul>
@@ -86,11 +77,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
                   size="md"
                   class="hero-section-cta"
                 >
-                  <UIcon
-                    v-if="heroLink.icon"
-                    :name="heroLink.icon"
-                    class="hero-section-icon"
-                  />
+                  <UIcon v-if="heroLink.icon" :name="heroLink.icon" class="hero-section-icon" />
                   {{ heroLink.text }}
                 </UButton>
 
@@ -107,13 +94,8 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
                       rel="noopener noreferrer"
                       class="hero-section-link"
                     >
-                      <UIcon
-                        :name="heroLink.icon || 'i-lucide-mail'"
-                        class="hero-section-icon"
-                      />
-                      <span class="hero-section-link-text">{{
-                        heroLink.text
-                      }}</span>
+                      <UIcon :name="heroLink.icon || 'i-lucide-mail'" class="hero-section-icon" />
+                      <span class="hero-section-link-text">{{ heroLink.text }}</span>
                     </a>
                   </UTooltip>
                   <a
@@ -123,13 +105,8 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
                     rel="noopener noreferrer"
                     class="hero-section-link"
                   >
-                    <UIcon
-                      :name="heroLink.icon || 'i-lucide-mail'"
-                      class="hero-section-icon"
-                    />
-                    <span class="hero-section-link-text">{{
-                      heroLink.text
-                    }}</span>
+                    <UIcon :name="heroLink.icon || 'i-lucide-mail'" class="hero-section-icon" />
+                    <span class="hero-section-link-text">{{ heroLink.text }}</span>
                   </a>
                 </template>
               </template>
@@ -175,11 +152,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
         <!-- Mobile Actions -->
         <div class="hero-section-actions mobile-only">
           <ul class="hero-section-tags" aria-label="Highlights">
-            <li
-              v-for="heroTag in data.heroTags || []"
-              :key="heroTag.id"
-              class="hero-section-tag"
-            >
+            <li v-for="heroTag in data.heroTags || []" :key="heroTag.id" class="hero-section-tag">
               <span>{{ heroTag.text }}</span>
             </li>
           </ul>
@@ -196,11 +169,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
                 size="md"
                 class="hero-section-cta"
               >
-                <UIcon
-                  v-if="heroLink.icon"
-                  :name="heroLink.icon"
-                  class="hero-section-icon"
-                />
+                <UIcon v-if="heroLink.icon" :name="heroLink.icon" class="hero-section-icon" />
                 {{ heroLink.text }}
               </UButton>
 
@@ -217,13 +186,8 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
                     rel="noopener noreferrer"
                     class="hero-section-link"
                   >
-                    <UIcon
-                      :name="heroLink.icon || 'i-lucide-mail'"
-                      class="hero-section-icon"
-                    />
-                    <span class="hero-section-link-text">{{
-                      heroLink.text
-                    }}</span>
+                    <UIcon :name="heroLink.icon || 'i-lucide-mail'" class="hero-section-icon" />
+                    <span class="hero-section-link-text">{{ heroLink.text }}</span>
                   </a>
                 </UTooltip>
                 <a
@@ -233,13 +197,8 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
                   rel="noopener noreferrer"
                   class="hero-section-link"
                 >
-                  <UIcon
-                    :name="heroLink.icon || 'i-lucide-mail'"
-                    class="hero-section-icon"
-                  />
-                  <span class="hero-section-link-text">{{
-                    heroLink.text
-                  }}</span>
+                  <UIcon :name="heroLink.icon || 'i-lucide-mail'" class="hero-section-icon" />
+                  <span class="hero-section-link-text">{{ heroLink.text }}</span>
                 </a>
               </template>
             </template>
@@ -251,7 +210,7 @@ const text = computed<RichTextNodes>(() => data.value?.text ?? []);
 </template>
 
 <style scoped lang="scss">
-$block: "hero-section";
+$block: 'hero-section';
 
 .#{$block} {
   position: relative;
@@ -299,7 +258,7 @@ $block: "hero-section";
     &-blur {
       position: absolute;
       inset: 0;
-      background-image: url("/images/hero_image.webp");
+      background-image: url('/images/hero_image.webp');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -318,28 +277,21 @@ $block: "hero-section";
     &-noise {
       position: absolute;
       inset: 0;
-      background-image: radial-gradient(
-          circle at 20% 30%,
-          rgba(255, 255, 255, 0.015) 1px,
-          transparent 1px
-        ),
-        radial-gradient(
-          circle at 80% 70%,
-          rgba(255, 255, 255, 0.01) 1px,
-          transparent 1px
-        ),
-        radial-gradient(
-          circle at 40% 80%,
-          rgba(255, 255, 255, 0.008) 1px,
-          transparent 1px
-        ),
-        radial-gradient(
-          circle at 60% 20%,
-          rgba(255, 255, 255, 0.012) 1px,
-          transparent 1px
-        );
-      background-size: 3px 3px, 5px 5px, 2px 2px, 4px 4px;
-      background-position: 0 0, 1px 2px, 3px 1px, 2px 3px;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+        radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.008) 1px, transparent 1px),
+        radial-gradient(circle at 60% 20%, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+      background-size:
+        3px 3px,
+        5px 5px,
+        2px 2px,
+        4px 4px;
+      background-position:
+        0 0,
+        1px 2px,
+        3px 1px,
+        2px 3px;
       opacity: 1;
       z-index: 2;
       mix-blend-mode: overlay;

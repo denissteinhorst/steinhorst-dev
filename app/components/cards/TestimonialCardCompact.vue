@@ -1,33 +1,29 @@
 <script setup lang="ts">
 const props = defineProps<{
-  data: RecommendationCard;
-  isActive?: boolean;
-}>();
+  data: RecommendationCard
+  isActive?: boolean
+}>()
 
 const emit = defineEmits<{
-  click: [];
-}>();
+  click: []
+}>()
 
-const { generateComponentId } = useIdGenerator();
+const { generateComponentId } = useIdGenerator()
 
 const cardId = computed(() =>
-  generateComponentId(
-    "testimonial",
-    props.data.author || "testimonial",
-    props.data.id || 0
-  )
-);
+  generateComponentId('testimonial', props.data.author || 'testimonial', props.data.id || 0),
+)
 
 const handleClick = () => {
-  emit("click");
-};
+  emit('click')
+}
 
 const handleKeydown = (event: KeyboardEvent) => {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    emit("click");
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault()
+    emit('click')
   }
-};
+}
 </script>
 
 <template>
@@ -64,7 +60,7 @@ const handleKeydown = (event: KeyboardEvent) => {
 </template>
 
 <style scoped lang="scss">
-$block: "testimonial-card-compact";
+$block: 'testimonial-card-compact';
 
 .#{$block} {
   transition: all 0.15s ease-in-out;

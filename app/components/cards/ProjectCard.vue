@@ -1,29 +1,25 @@
 <script setup lang="ts">
-const props = defineProps<{ data: ProjectCard }>();
+const props = defineProps<{ data: ProjectCard }>()
 
-const { buildImageUrl } = useStrapi();
-const { generateComponentId } = useIdGenerator();
+const { buildImageUrl } = useStrapi()
+const { generateComponentId } = useIdGenerator()
 
 const cardId = computed(() =>
-  generateComponentId(
-    "project",
-    props.data.title || "project",
-    props.data.id || 0
-  )
-);
+  generateComponentId('project', props.data.title || 'project', props.data.id || 0),
+)
 
 // extract Tags from RichText (one tag per line)
 const extractTextFromRichText = (block: RichTextBlock): string => {
   if (block.text) {
-    return block.text;
+    return block.text
   }
   if (block.children?.length) {
     return block.children
       .map((child: RichTextBlock): string => extractTextFromRichText(child))
-      .join("");
+      .join('')
   }
-  return "";
-};
+  return ''
+}
 </script>
 
 <template>
@@ -36,18 +32,13 @@ const extractTextFromRichText = (block: RichTextBlock): string => {
             format="webp"
             quality="80"
             :src="buildImageUrl(data.logo)!"
-            :alt="
-              data.logo.alternativeText || `${data.title} – ${data.company}`
-            "
+            :alt="data.logo.alternativeText || `${data.title} – ${data.company}`"
             class="project-card__image"
             loading="lazy"
             decoding="async"
           />
           <div v-else class="project-card__image-placeholder">
-            <UIcon
-              name="i-lucide-image"
-              class="project-card__placeholder-icon"
-            />
+            <UIcon name="i-lucide-image" class="project-card__placeholder-icon" />
           </div>
         </div>
         <div class="project-card__content">
@@ -61,22 +52,9 @@ const extractTextFromRichText = (block: RichTextBlock): string => {
       </div>
 
       <div class="project-card__footer">
-        <ul
-          v-if="data.tagList?.length"
-          class="project-card__tags"
-          aria-label="Tech Stack"
-        >
-          <li
-            v-for="(tag, index) in data.tagList"
-            :key="index"
-            class="project-card__tag"
-          >
-            <UBadge
-              size="sm"
-              color="neutral"
-              variant="outline"
-              class="project-card__badge"
-            >
+        <ul v-if="data.tagList?.length" class="project-card__tags" aria-label="Tech Stack">
+          <li v-for="(tag, index) in data.tagList" :key="index" class="project-card__tag">
+            <UBadge size="sm" color="neutral" variant="outline" class="project-card__badge">
               {{ extractTextFromRichText(tag) }}
             </UBadge>
           </li>
@@ -84,7 +62,7 @@ const extractTextFromRichText = (block: RichTextBlock): string => {
 
         <div class="project-card__meta">
           <p class="project-card__company">
-            {{ data.referral || "Im Rahmen meiner Tätigkeit bei" }}:&nbsp;
+            {{ data.referral || 'Im Rahmen meiner Tätigkeit bei' }}:&nbsp;
             <span class="project-card__company-name">{{ data.company }}</span>
           </p>
           <NuxtLink
@@ -111,7 +89,7 @@ const extractTextFromRichText = (block: RichTextBlock): string => {
 </template>
 
 <style scoped lang="scss">
-$block: "project-card";
+$block: 'project-card';
 
 .#{$block} {
   height: 100%;
@@ -324,12 +302,7 @@ $block: "project-card";
     inset-inline: 0;
     bottom: 0;
     height: 1px;
-    background: linear-gradient(
-      to right,
-      transparent,
-      rgb(59 130 246 / 0.4),
-      transparent
-    );
+    background: linear-gradient(to right, transparent, rgb(59 130 246 / 0.4), transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
   }

@@ -1,22 +1,20 @@
 <script setup lang="ts">
-const { cmsRequest } = useStrapi();
+const { cmsRequest } = useStrapi()
 
 definePageMeta({
   // Signal the layout to hide the ambient background on this route
   ambient: false,
-});
+})
 
-const { data, pending, error } = await useLazyAsyncData<ImprintSectionResponse>(
-  "imprint",
-  () =>
-    cmsRequest<ImprintSectionResponse>(
-      "imprint-section",
-      ["title", "text", "noticeTitle", "noticeText"],
-      false
-    )
-);
+const { data, pending, error } = await useLazyAsyncData<ImprintSectionResponse>('imprint', () =>
+  cmsRequest<ImprintSectionResponse>(
+    'imprint-section',
+    ['title', 'text', 'noticeTitle', 'noticeText'],
+    false,
+  ),
+)
 
-const imprintText = computed<RichTextNodes>(() => data.value?.text ?? []);
+const imprintText = computed<RichTextNodes>(() => data.value?.text ?? [])
 </script>
 
 <template>
@@ -38,10 +36,7 @@ const imprintText = computed<RichTextNodes>(() => data.value?.text ?? []);
         class="imprint-section__alert"
         color="neutral"
         variant="subtle"
-        :title="
-          data.noticeTitle ||
-          'Hinweis zur Rechtssicherheit / Note on Legal Validity'
-        "
+        :title="data.noticeTitle || 'Hinweis zur Rechtssicherheit / Note on Legal Validity'"
         :description="data.noticeText || ''"
         icon="i-lucide-info"
       />
@@ -56,7 +51,7 @@ const imprintText = computed<RichTextNodes>(() => data.value?.text ?? []);
 </template>
 
 <style scoped lang="scss">
-$block: "imprint-section";
+$block: 'imprint-section';
 
 .#{$block} {
   padding: 2rem 0;

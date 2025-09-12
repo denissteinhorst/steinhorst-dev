@@ -72,9 +72,8 @@ export const useScrollHashes = (options: ScrollHashesOptions = {}) => {
       }
 
       const rootHeight = entry.rootBounds?.height ?? window.innerHeight
-      const viewportRatio = rootHeight > 0
-        ? Math.min(1, Math.max(0, entry.intersectionRect.height / rootHeight))
-        : 0
+      const viewportRatio =
+        rootHeight > 0 ? Math.min(1, Math.max(0, entry.intersectionRect.height / rootHeight)) : 0
 
       visibilityRatios.set(entry.target, viewportRatio)
     }
@@ -92,8 +91,9 @@ export const useScrollHashes = (options: ScrollHashesOptions = {}) => {
   const observeElements = (): void => {
     if (!import.meta.client) return
 
-    const queriedElements = Array.from(document.querySelectorAll(selector))
-      .filter((element): element is HTMLElement => element instanceof HTMLElement)
+    const queriedElements = Array.from(document.querySelectorAll(selector)).filter(
+      (element): element is HTMLElement => element instanceof HTMLElement,
+    )
 
     elements.value = queriedElements
     if (!elements.value.length) return
@@ -101,14 +101,10 @@ export const useScrollHashes = (options: ScrollHashesOptions = {}) => {
     intersectionObserverStop?.()
     visibilityRatios.clear()
 
-    const { stop } = useIntersectionObserver(
-      () => elements.value,
-      handleIntersectionEntries,
-      {
-        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
-        rootMargin,
-      }
-    )
+    const { stop } = useIntersectionObserver(() => elements.value, handleIntersectionEntries, {
+      threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+      rootMargin,
+    })
 
     intersectionObserverStop = stop
 
@@ -148,7 +144,7 @@ export const useScrollHashes = (options: ScrollHashesOptions = {}) => {
         if (import.meta.client) {
           nextTick(() => observeElements())
         }
-      }
+      },
     )
   }
 

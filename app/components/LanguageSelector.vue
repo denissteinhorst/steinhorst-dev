@@ -1,22 +1,20 @@
 <script setup lang="ts">
-const { $t, $switchLocale, $getLocale } = useI18n();
+const { $t, $switchLocale, $getLocale } = useI18n()
 
 // Locale switching logic
-const currentLocale = computed<string>(() => $getLocale());
-const targetLocale = computed<string>(() =>
-  currentLocale.value === "de" ? "en" : "de"
-);
+const currentLocale = computed<string>(() => $getLocale())
+const targetLocale = computed<string>(() => (currentLocale.value === 'de' ? 'en' : 'de'))
 
 const switchLocale = (): void => {
-  $switchLocale(targetLocale.value);
-};
+  $switchLocale(targetLocale.value)
+}
 
 const localeSwitchTooltip = computed<string>(
   () =>
-    `${$t("language_switcher.label")} ${$t("language_switcher.to")} ${$t(
-      `language_switcher.${targetLocale.value}`
-    )}`
-);
+    `${$t('language_switcher.label')} ${$t('language_switcher.to')} ${$t(
+      `language_switcher.${targetLocale.value}`,
+    )}`,
+)
 </script>
 
 <template>
@@ -33,17 +31,14 @@ const localeSwitchTooltip = computed<string>(
         :aria-label="localeSwitchTooltip"
         @click="switchLocale()"
       >
-        <UIcon
-          name="i-heroicons-language-20-solid"
-          class="language-selector__icon"
-        />
+        <UIcon name="i-heroicons-language-20-solid" class="language-selector__icon" />
       </button>
     </UTooltip>
   </div>
 </template>
 
 <style scoped lang="scss">
-$block: "language-selector";
+$block: 'language-selector';
 
 .#{$block} {
   &__button {

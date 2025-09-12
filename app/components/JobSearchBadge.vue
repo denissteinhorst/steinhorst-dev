@@ -1,10 +1,10 @@
 <script setup lang="ts">
-const { cmsRequest, currentLocaleString } = useStrapi();
+const { cmsRequest, currentLocaleString } = useStrapi()
 
 const { data, pending, error } = await useLazyAsyncData<JobBadgeResponse>(
   () => `badge-${currentLocaleString.value}`,
-  () => cmsRequest<JobBadgeResponse>("job-badge", [])
-);
+  () => cmsRequest<JobBadgeResponse>('job-badge', []),
+)
 </script>
 
 <template>
@@ -23,7 +23,7 @@ const { data, pending, error } = await useLazyAsyncData<JobBadgeResponse>(
 </template>
 
 <style scoped lang="scss">
-$block: "job-search-badge";
+$block: 'job-search-badge';
 
 .#{$block} {
   display: inline-flex;
@@ -32,8 +32,8 @@ $block: "job-search-badge";
   padding: 0.375rem 0.75rem;
   border-radius: 9999px;
   border: 1px solid color-mix(in srgb, var(--color-secondary) 40%, transparent);
-  box-shadow: 0 0 0 1px
-      color-mix(in srgb, var(--color-secondary) 30%, transparent),
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--color-secondary) 30%, transparent),
     0 1px 2px 0 rgb(0 0 0 / 0.05);
 
   background-color: rgb(17 24 39 / 0.55);

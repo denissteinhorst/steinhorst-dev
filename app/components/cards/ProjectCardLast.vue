@@ -1,13 +1,9 @@
 <script setup lang="ts">
-defineProps<{ data: LastProjectCard }>();
+defineProps<{ data: LastProjectCard }>()
 </script>
 
 <template>
-  <BaseCard
-    class="project-card-last"
-    role="listitem"
-    aria-labelledby="manual-projects-heading"
-  >
+  <BaseCard class="project-card-last" role="listitem" aria-labelledby="manual-projects-heading">
     <div class="project-card-last__header">
       <h3 id="manual-projects-heading" class="project-card-last__title">
         {{ data.title }}
@@ -17,11 +13,7 @@ defineProps<{ data: LastProjectCard }>();
       </p>
     </div>
     <ul class="project-card-last__items" aria-label="Weitere Projekte Liste">
-      <li
-        v-for="item in data.content?.items"
-        :key="item.name"
-        class="project-card-last__item"
-      >
+      <li v-for="item in data.content?.items" :key="item.name" class="project-card-last__item">
         <span class="project-card-last__item-icon" aria-hidden="true">
           <UIcon name="i-lucide-star" />
         </span>
@@ -34,7 +26,7 @@ defineProps<{ data: LastProjectCard }>();
 </template>
 
 <style scoped lang="scss">
-$block: "project-card-last";
+$block: 'project-card-last';
 
 .#{$block} {
   &__header {

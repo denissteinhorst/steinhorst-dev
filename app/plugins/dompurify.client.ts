@@ -1,14 +1,14 @@
-import DOMPurify from 'dompurify';
+import DOMPurify from 'dompurify'
 
 interface SanitizeOptions {
-  ALLOWED_TAGS?: string[];
-  ALLOWED_ATTR?: string[];
-  [key: string]: unknown;
+  ALLOWED_TAGS?: string[]
+  ALLOWED_ATTR?: string[]
+  [key: string]: unknown
 }
 
 declare module '#app' {
   interface NuxtApp {
-    $sanitizeHtml: (html: string, options?: SanitizeOptions) => string;
+    $sanitizeHtml: (html: string, options?: SanitizeOptions) => string
   }
 }
 
@@ -18,11 +18,11 @@ export default defineNuxtPlugin(() => {
       sanitizeHtml: (html: string, options?: SanitizeOptions): string => {
         const defaultConfig: SanitizeOptions = {
           ALLOWED_TAGS: ['strong', 'em', 'span', 'b', 'i'],
-          ALLOWED_ATTR: ['class']
-        };
+          ALLOWED_ATTR: ['class'],
+        }
 
-        return DOMPurify.sanitize(html, { ...defaultConfig, ...options }) as unknown as string;
-      }
-    }
-  };
-});
+        return DOMPurify.sanitize(html, { ...defaultConfig, ...options }) as unknown as string
+      },
+    },
+  }
+})
