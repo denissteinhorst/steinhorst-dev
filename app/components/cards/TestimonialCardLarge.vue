@@ -200,7 +200,7 @@ const languageToggleText = computed((): string => {
 $block: "testimonial-card-large";
 
 .#{$block} {
-  height: 807px;
+  height: 872px;
 
   &__container {
     display: grid;
