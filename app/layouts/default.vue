@@ -39,7 +39,6 @@ watch(
     <NuxtRouteAnnouncer />
     <div class="layout-root">
       <NavigationSection />
-      <!-- Ambient background (starts after hero/first viewport) -->
       <div
         v-if="showAmbient"
         ref="ambientBackground"
@@ -59,34 +58,26 @@ watch(
 @import 'tailwindcss';
 @import '@nuxt/ui';
 
-/* Sticky footer layout */
 .layout-root {
-  min-height: 100vh;
-  min-height: 100dvh; /* modern viewport units for mobile */
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   position: relative;
-  /* Ensure stacking context so negative z-index child stays behind */
   isolation: isolate;
 }
 
 .layout-root > main {
-  flex: 1 0 auto; /* take remaining space so footer sits at bottom */
+  flex: 1 0 auto;
 }
 
-/* Ambient background effect */
-/* Ambient background now spans whole page; we use a vertical gradient so the area behind the hero stays softly translucent
-   and only solidifies further down, removing the hard cut after the hero. */
 .ambient-background {
   position: absolute;
-  top: 0; /* cover from very top to allow a gradual blend */
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: -1;
   pointer-events: none;
-  /* Layer 1: vertical luminance ramp (transparent near top so hero's own gradients show through)
-     Stops chosen so by ~55vh it begins darkening, reaching full #181818 after ~110vh. Adjust vh stops to taste. */
   background: linear-gradient(
     to bottom,
     rgba(24, 24, 24, 0) 0%,
@@ -100,7 +91,6 @@ watch(
   transition: background 0.5s ease-in-out;
 }
 
-/* Use pseudo elements so we can layer glows + subtle noise separately for compositing control */
 .ambient-background::before,
 .ambient-background::after {
   content: '';
@@ -109,21 +99,18 @@ watch(
   pointer-events: none;
 }
 
-/* Soft multi‑glow layer (very low opacity). Large blurred radial gradients animated slowly. */
 .ambient-background::before {
-  /* Multiple radial gradients with transparent falloff */
   background:
     radial-gradient(circle at 20% 35%, rgba(96, 140, 255, 0.12), transparent 60%),
     radial-gradient(circle at 78% 65%, rgba(255, 110, 150, 0.1), transparent 65%),
     radial-gradient(circle at 55% 80%, rgba(120, 255, 210, 0.08), transparent 55%),
     radial-gradient(circle at 35% 60%, rgba(255, 230, 140, 0.05), transparent 60%);
   filter: blur(60px) saturate(140%);
-  mix-blend-mode: screen; /* Keeps it subtle over dark base */
+  mix-blend-mode: screen;
   animation: ambient-shift-1 110s linear infinite alternate;
   opacity: 0.65;
 }
 
-/* Subtle secondary motion / parallax using another gentle gradient veil + dither noise */
 .ambient-background::after {
   background:
     radial-gradient(circle at 60% 40%, rgba(255, 255, 255, 0.04), transparent 70%),
@@ -136,7 +123,6 @@ watch(
   animation: ambient-shift-2 300s ease-in-out infinite alternate;
 }
 
-/* Light mode variant of the ambient background */
 .ambient-background-light {
   background: linear-gradient(
     to bottom,
@@ -174,7 +160,6 @@ watch(
   animation: ambient-shift-2 300s ease-in-out infinite alternate;
 }
 
-/* Keyframes: translate backgrounds subtly, no large movements to avoid distraction */
 @keyframes ambient-shift-1 {
   0% {
     transform: translate3d(0, 0, 0) scale(1);
@@ -196,7 +181,6 @@ watch(
   }
 }
 
-/* Reduced motion preference: keep static glows without animation */
 @media (prefers-reduced-motion: reduce) {
   .ambient-background::before,
   .ambient-background::after {
@@ -204,41 +188,12 @@ watch(
   }
 }
 
-/* Responsive tweaks (optional) - on very small screens reduce blur radius to save resources */
 @media (max-width: 640px) {
   .ambient-background::before {
     filter: blur(48px);
   }
   .ambient-background::after {
     filter: blur(32px);
-  }
-}
-
-/* ------------------------------------------------------------ */
-/* In‑page anchor smooth scrolling + offset for sticky header   */
-/* ------------------------------------------------------------ */
-/* Enable native smooth scrolling for hash / programmatic scroll */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Respect reduced motion preference */
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-}
-
-/* Provide top offset so target sections aren't hidden under the sticky header */
-/* Targets any section with an id (our main content blocks) */
-section[id] {
-  scroll-margin-top: 5.5rem; /* ~88px for mobile (header ~56px + breathing room) */
-}
-
-@media (min-width: 1024px) {
-  /* lg breakpoint (Tailwind default) */
-  section[id] {
-    scroll-margin-top: 6.5rem; /* a bit more room on large screens */
   }
 }
 </style>
