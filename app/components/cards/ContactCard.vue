@@ -103,6 +103,8 @@ $block: "contact-card";
   display: flex;
   align-items: stretch;
 
+  --color-primary: #854dff;
+
   @media (max-width: 768px) {
     height: 280px;
   }
@@ -227,8 +229,9 @@ $block: "contact-card";
     :deep() {
       width: 100% !important;
       justify-content: center !important;
-
-      color: #ffffff !important;
+      font-weight: 700;
+      background-color: var(--color-primary);
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 1);
 
       .bg-gray-50 {
         background-color: #374151 !important;
