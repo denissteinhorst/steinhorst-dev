@@ -1,4 +1,6 @@
 <script setup lang="ts">
+/* eslint-disable vue/no-v-html */
+
 /**
  * Option type for project count dropdown
  */

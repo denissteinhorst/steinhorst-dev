@@ -9,19 +9,6 @@ export type TextAlignment = 'left' | 'center' | 'right';
 
 /** Renderer-ready rich text node list (from nuxt-strapi-blocks-renderer). */
 export type RichTextNodes = BlockNode[];
-/** Query shape accepted by the request proxy endpoint. */
-export interface RequestProxyQuery {
-  endpoint: string;
-  fields?: string[];
-  locale?: string;
-  isCollection?: boolean;
-}
-
-/** Raw Strapi response wrapper shape (before our proxy unwraps .data). */
-export interface StrapiRawResponse<T = unknown> {
-  data?: T;
-  [key: string]: unknown;
-}
 
 /** ISO-8601 timestamp string, e.g. "2025-08-20T05:33:11.824Z" */
 export type ISODateString = string;
@@ -76,6 +63,8 @@ export interface NavigationResponse
 }
 
 // Reusable Strapi image shapes (matches common Strapi media object)
+
+/** Image format metadata for different sizes (thumbnail, small, medium, large). */
 export interface StrapiImageFormat {
   ext?: string | null;
   url?: string;
@@ -89,8 +78,10 @@ export interface StrapiImageFormat {
   sizeInBytes?: number;
 }
 
+/** Collection of image formats keyed by size name (e.g., 'thumbnail', 'small'). */
 export type StrapiImageFormats = Record<string, StrapiImageFormat | undefined> | undefined;
 
+/** Complete Strapi media object containing image metadata and format variants. */
 export interface StrapiImage {
   id?: number;
   documentId?: string;
@@ -114,13 +105,17 @@ export interface StrapiImage {
 }
 
 // Hero section specific types (all fields optional by request)
+
+/** Individual tag/badge displayed in the hero section. */
 export interface HeroTag {
   id?: number;
   text?: string;
 }
 
+/** Type of hero link for styling and behavior differentiation. */
 export type HeroLinkType = 'button' | 'anchor' | string;
 
+/** Interactive link/button element in the hero section. */
 export interface HeroLink {
   id?: number;
   type?: HeroLinkType;
@@ -146,17 +141,21 @@ export interface HeroSectionResponse extends BaseResponse<HeroSectionResponse> {
 }
 
 // Skills section specific types
+
+/** Individual skill item within a skill category. */
 export interface SkillItem {
   id?: number;
   title?: string;
 }
 
+/** Skill category card containing multiple skill items. */
 export interface SkillCard {
   id?: number;
   title?: string;
   skillItems?: SkillItem[];
 }
 
+/** Interactive filter component for skill search functionality. */
 export interface QuickFilter {
   id?: number;
   toggle?: string;
@@ -185,6 +184,8 @@ export interface SkillSectionResponse extends BaseResponse<SkillSectionResponse>
 }
 
 // Personality section specific types
+
+/** Chart type variant for personality cards (polar or bar chart). */
 export type PersonalityCardVariant = 'polarChart' | 'barChart' | string;
 
 /** Rich text content block structure from CMS */
@@ -195,6 +196,7 @@ export interface RichTextBlock {
   text?: string;
 }
 
+/** Tooltip data for polar chart segments in personality assessment. */
 export interface PolarChartTooltip {
   id: number;
   title: string;
@@ -202,6 +204,7 @@ export interface PolarChartTooltip {
   percentage: number;
 }
 
+/** Tooltip data for bar chart comparisons in personality assessment. */
 export interface BarChartTooltip {
   id: number;
   title: string;
@@ -212,6 +215,7 @@ export interface BarChartTooltip {
   outerValue: number;
 }
 
+/** Personality assessment card with chart data and tooltips. */
 export interface PersonalityCard {
   id?: number;
   title?: string;
@@ -426,6 +430,7 @@ export interface ContactSectionResponse extends BaseResponse<ContactSectionRespo
   contactCards?: ContactCard[];
 }
 
+// Imprint section specific types
 
 /**
  * Imprint section payload. Everything is optional to match flexible CMS responses.
@@ -439,6 +444,7 @@ export interface ImprintSectionResponse extends BaseResponse<ImprintSectionRespo
 }
 
 // AI Summary types
+
 /**
  * AI Summary payload returned by the CMS.
  * Mirrors common base fields and adds subtitle, summary and createdAt.
@@ -448,6 +454,8 @@ export interface AiSummaryResponse extends BaseResponse<AiSummaryResponse> {
   summary?: string;
   createdAt?: ISODateString;
 }
+
+// Leave Notification types
 
 /**
  * Leave Notification payload returned by the CMS.

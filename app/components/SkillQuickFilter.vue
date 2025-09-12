@@ -1,4 +1,6 @@
 <script setup lang="ts">
+/* eslint-disable vue/no-v-html */
+
 interface Props {
   quickFilter?: QuickFilter;
   skillCards?: SkillCard[];
