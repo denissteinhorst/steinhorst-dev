@@ -88,7 +88,8 @@
   },
   "footer_section": {
     "copyright": "All rights reserved.",
-    "imprint": "Imprint"
+    "imprint": "Imprint",
+    "source_code": "Sourcecode / Work sample"
   },
   "a11y_helper": {
     "skip_current_section": "Skip {section}",

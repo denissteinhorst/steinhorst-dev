@@ -87,7 +87,8 @@
   },
   "footer_section": {
     "copyright": "Alle Rechte vorbehalten.",
-    "imprint": "Impressum"
+    "imprint": "Impressum",
+    "source_code": "Quellcode / Arbeitsprobe"
   },
   "a11y_helper": {
     "skip_current_section": "{section} überspringen",

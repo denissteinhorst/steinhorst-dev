@@ -13,6 +13,15 @@ const currentYear = new Date().getFullYear()
           {{ t('footer_section.copyright') }}
         </p>
         <div class="footer-section__links">
+          <a
+            href="https://github.com/denissteinhorst/steinhorst-dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="footer-section__link"
+          >
+            {{ t('footer_section.source_code') }}
+          </a>
+          |
           <NuxtLink to="/imprint" class="footer-section__link">
             {{ t('footer_section.imprint') }}
           </NuxtLink>
