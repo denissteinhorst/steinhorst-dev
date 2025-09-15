@@ -1,16 +1,10 @@
 <a name="readme-top"></a>
 
-<h1 align="center">Denis Steinhorst – Portfolio <br/><br/>Personal Website & Developer Portfolio</h1>
+<h1 align="center">Personal Website & Developer Portfolio</h1>
 
 <div align="center">
-  <br>
-  <a>
-    <img src="public/logo-magnify.svg" alt="Denis Steinhorst Logo" height="64">
-  </a>
-  <br>
-  <br>
-  <p>- A modern, multilingual portfolio showcasing fullstack development expertise -</p>
-  <h1 align="center">&nbsp;</h1>
+  <p>- my multilingual portfolio showcasing some of my development expertise -</p>
+  <h5 align="center">&nbsp;</h5>
 </div>
 
 ## About The Project
@@ -67,7 +61,6 @@ This project leverages modern technologies for optimal performance and developer
 **Development & Quality:**
 
 - [@nuxt/eslint](https://eslint.nuxt.com/) - ESLint configuration for Nuxt
-- [Cypress](https://www.cypress.io/) - End-to-end testing framework
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -184,31 +177,108 @@ The portfolio content is managed through a Strapi CMS instance. The application 
 
 ## Project Structure
 
+<details>
+<summary>Click here to expand the Project Structure</summary>
+
 ```text
 steinhorst-dev/
-├── app/                      # Nuxt 4 app directory
-│   ├── app.vue              # Main app component
-│   ├── assets/              # Processed assets (SCSS)
+├── .github/
+│   └── copilot-instructions.md  # GitHub Copilot coding guidelines and conventions
+├── app/                        # Nuxt 4 application source code directory
+│   ├── app.config.ts           # App-level configuration for UI colors and themes
+│   ├── assets/                 # Processed assets (SCSS, images used by Vite)
 │   │   └── scss/
-│   │       ├── app.scss     # Global styles
-│   │       └── theme.scss   # Theme variables
-│   ├── components/          # Vue components
-│   │   ├── cards/           # Card components
-│   │   ├── sections/        # Page section components
-│   │   └── *.vue            # Utility components
-│   ├── composables/         # Vue composables
-│   │   ├── usePdfEasy.ts    # PDF generation
-│   │   ├── useStrapi.ts     # CMS data fetching
-│   │   └── *.ts             # Other utilities
-│   ├── layouts/             # Layout components
-│   ├── pages/               # Route pages
-│   ├── plugins/             # Nuxt plugins
-│   ├── server/              # Server-side code
-│   └── types/               # TypeScript definitions
-├── locales/                 # Internationalization files
-├── public/                  # Static assets
-└── nuxt.config.ts          # Nuxt configuration
+│   │       ├── app.scss        # Global SCSS styles and imports
+│   │       └── theme.scss      # Theme-specific styling variables and mixins
+│   ├── components/             # Reusable Vue 3 components (PascalCase SFCs)
+│   │   ├── A11yHelper.vue      # Accessibility helper component for screen readers
+│   │   ├── AiSummary.vue       # AI-generated content summary display component
+│   │   ├── BaseCard.vue        # Base card component with consistent styling
+│   │   ├── ColorSelector.vue   # Theme color selection component
+│   │   ├── JobSearchBadge.vue  # Job availability status badge component
+│   │   ├── LanguageSelector.vue # Language switching component for i18n
+│   │   ├── LeaveNotification.vue # User leave intent notification component
+│   │   ├── ProjectFilter.vue   # Project filtering and search functionality
+│   │   ├── ScrollCompanion.vue # Scroll-based navigation and progress indicator
+│   │   ├── SectionWrapper.vue  # Common wrapper component for page sections
+│   │   ├── SkillQuickFilter.vue # Quick filtering component for skills display
+│   │   ├── cards/              # Specialized card components for different content types
+│   │   │   ├── BarchartCard.vue        # Bar chart visualization card component
+│   │   │   ├── CertificateCard.vue     # Professional certificate display card
+│   │   │   ├── ContactCard.vue         # Contact information display card
+│   │   │   ├── ExperienceCard.vue      # Work experience timeline card
+│   │   │   ├── PolarchartCard.vue      # Polar chart visualization card component
+│   │   │   ├── ProjectCard.vue         # Individual project showcase card
+│   │   │   ├── ProjectCardLast.vue     # Special "see more" project card variant
+│   │   │   ├── SkillCard.vue           # Individual skill display card
+│   │   │   ├── TestimonialCardCompact.vue # Compact testimonial display card
+│   │   │   └── TestimonialCardLarge.vue   # Full-featured testimonial display card
+│   │   └── sections/           # Page section components for layout organization
+│   │       ├── CertificateSection.vue  # Professional certifications section
+│   │       ├── ContactSection.vue      # Contact form and information section
+│   │       ├── ExperienceSection.vue   # Work experience timeline section
+│   │       ├── FaqSection.vue          # Frequently asked questions section
+│   │       ├── FooterSection.vue       # Site footer with links and info
+│   │       ├── HeroSection.vue         # Main landing page hero section
+│   │       ├── NavigationSection.vue   # Site navigation header component
+│   │       ├── PersonalitySection.vue  # Personal traits and characteristics section
+│   │       ├── ProjectSection.vue      # Project portfolio showcase section
+│   │       ├── SkillSection.vue        # Technical skills display section
+│   │       └── TestimonialSection.vue  # Client testimonials and references section
+│   ├── composables/            # Vue 3 Composition API reusable logic
+│   │   ├── useFocusHelper.ts   # Focus management and accessibility utilities
+│   │   ├── useIdGenerator.ts   # Unique ID generation for components
+│   │   ├── usePdfEasy.ts       # PDF generation and download functionality
+│   │   ├── usePdfEasyFormatter.ts # PDF content formatting utilities
+│   │   ├── useScrollHashes.ts  # URL hash-based scroll navigation
+│   │   ├── useSkillSearch.ts   # Skill filtering and search functionality
+│   │   └── useStrapi.ts        # Strapi CMS data fetching and caching
+│   ├── layouts/                # Page layout components
+│   │   └── default.vue         # Default layout template for all pages
+│   ├── pages/                  # File-based routing pages (auto-generated routes)
+│   │   ├── imprint.vue         # Legal imprint and privacy policy page
+│   │   └── index.vue           # Main portfolio homepage
+│   ├── plugins/                # Nuxt plugins for client-side functionality
+│   │   ├── chartjs.client.ts   # Chart.js setup and configuration plugin
+│   │   ├── dompurify.client.ts # HTML sanitization plugin for security
+│   │   └── pdfeasy.client.ts   # PDF generation library initialization
+│   └── types/                  # Shared TypeScript type definitions
+│       ├── pdfeasy.d.ts        # Type definitions for PDF generation library
+│       └── types.ts            # Application-wide TypeScript interfaces
+├── locales/                    # Internationalization (i18n) translation files
+│   ├── de.json                 # German language translations
+│   └── en.json                 # English language translations
+│
+├── public/                     # Static files served as-is by the web server
+│   ├── _robots.txt             # Search engine crawling instructions
+│   ├── favicon.ico             # Website favicon for browser tabs
+│   ├── logo-magnify.svg        # SVG logo file for branding
+│   └── images/
+│       ├── hero_image.webp     # Optimized hero section background image
+│       └── og_image.png        # Open Graph social media preview image
+├── server/                     # Server-side code (Nitro / h3)
+│   ├── tsconfig.json           # TypeScript configuration for server code
+│   ├── api/
+│   │   └── request.ts          # Server API endpoint for handling requests
+│   └── assets/
+│       └── _locales/           # Server-side locale assets (legacy structure)
+├── .dockerignore                # Docker build context ignore rules
+├── .env                         # Environment variables for local development
+├── .gitignore                   # Git ignore rules for version control
+├── .nvmrc                       # Node.js version specification for NVM
+├── .prettierrc                  # Prettier code formatting configuration
+├── Dockerfile                   # Docker container configuration for deployment
+├── README.md                    # Project documentation and setup guide
+├── eslint.config.mjs           # ESLint configuration for code quality and style
+├── nuxt.config.ts              # Main Nuxt 4 framework configuration file
+├── package.json                # NPM dependencies and project scripts
+├── package-lock.json           # NPM dependency lock file for consistent installs
+├── tsconfig.json               # TypeScript compiler configuration
 ```
+
+</details>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Features
 
