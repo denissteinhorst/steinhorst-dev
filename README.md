@@ -303,7 +303,7 @@ steinhorst-dev/
 - Lazy loading for better performance
 - Minimal JavaScript bundle size
 - Google Lighthouse optimized: for maximum performance scores
-- WCAG 2.2 accessibility compliance: validated with [AccessibleWeb.com](https://accessibleweb.com/) (Best Practices 102 Tests / Extended AAA-Rating) as well as [WAVE from WebAim.org](https://wave.webaim.org/)
+- WCAG 2.2 accessibility compliance: validated with [AccessibleWeb.com](https://chromewebstore.google.com/detail/accessible-web-helper/gdnpkbipbholkoaggmlblpbmgemddbgb) (Best Practices 102 Tests / Extended AAA-Rating) as well as the WAVE Browser-Plugin [WebAim.org](https://chromewebstore.google.com/detail/wave-evaluation-tool/jbbplnpkjmmeebjpijfedlgcdilocofh)
 
 ### 📊 Interactive Charts
 
