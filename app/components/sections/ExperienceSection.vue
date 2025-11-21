@@ -38,18 +38,8 @@ const timelineStatus = computed(() => {
 
 const timelineItems = computed(() => {
   const cards = data.value?.experienceCards ?? []
-  let filteredCards = cards
 
-  // Skip first card if it's jobsearch-only and badge is disabled
-  if (
-    jobSearchData.value?.isEnabled === false &&
-    cards.length > 0 &&
-    cards[0]?.isJobsearch === true
-  ) {
-    filteredCards = cards.slice(1)
-  }
-
-  return filteredCards.map((card, cardIndex) => ({
+  return cards.map((card, cardIndex) => ({
     date: '',
     title: '',
     description: '',
