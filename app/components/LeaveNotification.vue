@@ -22,6 +22,7 @@ const { data, pending, error } = await useLazyAsyncData<LeaveNotificationRespons
       'openWhatsapp',
       'directMessage',
       'disclaimer',
+      'isEnabled',
     ]),
 )
 const breakpoints = useBreakpoints({ lg: 1024 })
@@ -105,7 +106,7 @@ watch(isOpen, (newValue: boolean, oldValue: boolean) => {
 
   <div v-else-if="error" class="leave-notification">Failed to load leave-notification.</div>
 
-  <div v-else-if="data" class="leave-notification">
+  <div v-else-if="data && data.isEnabled" class="leave-notification">
     <ClientOnly>
       <UModal
         v-if="isOpen"

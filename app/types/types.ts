@@ -468,4 +468,5 @@ export interface LeaveNotificationResponse extends BaseResponse<LeaveNotificatio
   directMessage?: string
   disclaimer?: string
   createdAt?: ISODateString
+  isEnabled?: boolean
 }
