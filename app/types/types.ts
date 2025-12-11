@@ -294,6 +294,31 @@ export interface ProjectSectionResponse extends BaseResponse<ProjectSectionRespo
   footnote?: RichTextNodes
 }
 
+// Featured projects section specific types
+
+/** Individual featured project card */
+export interface FeaturedProjectCard {
+  id?: number
+  name?: string
+  title?: string
+  subtitle?: string
+  description?: string
+  image?: StrapiImage | null
+  link?: string
+  target?: NavigationLinkTarget
+}
+
+/**
+ * Featured projects section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface FeaturedProjectsSectionResponse
+  extends BaseResponse<FeaturedProjectsSectionResponse> {
+  title?: string
+  text?: RichTextNodes
+  jumpmark?: string
+  featureCards?: FeaturedProjectCard[]
+}
+
 // Experience section specific types
 
 /** Individual experience card representing a professional role */
@@ -363,6 +388,26 @@ export interface FaqSectionResponse extends BaseResponse<FaqSectionResponse> {
   text?: RichTextNodes
   jumpmark?: string
   faqItems?: FaqItem[]
+}
+
+// Counter section specific types
+
+/** Individual counter card with statistical information */
+export interface CounterCard {
+  id?: number
+  title?: string
+  text?: string
+  count?: number
+}
+
+/**
+ * Counter section payload. Everything is optional to match flexible CMS responses.
+ */
+export interface CounterSectionResponse extends BaseResponse<CounterSectionResponse> {
+  title?: string
+  text?: RichTextNodes
+  jumpmark?: string
+  counterCards?: CounterCard[]
 }
 
 // Testimonial section specific types
