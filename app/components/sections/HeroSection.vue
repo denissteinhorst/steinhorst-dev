@@ -246,6 +246,7 @@ $block: 'hero-section';
     font-weight: 700;
     background-color: var(--color-primary);
     text-shadow: 0 1px 1px rgba(0, 0, 0, 1);
+    color: #ffffff;
   }
 
   /* Background Elements */

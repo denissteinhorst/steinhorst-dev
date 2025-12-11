@@ -200,11 +200,13 @@ $block: 'contact-card';
     display: flex !important;
     align-items: center;
     gap: 0.5rem;
+    color: #ffffff !important;
 
     :deep(button) {
       width: 100% !important;
       justify-content: center !important;
       display: flex !important;
+      color: #ffffff !important;
     }
 
     :deep() {
