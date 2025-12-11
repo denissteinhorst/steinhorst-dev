@@ -26,7 +26,7 @@ const { data: jobSearchData } = await useAsyncData<JobBadgeResponse>(
   () => cmsRequest<JobBadgeResponse>('job-badge', ['isEnabled'], false, []),
 )
 
-const visibleStationsBase = ref(3)
+const visibleStationsBase = ref(2)
 const isMobile = ref(false)
 
 const headerText = computed<RichTextNodes>(() => data.value?.text ?? [])
@@ -63,13 +63,13 @@ const toggleStations = () => {
   if (visibleStationsBase.value < totalCards) {
     visibleStationsBase.value += 1
   } else {
-    visibleStationsBase.value = isMobile.value ? 2 : 3
+    visibleStationsBase.value = isMobile.value ? 1 : 2
   }
 }
 
 onMounted(() => {
   checkMobile()
-  visibleStationsBase.value = isMobile.value ? 2 : 3
+  visibleStationsBase.value = isMobile.value ? 1 : 2
   window.addEventListener('resize', checkMobile)
 })
 
