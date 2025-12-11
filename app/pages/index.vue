@@ -3,8 +3,10 @@
     <LeaveNotification :blind-top-offset-px="10" />
     <HeroSection />
     <SkillSection />
+    <CounterSection />
     <PersonalitySection />
     <ProjectSection />
+    <FeaturedProjectsSection />
     <ExperienceSection />
     <CertificateSection />
     <FaqSection />

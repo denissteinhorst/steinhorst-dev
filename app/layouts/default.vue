@@ -122,6 +122,10 @@ watch(
   opacity: 0.35;
   animation: ambient-shift-2 300s ease-in-out infinite alternate;
 }
+.dark .ambient-background::before,
+.dark .ambient-background::after {
+  animation: none;
+}
 
 .ambient-background-light {
   background: linear-gradient(

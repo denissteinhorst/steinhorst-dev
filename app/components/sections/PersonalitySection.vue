@@ -30,7 +30,6 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? [])
     :jumpmark="data.jumpmark || ''"
     :header-title="data.title || ''"
     :header-text="headerText"
-    :is-wrapped="true"
     :next-section="'projects'"
   >
     <template #content>
@@ -42,7 +41,7 @@ const headerText = computed<RichTextNodes>(() => data.value?.text ?? [])
           :data-aos-delay="cardIndex * 100"
           class="personality-section__card-wrapper"
         >
-          <BaseCard :is-in-wrapper="true" class="personality-section__card">
+          <BaseCard class="personality-section__card">
             <div class="personality-section__card-content">
               <template v-if="personalityCard.variant === 'polarChart'">
                 <PolarchartCard
@@ -131,6 +130,7 @@ $block: 'personality-section';
     height: 100%;
     display: flex;
     flex-direction: column;
+    background-color: color-mix(in oklab, var(--ui-bg-elevated) 50%, transparent);
   }
 
   &__card {

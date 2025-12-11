@@ -80,6 +80,7 @@ const filteredProjects = computed((): ProjectCard[] => {
     :header-title="data.title || ''"
     :header-text="headerText"
     :footer-text="footerText"
+    :is-wrapped="true"
     :next-section="'experiences'"
   >
     <template #content>

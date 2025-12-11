@@ -3,7 +3,12 @@ defineProps<{ data: LastProjectCard }>()
 </script>
 
 <template>
-  <BaseCard class="project-card-last" role="listitem" aria-labelledby="manual-projects-heading">
+  <BaseCard
+    :is-in-wrapper="true"
+    class="project-card-last"
+    role="listitem"
+    aria-labelledby="manual-projects-heading"
+  >
     <div class="project-card-last__header">
       <h3 id="manual-projects-heading" class="project-card-last__title">
         {{ data.title }}
